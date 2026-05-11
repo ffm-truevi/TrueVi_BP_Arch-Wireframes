@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TrueVi — API Contract (M1.2)</title>
+<style>
+  :root {
+    --tv-canvas:        #030C0F;
+    --tv-rail:          #051318;
+    --tv-card:          #0A2830;
+    --tv-card-hover:    #112F38;
+    --tv-element-mid:   #1A4E5C;
+    --tv-accent:        #245F70;
+    --tv-glow:          #2E7A8A;
+    --tv-cta:           #C9902A;
+    --tv-cta-bright:    #E8A832;
+    --tv-glacia:        #C8E4E8;
+    --tv-secondary:     #8FB8BE;
+    --tv-stone:         #E8E8E2;
+    --tv-text-dark:     #1A1A1A;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--tv-canvas); color: var(--tv-glacia); }
+  body {
+    font-family: "Jost", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-weight: 300; line-height: 1.6; font-size: 15px;
+  }
+  .layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+  nav.toc {
+    background: var(--tv-rail); border-right: 1px solid var(--tv-element-mid);
+    padding: 32px 24px; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  nav.toc h2 { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--tv-secondary); margin: 24px 0 8px; font-weight: 500; }
+  nav.toc h2:first-of-type { margin-top: 0; }
+  nav.toc a { display: block; color: var(--tv-glacia); text-decoration: none; padding: 6px 0 6px 12px; font-size: 13px; border-left: 2px solid transparent; margin-left: -12px; }
+  nav.toc a:hover { color: var(--tv-stone); border-left-color: var(--tv-accent); }
+  main { padding: 48px 64px 96px; max-width: 1080px; }
+  .wordmark { font-family: "Jost", sans-serif; font-weight: 800; color: var(--tv-stone); font-size: 22px; letter-spacing: -0.01em; margin-bottom: 4px; }
+  .tagline { font-family: "Cormorant Garamond", Georgia, serif; font-style: italic; color: var(--tv-secondary); font-size: 14px; margin-bottom: 32px; }
+  h1 { font-family: "Jost", sans-serif; font-weight: 800; color: var(--tv-stone); font-size: 36px; line-height: 1.15; margin: 0 0 8px; }
+  h2 { font-family: "Jost", sans-serif; font-weight: 700; color: var(--tv-stone); font-size: 24px; margin: 56px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--tv-element-mid); }
+  h3 { font-family: "Jost", sans-serif; font-weight: 600; color: var(--tv-stone); font-size: 18px; margin: 32px 0 8px; }
+  h4 { font-family: "Jost", sans-serif; font-weight: 600; color: var(--tv-glacia); font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; margin: 24px 0 6px; }
+  p, li { color: var(--tv-glacia); }
+  strong { color: var(--tv-stone); font-weight: 600; }
+  em { color: var(--tv-secondary); font-style: italic; }
+  .lede { font-size: 17px; color: var(--tv-glacia); margin-bottom: 32px; }
+  .callout {
+    background: var(--tv-card); border-left: 3px solid var(--tv-cta);
+    padding: 18px 22px; margin: 20px 0; border-radius: 0 8px 8px 0;
+  }
+  .callout.principle { border-left-color: var(--tv-glow); }
+  .callout.warning   { border-left-color: var(--tv-cta-bright); }
+  .callout h4 { margin-top: 0; color: var(--tv-stone); }
+  code, pre { font-family: "JetBrains Mono", "Consolas", monospace; }
+  code { background: var(--tv-card); color: var(--tv-glacia); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+  pre {
+    background: var(--tv-rail); border: 1px solid var(--tv-element-mid);
+    border-radius: 8px; padding: 18px 22px; overflow-x: auto;
+    font-size: 13px; line-height: 1.5; color: var(--tv-glacia);
+  }
+  pre code { background: transparent; padding: 0; color: inherit; }
+  pre .k { color: var(--tv-cta-bright); }
+  pre .s { color: var(--tv-glacia); }
+  pre .c { color: var(--tv-secondary); font-style: italic; }
+  pre .n { color: var(--tv-glow); }
+  pre .v { color: #ffd185; }
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
+  th { text-align: left; padding: 10px 14px; background: var(--tv-rail); color: var(--tv-stone); font-weight: 600; border-bottom: 1px solid var(--tv-accent); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--tv-element-mid); color: var(--tv-glacia); vertical-align: top; }
+  tr:hover td { background: var(--tv-card-hover); }
+  .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
+  .pill.post { background: var(--tv-cta); color: var(--tv-text-dark); }
+  .pill.get  { background: var(--tv-glow); color: var(--tv-stone); }
+  .pill.del  { background: #b04545; color: var(--tv-stone); }
+  .pill.note { background: var(--tv-card); color: var(--tv-glacia); border: 1px solid var(--tv-accent); }
+  .docmeta { color: var(--tv-secondary); font-size: 12px; margin-bottom: 40px; padding-bottom: 16px; border-bottom: 1px solid var(--tv-element-mid); }
+  hr { border: none; border-top: 1px solid var(--tv-element-mid); margin: 48px 0; }
+  .endpoint {
+    background: var(--tv-card); border: 1px solid var(--tv-accent);
+    border-radius: 10px; padding: 18px 22px; margin: 18px 0;
+  }
+  .endpoint-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 8px; font-family: "JetBrains Mono", monospace; font-size: 14px;
+  }
+  .endpoint-header .path { color: var(--tv-stone); }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="toc">
+  <div class="wordmark">TrueVi</div>
+  <div class="tagline">API Contract · M1.2</div>
+
+  <h2>Foundations</h2>
+  <a href="#overview">1 · Overview</a>
+  <a href="#conventions">2 · Conventions</a>
+  <a href="#auth">3 · Authentication</a>
+  <a href="#errors">4 · Error Format</a>
+
+  <h2>Schemas</h2>
+  <a href="#schema-identity">5 · Identity</a>
+  <a href="#schema-request">6 · Request Envelope</a>
+  <a href="#schema-content">7 · ContentItem</a>
+  <a href="#schema-component">8 · ComponentInstance</a>
+  <a href="#schema-filled">9 · FilledInstance</a>
+  <a href="#schema-slot">10 · SlotSpec</a>
+  <a href="#schema-signals">11 · DerivedSignals</a>
+  <a href="#schema-experiment">12 · ExperimentAssignment</a>
+  <a href="#schema-why">13 · Why Payload</a>
+
+  <h2>Endpoints</h2>
+  <a href="#ep-compose">14 · POST compose-page</a>
+  <a href="#ep-ask">15 · POST ask-anything</a>
+  <a href="#ep-events">16 · POST events</a>
+  <a href="#ep-inference">17 · GET inference</a>
+  <a href="#ep-health">18 · GET health</a>
+
+  <h2>Events</h2>
+  <a href="#events-taxonomy">19 · Event Taxonomy</a>
+  <a href="#events-payloads">20 · Event Payloads</a>
+
+  <h2>Operations</h2>
+  <a href="#caching">21 · Caching &amp; ETags</a>
+  <a href="#rate-limit">22 · Rate Limiting</a>
+  <a href="#versioning">23 · Versioning</a>
+  <a href="index.html" style="color:var(--tv-cta-bright)">← Back to index</a>
+</nav>
+
+<main>
+
+<div class="docmeta">
+  Document M1.2 · API Contract · v0.1 · 2026-05-11 ·
+  Owner: Brian (COO) · Sign-off: Bunker (CEO) ·
+  Audience: TrueVi engineering team + integration contractors
+</div>
+
+<h1>TrueVi Library — API Contract</h1>
+<p class="lede">
+  The wire protocol between the Page Renderer and the TrueVi Library.
+  Five endpoints, eight canonical schemas, one taxonomy of activity events.
+  Stable across renderer evolution, content backend swaps, and inference
+  engine replacements.
+</p>
+
+<div class="callout principle">
+  <h4>One sentence</h4>
+  <p style="margin:0">
+    The renderer asks the Library to <strong>compose a page</strong> or
+    <strong>answer a question</strong> and reports back <strong>what the
+    user did</strong>. Everything else lives behind that wall.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="overview">1 · Overview</h2>
+
+<table>
+  <thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><span class="pill post">POST</span></td><td><code>/library/compose-page</code></td><td>Render a page composition for a given user + route</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/library/ask-anything</code></td><td>Generate or retrieve a Search Response for an Ask Anything query</td></tr>
+    <tr><td><span class="pill post">POST</span></td><td><code>/library/events</code></td><td>Ingest one or more activity events (fire-and-forget)</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/library/inference/:userId</code></td><td>Read derived signals for a user (admin/debug only)</td></tr>
+    <tr><td><span class="pill get">GET</span></td><td><code>/library/health</code></td><td>Liveness probe</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2 id="conventions">2 · Conventions</h2>
+
+<ul>
+  <li><strong>Transport.</strong> HTTPS only. HTTP/2.</li>
+  <li><strong>Encoding.</strong> JSON, UTF-8. <code>Content-Type: application/json</code>.</li>
+  <li><strong>Time.</strong> RFC 3339, always UTC: <code>2026-05-11T14:32:00Z</code>.</li>
+  <li><strong>IDs.</strong> UUIDv7 for entities (sortable by creation time). Slug strings for human-readable taxonomies (ministry, subject, series).</li>
+  <li><strong>Casing.</strong> <code>camelCase</code> on the wire.</li>
+  <li><strong>Null vs missing.</strong> Optional fields are omitted, not nulled. The wire format favors smaller payloads.</li>
+  <li><strong>Booleans.</strong> Always lowercase <code>true</code>/<code>false</code>. Never 0/1.</li>
+  <li><strong>Locale.</strong> Every user-visible string is locale-keyed: <code>{ en: "...", es: "..." }</code>. EN is the fallback.</li>
+  <li><strong>Pagination.</strong> Cursor-based: <code>nextCursor</code> field. No offset pagination.</li>
+  <li><strong>Backwards compatibility.</strong> Additive only. Removing or renaming fields is a major version change (§23).</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="auth">3 · Authentication</h2>
+
+<p>
+  All endpoints accept an <strong>internal service token</strong> issued by
+  the TrueVi platform. The Page Renderer is the sole authorized client; the
+  Library is not directly callable from end-user browsers.
+</p>
+
+<pre><code>Authorization: Bearer &lt;service-token&gt;
+X-TrueVi-Renderer-Version: 2026.05.11
+X-Request-Id: 01919ab0-f8e2-7d34-a3c1-9e2f1c8b5d4a</code></pre>
+
+<ul>
+  <li><code>Authorization</code> — required; rejected with <code>401</code> if missing or invalid</li>
+  <li><code>X-TrueVi-Renderer-Version</code> — required; used for Library-side compatibility logic</li>
+  <li><code>X-Request-Id</code> — recommended; echoed back in responses for trace correlation</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="errors">4 · Error Format</h2>
+
+<p>All errors return a stable shape with a typed code and a human-readable detail.</p>
+
+<pre><code>HTTP 4xx | 5xx
+{
+  <span class="k">"error"</span>: {
+    <span class="k">"code"</span>:     <span class="s">"INVALID_PAGE_TYPE"</span>,
+    <span class="k">"message"</span>:  <span class="s">"Unknown pageType: 'profile'"</span>,
+    <span class="k">"requestId"</span>: <span class="s">"01919ab0-..."</span>,
+    <span class="k">"retryable"</span>: <span class="n">false</span>,
+    <span class="k">"details"</span>:  { <span class="k">"pageType"</span>: <span class="s">"profile"</span> }
+  }
+}</code></pre>
+
+<table>
+  <thead><tr><th>HTTP</th><th>code</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>400</td><td><code>BAD_REQUEST</code></td><td>Malformed JSON or schema violation</td></tr>
+    <tr><td>400</td><td><code>INVALID_PAGE_TYPE</code></td><td>pageType not recognized</td></tr>
+    <tr><td>401</td><td><code>UNAUTHORIZED</code></td><td>Missing or invalid service token</td></tr>
+    <tr><td>404</td><td><code>NOT_FOUND</code></td><td>Resource (route, response hash, user) does not exist</td></tr>
+    <tr><td>409</td><td><code>EXPERIMENT_CONFLICT</code></td><td>Forced variant does not match user's existing assignment</td></tr>
+    <tr><td>422</td><td><code>NO_TEMPLATE_FOR_PAGE_TYPE</code></td><td>No published template exists for this pageType (Library bug or unpublished setup)</td></tr>
+    <tr><td>429</td><td><code>RATE_LIMITED</code></td><td>Renderer exceeded rate; retry-after header included</td></tr>
+    <tr><td>500</td><td><code>INTERNAL</code></td><td>Unexpected server error; safe to retry</td></tr>
+    <tr><td>503</td><td><code>DEGRADED</code></td><td>Library running in fallback mode; response may lack personalization</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2 id="schema-identity">5 · Identity</h2>
+
+<p>Every request carries an identity envelope. The Library uses it to look up inferences, allocate experiments, and write activity events.</p>
+
+<pre><code>Identity {
+  <span class="k">"userId"</span>:       <span class="s">"01919ab0-..."</span>,   <span class="c">// null until signup</span>
+  <span class="k">"anonymousId"</span>:  <span class="s">"01919ab0-..."</span>,   <span class="c">// required, set on first visit</span>
+  <span class="k">"sessionId"</span>:    <span class="s">"01919ab0-..."</span>,   <span class="c">// required, rotates per session</span>
+  <span class="k">"deviceId"</span>:     <span class="s">"01919ab0-..."</span>    <span class="c">// optional, localStorage</span>
+}</code></pre>
+
+<p>
+  <strong>Identity precedence.</strong> When multiple IDs are present, the
+  Library scopes inferences by <code>userId</code> if present, else
+  <code>anonymousId</code>. <code>sessionId</code> is used only for session-level caching and analytics. <code>deviceId</code> is used for cold-start defaults.
+</p>
+
+<!-- ============================================================ -->
+<h2 id="schema-request">6 · Request Envelope</h2>
+
+<p>Per-request signals available to the Library, especially for cold-start.</p>
+
+<pre><code>RequestEnvelope {
+  <span class="k">"timestamp"</span>:     <span class="s">"2026-05-11T14:32:00Z"</span>,
+  <span class="k">"referrer"</span>:      <span class="s">"https://www.google.com/..."</span>,
+  <span class="k">"utm"</span>: {
+    <span class="k">"source"</span>:      <span class="s">"google"</span>,
+    <span class="k">"medium"</span>:      <span class="s">"organic"</span>,
+    <span class="k">"campaign"</span>:    <span class="s">"easter-2026"</span>
+  },
+  <span class="k">"userAgent"</span>:     <span class="s">"Mozilla/5.0 ..."</span>,
+  <span class="k">"deviceClass"</span>:   <span class="s">"desktop"</span>,           <span class="c">// "desktop" | "tablet" | "mobile" | "tv"</span>
+  <span class="k">"ipGeoCountry"</span>:  <span class="s">"US"</span>,                <span class="c">// ISO 3166-1 alpha-2; country only</span>
+  <span class="k">"locale"</span>:        <span class="s">"en-US"</span>,
+  <span class="k">"timezone"</span>:      <span class="s">"America/Chicago"</span>
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2 id="schema-content">7 · ContentItem</h2>
+
+<p>The canonical shape for everything the Library returns as "content." Used uniformly across video, series, ministry, subject, and scripture types.</p>
+
+<pre><code>ContentItem {
+  <span class="k">"contentId"</span>:    <span class="s">"01919ab0-..."</span>,
+  <span class="k">"type"</span>:         <span class="s">"video" | "series" | "ministry" | "subject" | "scripture"</span>,
+  <span class="k">"title"</span>:        { <span class="k">"en"</span>: <span class="s">"How to Forgive"</span> },
+  <span class="k">"description"</span>:  { <span class="k">"en"</span>: <span class="s">"A teaching on Matthew 18..."</span> },
+  <span class="k">"durationSec"</span>:  <span class="n">1845</span>,                                <span class="c">// videos only</span>
+  <span class="k">"thumbnailUrl"</span>: <span class="s">"https://..."</span>,
+  <span class="k">"youtubeId"</span>:    <span class="s">"dQw4w9WgXcQ"</span>,                       <span class="c">// videos only</span>
+
+  <span class="k">"ministry"</span>: {
+    <span class="k">"slug"</span>:       <span class="s">"mercy-hill"</span>,
+    <span class="k">"name"</span>:       <span class="s">"Mercy Hill Church"</span>,
+    <span class="k">"logoUrl"</span>:    <span class="s">"https://..."</span>,
+    <span class="k">"pastorName"</span>: <span class="s">"Jane Doe"</span>
+  },
+  <span class="k">"series"</span>: {                                              <span class="c">// optional</span>
+    <span class="k">"slug"</span>:           <span class="s">"forgiveness-series"</span>,
+    <span class="k">"episodeNumber"</span>:  <span class="n">3</span>,
+    <span class="k">"totalEpisodes"</span>:  <span class="n">7</span>
+  },
+
+  <span class="c">// taxonomy</span>
+  <span class="k">"subjects"</span>: [
+    { <span class="k">"slug"</span>: <span class="s">"forgiveness"</span>, <span class="k">"weight"</span>: <span class="n">0.9</span> },
+    { <span class="k">"slug"</span>: <span class="s">"family-relationships"</span>, <span class="k">"weight"</span>: <span class="n">0.6</span> }
+  ],
+  <span class="k">"faithStageAlignment"</span>: [
+    { <span class="k">"stage"</span>: <span class="s">"GrowingBeliever"</span>, <span class="k">"alignment"</span>: <span class="n">0.85</span> }
+  ],
+  <span class="k">"lifeStageAlignment"</span>: [
+    { <span class="k">"stage"</span>: <span class="s">"YoungAdult"</span>, <span class="k">"alignment"</span>: <span class="n">0.7</span> },
+    { <span class="k">"stage"</span>: <span class="s">"EstablishedFamily"</span>, <span class="k">"alignment"</span>: <span class="n">0.5</span> }
+  ],
+  <span class="k">"lifeEvents"</span>: [
+    { <span class="k">"tag"</span>: <span class="s">"grief-loss"</span>, <span class="k">"relevance"</span>: <span class="n">0.3</span> }
+  ],
+
+  <span class="c">// theological metadata</span>
+  <span class="k">"denomination"</span>:        <span class="s">"nondenominational"</span>,
+  <span class="k">"theologicalScore"</span>:    <span class="n">0.92</span>,                       <span class="c">// 0..1, guardrail filter floor = 0.75</span>
+  <span class="k">"contentWarnings"</span>:     [],
+  <span class="k">"pastoralReviewStatus"</span>: <span class="s">"approved"</span>,                  <span class="c">// approved | pending | flagged</span>
+
+  <span class="c">// engagement metrics — aggregate, public</span>
+  <span class="k">"metrics"</span>: {
+    <span class="k">"views"</span>:           <span class="n">12450</span>,
+    <span class="k">"completionRate"</span>:  <span class="n">0.61</span>,
+    <span class="k">"saves"</span>:           <span class="n">340</span>,
+    <span class="k">"shares"</span>:          <span class="n">58</span>,
+    <span class="k">"avgDwellSec"</span>:     <span class="n">920</span>
+  },
+
+  <span class="c">// per-user state — filled by Library when identity is known</span>
+  <span class="k">"userState"</span>: {
+    <span class="k">"watchProgress"</span>:  <span class="n">0.42</span>,             <span class="c">// 0..1; 1 = completed</span>
+    <span class="k">"savedAt"</span>:        <span class="s">"2026-04-02T..."</span>,
+    <span class="k">"completedAt"</span>:    <span class="s">null</span>,
+    <span class="k">"lastViewedAt"</span>:   <span class="s">"2026-05-10T..."</span>
+  },
+
+  <span class="c">// monetization</span>
+  <span class="k">"tierRequirement"</span>: <span class="s">"new" | "vine" | "plus" | null</span>,
+
+  <span class="k">"publishedAt"</span>:      <span class="s">"2026-03-12T..."</span>,
+  <span class="k">"updatedAt"</span>:        <span class="s">"2026-04-01T..."</span>
+}</code></pre>
+
+<div class="callout">
+  <h4>userState is conditional</h4>
+  <p style="margin:0">
+    <code>userState</code> is present only when the request carried a known
+    identity (anonymous or authenticated). For pre-cookie or cold-start
+    contexts, the field is absent. The renderer must handle both cases.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="schema-component">8 · ComponentInstance</h2>
+
+<p>The admin-authored shape stored on a template. The renderer never builds this — it is published from the Console and persisted in the Library.</p>
+
+<pre><code>ComponentInstance {
+  <span class="k">"type"</span>:          <span class="s">"ContentRail"</span>,
+  <span class="k">"instanceId"</span>:    <span class="s">"rail-continue-watching-001"</span>,
+  <span class="k">"version"</span>:       <span class="s">"1.4.2"</span>,
+
+  <span class="k">"config"</span>: {
+    <span class="k">"layout"</span>:      <span class="s">"horizontal-scroll"</span>,
+    <span class="k">"cardSize"</span>:    <span class="s">"medium"</span>,
+    <span class="k">"maxItems"</span>:    <span class="n">12</span>,
+    <span class="k">"showAllLink"</span>: <span class="n">true</span>
+  },
+
+  <span class="k">"query"</span>: {
+    <span class="k">"contentType"</span>: <span class="s">"video"</span>,
+    <span class="k">"mode"</span>:        <span class="s">"auto"</span>,                  <span class="c">// or "curated"</span>
+    <span class="k">"sort"</span>:        <span class="s">"recommended"</span>,
+    <span class="k">"filters"</span>: {
+      <span class="k">"faithStage"</span>:   <span class="s">null</span>,                <span class="c">// null = use inference</span>
+      <span class="k">"lifeStage"</span>:    <span class="s">null</span>,
+      <span class="k">"ministry"</span>:     <span class="s">null</span>,
+      <span class="k">"subject"</span>:      <span class="s">null</span>,
+      <span class="k">"tags"</span>:         []
+    },
+    <span class="k">"limit"</span>:       <span class="n">12</span>
+  },
+
+  <span class="k">"personalization"</span>: {
+    <span class="k">"enabled"</span>:    <span class="n">true</span>,
+    <span class="k">"signals"</span>:    [<span class="s">"inferredFaithStage"</span>, <span class="s">"watchHistory"</span>, <span class="s">"exploredSubjects"</span>],
+    <span class="k">"fallback"</span>:   <span class="s">"trending"</span>
+  },
+
+  <span class="k">"visibility"</span>: {
+    <span class="k">"tiers"</span>:          [<span class="s">"new"</span>, <span class="s">"vine"</span>, <span class="s">"plus"</span>],
+    <span class="k">"deviceClasses"</span>:  [<span class="s">"desktop"</span>, <span class="s">"tablet"</span>, <span class="s">"mobile"</span>],
+    <span class="k">"minSessions"</span>:    <span class="n">0</span>,
+    <span class="k">"maxSessions"</span>:    <span class="s">null</span>
+  },
+
+  <span class="k">"copy"</span>: {
+    <span class="k">"en"</span>: { <span class="k">"title"</span>: <span class="s">"Continue Watching"</span>, <span class="k">"cta"</span>: <span class="s">"See all"</span> }
+  }
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2 id="schema-filled">9 · FilledInstance</h2>
+
+<p>What the Library returns inside a composition. The renderer takes this and hydrates the component directly.</p>
+
+<pre><code>FilledInstance {
+  <span class="k">"instanceId"</span>:    <span class="s">"rail-continue-watching-001"</span>,
+  <span class="k">"componentType"</span>: <span class="s">"ContentRail"</span>,
+  <span class="k">"version"</span>:       <span class="s">"1.4.2"</span>,
+
+  <span class="k">"resolvedConfig"</span>: { ... },                       <span class="c">// merged with Library overrides</span>
+  <span class="k">"content"</span>:        [ ContentItem, ContentItem, ... ],
+  <span class="k">"copy"</span>: {
+    <span class="k">"title"</span>:    <span class="s">"Continue Watching"</span>,
+    <span class="k">"subtitle"</span>: <span class="s">null</span>,
+    <span class="k">"cta"</span>:      <span class="s">"See all"</span>
+  },
+  <span class="k">"why"</span>: WhyPayload,                              <span class="c">// see §13</span>
+  <span class="k">"experimentVariant"</span>: <span class="s">"home-v3-variant-B"</span>,
+  <span class="k">"ttl"</span>: <span class="n">900</span>                              <span class="c">// seconds — per-instance override</span>
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2 id="schema-slot">10 · SlotSpec</h2>
+
+<p>The template-level shape of a slot. Stored on the template; never created at render time.</p>
+
+<pre><code>SlotSpec {
+  <span class="k">"slotId"</span>:        <span class="s">"dynamic-rails"</span>,
+  <span class="k">"kind"</span>:          <span class="s">"FIXED" | "DYNAMIC"</span>,
+
+  <span class="c">// FIXED slots — admin pinned a specific component</span>
+  <span class="k">"component"</span>:     <span class="s">"ContentRail"</span>,                  <span class="c">// FIXED only</span>
+  <span class="k">"instance"</span>:      ComponentInstance,                <span class="c">// FIXED only — see §8</span>
+
+  <span class="c">// DYNAMIC slots — admin defined constraints, Library decides</span>
+  <span class="k">"allows"</span>:        [<span class="s">"ContentRail"</span>, <span class="s">"MinistryRail"</span>],   <span class="c">// DYNAMIC only</span>
+  <span class="k">"minCount"</span>:      <span class="n">3</span>,                                <span class="c">// DYNAMIC only</span>
+  <span class="k">"maxCount"</span>:      <span class="n">10</span>,                               <span class="c">// DYNAMIC only</span>
+
+  <span class="c">// shared</span>
+  <span class="k">"tierVisibility"</span>: [<span class="s">"new"</span>, <span class="s">"vine"</span>, <span class="s">"plus"</span>]
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2 id="schema-signals">11 · DerivedSignals</h2>
+
+<p>The user's behavioral profile. See architecture §6 for full taxonomy. The Library exposes a read-only view through <code>GET /library/inference/:userId</code> (§17).</p>
+
+<pre><code>DerivedSignals {
+  <span class="k">"userId"</span>:        <span class="s">"01919ab0-..."</span>,
+  <span class="k">"updatedAt"</span>:     <span class="s">"2026-05-11T14:30:00Z"</span>,
+
+  <span class="k">"inferred"</span>: {
+    <span class="k">"faithStage"</span>:    { <span class="k">"value"</span>: <span class="s">"Seeking"</span>,    <span class="k">"confidence"</span>: <span class="n">0.61</span> },
+    <span class="k">"lifeStage"</span>:     { <span class="k">"value"</span>: <span class="s">"YoungAdult"</span>, <span class="k">"confidence"</span>: <span class="n">0.78</span> },
+    <span class="k">"lifeEvents"</span>:    [
+      { <span class="k">"tag"</span>: <span class="s">"spiritual-doubt"</span>, <span class="k">"confidence"</span>: <span class="n">0.72</span> }
+    ]
+  },
+
+  <span class="k">"behavior"</span>: {
+    <span class="k">"watchPatterns"</span>: {
+      <span class="k">"completionRate"</span>:    <span class="n">0.42</span>,
+      <span class="k">"avgDwellSec"</span>:       <span class="n">680</span>,
+      <span class="k">"formatAffinity"</span>: { <span class="k">"sermon"</span>: <span class="n">0.61</span>, <span class="k">"devotional"</span>: <span class="n">0.22</span> },
+      <span class="k">"preferredSessionMin"</span>: <span class="n">28</span>
+    },
+    <span class="k">"exploredSubjects"</span>:  [{ <span class="k">"subject"</span>: <span class="s">"forgiveness"</span>, <span class="k">"weight"</span>: <span class="n">0.81</span> }],
+    <span class="k">"visitedMinistries"</span>: [{ <span class="k">"slug"</span>: <span class="s">"mercy-hill"</span>, <span class="k">"recencyScore"</span>: <span class="n">0.92</span> }],
+    <span class="k">"searchHistory"</span>:     [{ <span class="k">"query"</span>: <span class="s">"how to forgive"</span>, <span class="k">"intent"</span>: <span class="s">"emotional-pain"</span> }],
+    <span class="k">"askAnythingHistory"</span>:[{ <span class="k">"topic"</span>: <span class="s">"forgiving-father"</span>, <span class="k">"weight"</span>: <span class="n">0.88</span> }],
+    <span class="k">"scriptureEngagement"</span>:[{ <span class="k">"ref"</span>: <span class="s">"Matthew 18:21"</span>, <span class="k">"weight"</span>: <span class="n">0.45</span> }]
+  },
+
+  <span class="k">"session"</span>: {
+    <span class="k">"visitorType"</span>:    <span class="s">"returning"</span>,
+    <span class="k">"sessionNumber"</span>:  <span class="n">7</span>,
+    <span class="k">"timeOfDay"</span>:      <span class="s">"evening"</span>,
+    <span class="k">"dayOfWeek"</span>:      <span class="s">"sunday"</span>
+  }
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2 id="schema-experiment">12 · ExperimentAssignment</h2>
+
+<pre><code>ExperimentAssignment {
+  <span class="k">"experimentId"</span>: <span class="s">"home-hero-carousel-vs-static"</span>,
+  <span class="k">"variantId"</span>:    <span class="s">"variant-B"</span>,
+  <span class="k">"assignedAt"</span>:   <span class="s">"2026-04-22T10:01:23Z"</span>,
+  <span class="k">"assignmentKey"</span>: <span class="s">"userId"</span>            <span class="c">// userId | sessionId | deviceId</span>
+}</code></pre>
+
+<p>
+  Every page composition response carries the active experiment assignments
+  (§14). Every activity event posted by the renderer carries the same
+  assignments (§16) so the Library can attribute outcomes.
+</p>
+
+<!-- ============================================================ -->
+<h2 id="schema-why">13 · Why Payload</h2>
+
+<p>The explainability shape attached to every FilledInstance. Surfaced in Console preview, not to end users.</p>
+
+<pre><code>WhyPayload {
+  <span class="k">"reason"</span>:       <span class="s">"high_engagement_with_forgiveness_subjects"</span>,
+  <span class="k">"confidence"</span>:   <span class="n">0.82</span>,
+  <span class="k">"signalsUsed"</span>:  [<span class="s">"watchHistory"</span>, <span class="s">"exploredSubjects"</span>],
+  <span class="k">"alternativesConsidered"</span>: [
+    { <span class="k">"componentType"</span>: <span class="s">"MinistryRail"</span>, <span class="k">"score"</span>: <span class="n">0.61</span> },
+    { <span class="k">"componentType"</span>: <span class="s">"SeriesRail"</span>,    <span class="k">"score"</span>: <span class="n">0.54</span> }
+  ],
+  <span class="k">"editorialOverride"</span>: <span class="s">null</span>     <span class="c">// or { type: "pin", pinId: "..." }</span>
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2 id="ep-compose">14 · <span class="pill post">POST</span> <code>/library/compose-page</code></h2>
+
+<div class="endpoint">
+  <div class="endpoint-header"><span class="pill post">POST</span><span class="path">/library/compose-page</span></div>
+  <p style="margin:0">
+    Returns the full composition for a page request. One call per page render.
+  </p>
+</div>
+
+<h3>Request</h3>
+<pre><code>{
+  <span class="k">"pageType"</span>:    <span class="s">"home"</span>,
+  <span class="k">"route"</span>:       <span class="s">"/"</span>,
+  <span class="k">"routeParams"</span>: {},                            <span class="c">// e.g. { ministrySlug: "mercy-hill" }</span>
+
+  <span class="k">"identity"</span>:    Identity,
+  <span class="k">"request"</span>:     RequestEnvelope,
+
+  <span class="k">"overrides"</span>: {                                 <span class="c">// optional, QA-only</span>
+    <span class="k">"forceTemplateId"</span>: <span class="s">null</span>,
+    <span class="k">"forceVariant"</span>:    <span class="s">null</span>,
+    <span class="k">"viewAsCohort"</span>:    <span class="s">null</span>                     <span class="c">// "first-visit" | "power" | { userId }</span>
+  }
+}</code></pre>
+
+<h3>Response (200)</h3>
+<pre><code>{
+  <span class="k">"templateId"</span>:       <span class="s">"home-v3"</span>,
+  <span class="k">"templateVersion"</span>:  <span class="s">"1.4.2"</span>,
+  <span class="k">"pageType"</span>:         <span class="s">"home"</span>,
+  <span class="k">"experimentAssignments"</span>: [ ExperimentAssignment, ... ],
+
+  <span class="k">"composition"</span>: {
+    <span class="k">"slots"</span>: [
+      {
+        <span class="k">"slotId"</span>:    <span class="s">"hero"</span>,
+        <span class="k">"kind"</span>:      <span class="s">"FIXED"</span>,
+        <span class="k">"instances"</span>: [ FilledInstance ]
+      },
+      {
+        <span class="k">"slotId"</span>:    <span class="s">"dynamic-rails"</span>,
+        <span class="k">"kind"</span>:      <span class="s">"DYNAMIC"</span>,
+        <span class="k">"instances"</span>: [ FilledInstance, FilledInstance, ... ]
+      }
+    ]
+  },
+
+  <span class="k">"cacheKey"</span>:        <span class="s">"home:user-abc:v3:..."</span>,
+  <span class="k">"ttl"</span>:             <span class="n">900</span>,
+  <span class="k">"serverTime"</span>:      <span class="s">"2026-05-11T14:32:00Z"</span>,
+  <span class="k">"degraded"</span>:        <span class="n">false</span>                 <span class="c">// true when Library is in fallback mode</span>
+}</code></pre>
+
+<h3>Behavior notes</h3>
+<ul>
+  <li>The renderer must respect <code>kind</code>. A FIXED slot will always have exactly one instance. A DYNAMIC slot will have between <code>minCount</code> and <code>maxCount</code> instances (or zero if Library determined nothing fits — see fallback rules in architecture §6).</li>
+  <li>The order of slots in the response is the render order. Do not reorder.</li>
+  <li>Within a DYNAMIC slot, the order of instances is the render order. The Library is responsible for prioritization.</li>
+  <li>When <code>degraded: true</code>, the renderer should display normally — the Library has returned editorial defaults rather than personalized output.</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="ep-ask">15 · <span class="pill post">POST</span> <code>/library/ask-anything</code></h2>
+
+<div class="endpoint">
+  <div class="endpoint-header"><span class="pill post">POST</span><span class="path">/library/ask-anything</span></div>
+  <p style="margin:0">
+    Submit a free-form question. Returns a Search Response composition,
+    optionally retrieved from the semantic cache.
+  </p>
+</div>
+
+<h3>Request</h3>
+<pre><code>{
+  <span class="k">"query"</span>:      <span class="s">"How do I forgive my father?"</span>,
+  <span class="k">"identity"</span>:   Identity,
+  <span class="k">"request"</span>:    RequestEnvelope,
+
+  <span class="k">"context"</span>: {                                <span class="c">// optional — for multi-turn</span>
+    <span class="k">"previousResponseId"</span>: <span class="s">null</span>,
+    <span class="k">"conversationId"</span>:    <span class="s">null</span>
+  }
+}</code></pre>
+
+<h3>Response (200)</h3>
+<pre><code>{
+  <span class="k">"responseId"</span>:     <span class="s">"a3f9c2..."</span>,                <span class="c">// semantic hash</span>
+  <span class="k">"responseUrl"</span>:    <span class="s">"/answer/a3f9c2..."</span>,
+  <span class="k">"templateId"</span>:     <span class="s">"search-response-empathic-v1"</span>,
+  <span class="k">"composition"</span>:    { <span class="k">"slots"</span>: [ ... ] },        <span class="c">// same shape as compose-page</span>
+
+  <span class="k">"meta"</span>: {
+    <span class="k">"cached"</span>:        <span class="n">true</span>,
+    <span class="k">"generatedAt"</span>:   <span class="s">"2026-05-09T..."</span>,
+    <span class="k">"semanticHash"</span>:  <span class="s">"a3f9c2..."</span>,
+    <span class="k">"intent"</span>:        <span class="s">"emotional-pain"</span>,
+    <span class="k">"shareableUrl"</span>:  <span class="s">"https://truevi.tv/answer/a3f9c2..."</span>
+  }
+}</code></pre>
+
+<h3>Notes</h3>
+<ul>
+  <li>Queries are normalized and hashed semantically — equivalent queries return identical responses (architecture §15).</li>
+  <li>The composition is returned in the same shape as <code>compose-page</code> so the renderer hydrates it identically.</li>
+  <li>The Library may select a different <code>templateId</code> per query — the AI picks the right Search Response template (empathic, theological, practical, scripture-heavy) for the intent.</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="ep-events">16 · <span class="pill post">POST</span> <code>/library/events</code></h2>
+
+<div class="endpoint">
+  <div class="endpoint-header"><span class="pill post">POST</span><span class="path">/library/events</span></div>
+  <p style="margin:0">
+    Ingest activity events. Batched. Fire-and-forget. The renderer does not
+    block on responses.
+  </p>
+</div>
+
+<h3>Request</h3>
+<pre><code>{
+  <span class="k">"identity"</span>: Identity,
+  <span class="k">"events"</span>: [
+    {
+      <span class="k">"eventType"</span>:             <span class="s">"video_completed"</span>,
+      <span class="k">"timestamp"</span>:             <span class="s">"2026-05-11T14:32:45.231Z"</span>,
+      <span class="k">"slotId"</span>:               <span class="s">"dynamic-rails"</span>,
+      <span class="k">"componentInstanceId"</span>:   <span class="s">"rail-continue-watching-001"</span>,
+      <span class="k">"contentId"</span>:             <span class="s">"01919ab0-..."</span>,
+      <span class="k">"experimentAssignments"</span>: [ ExperimentAssignment, ... ],
+      <span class="k">"payload"</span>: {
+        <span class="k">"durationSec"</span>:     <span class="n">1845</span>,
+        <span class="k">"watchedSec"</span>:      <span class="n">1820</span>,
+        <span class="k">"completionPct"</span>:   <span class="n">0.99</span>
+      }
+    },
+    { ... },
+    { ... }
+  ]
+}</code></pre>
+
+<h3>Response (202 Accepted)</h3>
+<pre><code>{ <span class="k">"accepted"</span>: <span class="n">3</span>, <span class="k">"rejected"</span>: <span class="n">0</span> }</code></pre>
+
+<h3>Behavior notes</h3>
+<ul>
+  <li>The endpoint always returns <code>202 Accepted</code> on a well-formed batch — never <code>200</code>. Processing is asynchronous.</li>
+  <li>Rejected events are dropped silently; the renderer is not expected to retry. Lost events are acceptable.</li>
+  <li>Batch size soft-limit: 50 events. Hard-limit: 200. Larger batches are split or partial-rejected.</li>
+  <li>The browser may send events via <code>navigator.sendBeacon</code> on page unload — the endpoint must accept those payloads.</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="ep-inference">17 · <span class="pill get">GET</span> <code>/library/inference/:userId</code></h2>
+
+<div class="endpoint">
+  <div class="endpoint-header"><span class="pill get">GET</span><span class="path">/library/inference/{userId}</span></div>
+  <p style="margin:0">
+    Read derived signals for a user. Admin/debug only — used by Console
+    "View as User" mode and the inference inspector.
+  </p>
+</div>
+
+<h3>Response (200)</h3>
+<pre><code>DerivedSignals  <span class="c">// see §11</span></code></pre>
+
+<p>
+  Returns <code>404</code> if no signals exist for the user yet (e.g.,
+  pre-first-event). Caller should handle as a cold-start case.
+</p>
+
+<!-- ============================================================ -->
+<h2 id="ep-health">18 · <span class="pill get">GET</span> <code>/library/health</code></h2>
+
+<pre><code>200 OK
+{
+  <span class="k">"status"</span>:           <span class="s">"healthy"</span>,
+  <span class="k">"version"</span>:          <span class="s">"2026.05.11.1"</span>,
+  <span class="k">"templateCacheLag"</span>: <span class="n">2.4</span>,                  <span class="c">// seconds</span>
+  <span class="k">"inferenceLag"</span>:     <span class="n">14.1</span>,                 <span class="c">// seconds since last warm-tier run</span>
+  <span class="k">"degraded"</span>:         <span class="n">false</span>
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2 id="events-taxonomy">19 · Event Taxonomy</h2>
+
+<p>The complete set of event types the renderer may emit. Adding new types is additive (minor version); removing or renaming is a major version change.</p>
+
+<table>
+  <thead><tr><th style="width:24%">eventType</th><th style="width:14%">Fires when</th><th>Required payload fields</th></tr></thead>
+  <tbody>
+    <tr><td><code>page_view</code></td><td>Page composition rendered</td><td><code>pageType, templateId, route</code></td></tr>
+    <tr><td><code>impression</code></td><td>Slot enters viewport</td><td><code>slotId, componentInstanceId</code></td></tr>
+    <tr><td><code>card_impression</code></td><td>Individual card enters viewport</td><td><code>componentInstanceId, contentId, position</code></td></tr>
+    <tr><td><code>click</code></td><td>Any clickable element</td><td><code>componentInstanceId, target ("card" / "cta" / "title")</code></td></tr>
+    <tr><td><code>dwell</code></td><td>Cursor or focus on element &gt;1s</td><td><code>componentInstanceId, dwellMs</code></td></tr>
+    <tr><td><code>video_started</code></td><td>YouTube player play event</td><td><code>contentId</code></td></tr>
+    <tr><td><code>video_progress</code></td><td>Quartile marks: 10/25/50/75/95%</td><td><code>contentId, progressPct</code></td></tr>
+    <tr><td><code>video_completed</code></td><td>&gt;95% watched OR end-of-video event</td><td><code>contentId, watchedSec, completionPct</code></td></tr>
+    <tr><td><code>video_abandoned</code></td><td>Player closed before completion</td><td><code>contentId, watchedSec, completionPct</code></td></tr>
+    <tr><td><code>save_added</code></td><td>User saved content</td><td><code>contentId</code></td></tr>
+    <tr><td><code>save_removed</code></td><td>User unsaved content</td><td><code>contentId</code></td></tr>
+    <tr><td><code>share_initiated</code></td><td>Share button clicked</td><td><code>contentId, channel</code></td></tr>
+    <tr><td><code>ask_anything_submitted</code></td><td>Query submitted</td><td><code>query, queryLength, fromSlotId</code></td></tr>
+    <tr><td><code>ask_anything_response_viewed</code></td><td>Response page rendered</td><td><code>responseId, semanticHash</code></td></tr>
+    <tr><td><code>search_performed</code></td><td>Search form submitted</td><td><code>query, scope ("global" | "ministry"), ministrySlug?</code></td></tr>
+    <tr><td><code>search_result_clicked</code></td><td>Result selected</td><td><code>query, contentId, position</code></td></tr>
+    <tr><td><code>filter_applied</code></td><td>Filter chip toggled</td><td><code>filterType, value</code></td></tr>
+    <tr><td><code>ministry_visited</code></td><td>Ministry landing page viewed</td><td><code>ministrySlug</code></td></tr>
+    <tr><td><code>series_visited</code></td><td>Series page viewed</td><td><code>seriesSlug, ministrySlug</code></td></tr>
+    <tr><td><code>subject_explored</code></td><td>Subject page viewed</td><td><code>subjectSlug</code></td></tr>
+    <tr><td><code>scripture_viewed</code></td><td>Scripture reader opened</td><td><code>scriptureRef, translation</code></td></tr>
+    <tr><td><code>upgrade_teaser_shown</code></td><td>Teaser entered viewport</td><td><code>teaserId, currentTier, targetTier</code></td></tr>
+    <tr><td><code>upgrade_teaser_clicked</code></td><td>Teaser CTA clicked</td><td><code>teaserId, targetTier</code></td></tr>
+    <tr><td><code>upgrade_teaser_dismissed</code></td><td>Teaser closed</td><td><code>teaserId</code></td></tr>
+    <tr><td><code>signup_started</code></td><td>Signup flow entered</td><td><code>fromSlotId?, fromTeaserId?</code></td></tr>
+    <tr><td><code>signup_completed</code></td><td>Account created</td><td><code>tier, attributionPath</code></td></tr>
+    <tr><td><code>experiment_exposure</code></td><td>User saw an experiment variant</td><td><code>experimentId, variantId</code></td></tr>
+    <tr><td><code>error</code></td><td>Renderer caught a non-fatal error</td><td><code>code, message, componentInstanceId?</code></td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2 id="events-payloads">20 · Event Payloads — example detail</h2>
+
+<h3><code>video_completed</code></h3>
+<pre><code>{
+  <span class="k">"eventType"</span>: <span class="s">"video_completed"</span>,
+  <span class="k">"timestamp"</span>: <span class="s">"2026-05-11T14:32:45Z"</span>,
+  <span class="k">"slotId"</span>:    <span class="s">"dynamic-rails"</span>,
+  <span class="k">"componentInstanceId"</span>: <span class="s">"rail-continue-watching-001"</span>,
+  <span class="k">"contentId"</span>: <span class="s">"01919ab0-..."</span>,
+  <span class="k">"experimentAssignments"</span>: [ ... ],
+  <span class="k">"payload"</span>: {
+    <span class="k">"durationSec"</span>:   <span class="n">1845</span>,
+    <span class="k">"watchedSec"</span>:    <span class="n">1820</span>,
+    <span class="k">"completionPct"</span>: <span class="n">0.99</span>,
+    <span class="k">"deviceClass"</span>:   <span class="s">"desktop"</span>,
+    <span class="k">"abTestExposed"</span>: <span class="n">true</span>
+  }
+}</code></pre>
+
+<h3><code>ask_anything_submitted</code></h3>
+<pre><code>{
+  <span class="k">"eventType"</span>: <span class="s">"ask_anything_submitted"</span>,
+  <span class="k">"timestamp"</span>: <span class="s">"2026-05-11T14:30:01Z"</span>,
+  <span class="k">"componentInstanceId"</span>: <span class="s">"ask-anything-hero"</span>,
+  <span class="k">"payload"</span>: {
+    <span class="k">"query"</span>:        <span class="s">"how do i forgive my father"</span>,
+    <span class="k">"queryLength"</span>:  <span class="n">28</span>,
+    <span class="k">"fromSlotId"</span>:   <span class="s">"ask-anything"</span>,
+    <span class="k">"fromPageType"</span>: <span class="s">"home"</span>
+  }
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2 id="caching">21 · Caching &amp; ETags</h2>
+
+<p>The Library uses both HTTP-level and application-level caching.</p>
+
+<table>
+  <thead><tr><th>Header</th><th>Used by</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>Cache-Control</code></td><td>compose-page, ask-anything</td><td><code>private, max-age=&lt;ttl&gt;</code> — respects per-user TTL</td></tr>
+    <tr><td><code>ETag</code></td><td>compose-page</td><td>Composition fingerprint; renderer may send <code>If-None-Match</code> on revisit</td></tr>
+    <tr><td><code>Vary</code></td><td>compose-page</td><td>Always includes <code>X-TrueVi-Identity</code> so CDN doesn't cross-bleed</td></tr>
+    <tr><td><code>Age</code></td><td>compose-page</td><td>Seconds since the composition was generated</td></tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <h4>304 Not Modified</h4>
+  <p style="margin:0">
+    The renderer is encouraged to send <code>If-None-Match</code> when
+    re-fetching a page. The Library returns <code>304</code> if the
+    composition would be identical, saving the full payload.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="rate-limit">22 · Rate Limiting</h2>
+
+<p>The Library enforces per-renderer rate limits.</p>
+
+<table>
+  <thead><tr><th>Endpoint</th><th>Limit (per renderer instance)</th></tr></thead>
+  <tbody>
+    <tr><td><code>compose-page</code></td><td>200 req/s sustained · 500 burst</td></tr>
+    <tr><td><code>ask-anything</code></td><td>20 req/s sustained · 50 burst</td></tr>
+    <tr><td><code>events</code></td><td>2000 req/s sustained · 5000 burst</td></tr>
+    <tr><td><code>inference</code></td><td>10 req/s sustained · 20 burst</td></tr>
+  </tbody>
+</table>
+
+<p>
+  When exceeded, Library returns <code>429</code> with a
+  <code>Retry-After</code> header. The renderer should fall back to the
+  most recent cached composition if available; otherwise render a degraded
+  page from editorial defaults.
+</p>
+
+<!-- ============================================================ -->
+<h2 id="versioning">23 · Versioning</h2>
+
+<p>
+  The API is versioned via the URL path and the renderer header. Current
+  major version: <strong>v1</strong>.
+</p>
+
+<pre><code>https://library.truevi.internal/v1/compose-page
+X-TrueVi-Renderer-Version: 2026.05.11</code></pre>
+
+<ul>
+  <li><strong>Minor changes</strong> (additive fields, new event types, new pageTypes) — no version bump; renderers ignore unknown fields gracefully.</li>
+  <li><strong>Major changes</strong> (removing fields, changing field semantics, restructuring composition shape) — new path prefix (<code>/v2</code>); both versions served in parallel until migration is complete.</li>
+  <li><strong>Renderer-version header</strong> — the Library uses this to apply compatibility shims for older renderers in production while a new version is deploying.</li>
+</ul>
+
+<hr/>
+
+<p style="color:var(--tv-secondary); font-size: 12px; text-align: center;">
+  Previous: <a href="00-architecture.html" style="color:var(--tv-cta-bright)">00 · Architecture</a> ·
+  Next: <a href="02-data-model.html" style="color:var(--tv-cta-bright)">02 · Data Model</a> ·
+  <a href="../index.html" style="color:var(--tv-cta-bright)">Index</a>
+</p>
+
+</main>
+</div>
+</body>
+</html>

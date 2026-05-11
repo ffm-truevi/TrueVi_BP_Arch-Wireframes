@@ -1,0 +1,922 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TrueVi — Data Model (M1.3)</title>
+<style>
+  :root {
+    --tv-canvas:        #030C0F;
+    --tv-rail:          #051318;
+    --tv-card:          #0A2830;
+    --tv-card-hover:    #112F38;
+    --tv-element-mid:   #1A4E5C;
+    --tv-accent:        #245F70;
+    --tv-glow:          #2E7A8A;
+    --tv-cta:           #C9902A;
+    --tv-cta-bright:    #E8A832;
+    --tv-glacia:        #C8E4E8;
+    --tv-secondary:     #8FB8BE;
+    --tv-stone:         #E8E8E2;
+    --tv-text-dark:     #1A1A1A;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--tv-canvas); color: var(--tv-glacia); }
+  body { font-family: "Jost", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-weight: 300; line-height: 1.6; font-size: 15px; }
+  .layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+  nav.toc { background: var(--tv-rail); border-right: 1px solid var(--tv-element-mid); padding: 32px 24px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  nav.toc h2 { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--tv-secondary); margin: 24px 0 8px; font-weight: 500; }
+  nav.toc h2:first-of-type { margin-top: 0; }
+  nav.toc a { display: block; color: var(--tv-glacia); text-decoration: none; padding: 6px 0 6px 12px; font-size: 13px; border-left: 2px solid transparent; margin-left: -12px; }
+  nav.toc a:hover { color: var(--tv-stone); border-left-color: var(--tv-accent); }
+  main { padding: 48px 64px 96px; max-width: 1080px; }
+  .wordmark { font-family: "Jost", sans-serif; font-weight: 800; color: var(--tv-stone); font-size: 22px; letter-spacing: -0.01em; margin-bottom: 4px; }
+  .tagline { font-family: "Cormorant Garamond", Georgia, serif; font-style: italic; color: var(--tv-secondary); font-size: 14px; margin-bottom: 32px; }
+  h1 { font-family: "Jost", sans-serif; font-weight: 800; color: var(--tv-stone); font-size: 36px; line-height: 1.15; margin: 0 0 8px; }
+  h2 { font-family: "Jost", sans-serif; font-weight: 700; color: var(--tv-stone); font-size: 24px; margin: 56px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--tv-element-mid); }
+  h3 { font-family: "Jost", sans-serif; font-weight: 600; color: var(--tv-stone); font-size: 18px; margin: 32px 0 8px; }
+  h4 { font-family: "Jost", sans-serif; font-weight: 600; color: var(--tv-glacia); font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; margin: 24px 0 6px; }
+  p, li { color: var(--tv-glacia); }
+  strong { color: var(--tv-stone); font-weight: 600; }
+  em { color: var(--tv-secondary); font-style: italic; }
+  .lede { font-size: 17px; color: var(--tv-glacia); margin-bottom: 32px; }
+  .callout { background: var(--tv-card); border-left: 3px solid var(--tv-cta); padding: 18px 22px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+  .callout.principle { border-left-color: var(--tv-glow); }
+  .callout.warning   { border-left-color: var(--tv-cta-bright); }
+  .callout h4 { margin-top: 0; color: var(--tv-stone); }
+  code, pre { font-family: "JetBrains Mono", "Consolas", monospace; }
+  code { background: var(--tv-card); color: var(--tv-glacia); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+  pre { background: var(--tv-rail); border: 1px solid var(--tv-element-mid); border-radius: 8px; padding: 18px 22px; overflow-x: auto; font-size: 13px; line-height: 1.5; color: var(--tv-glacia); }
+  pre code { background: transparent; padding: 0; color: inherit; }
+  pre .k { color: var(--tv-cta-bright); }
+  pre .s { color: var(--tv-glacia); }
+  pre .c { color: var(--tv-secondary); font-style: italic; }
+  pre .n { color: var(--tv-glow); }
+  pre .t { color: #ff9a76; }
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
+  th { text-align: left; padding: 10px 14px; background: var(--tv-rail); color: var(--tv-stone); font-weight: 600; border-bottom: 1px solid var(--tv-accent); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--tv-element-mid); color: var(--tv-glacia); vertical-align: top; }
+  tr:hover td { background: var(--tv-card-hover); }
+  .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
+  .pill.pk   { background: var(--tv-cta); color: var(--tv-text-dark); }
+  .pill.fk   { background: var(--tv-accent); color: var(--tv-stone); }
+  .pill.idx  { background: var(--tv-glow); color: var(--tv-stone); }
+  .pill.json { background: var(--tv-card); color: var(--tv-glacia); border: 1px solid var(--tv-accent); }
+  .pill.new  { background: var(--tv-cta); color: var(--tv-text-dark); }
+  .pill.ext  { background: transparent; color: var(--tv-secondary); border: 1px solid var(--tv-accent); }
+  .docmeta { color: var(--tv-secondary); font-size: 12px; margin-bottom: 40px; padding-bottom: 16px; border-bottom: 1px solid var(--tv-element-mid); }
+  hr { border: none; border-top: 1px solid var(--tv-element-mid); margin: 48px 0; }
+  .diagram { background: var(--tv-rail); border: 1px solid var(--tv-element-mid); border-radius: 12px; padding: 28px; margin: 24px 0; text-align: center; overflow-x: auto; }
+  .diagram svg { max-width: 100%; height: auto; }
+  .diagram-caption { color: var(--tv-secondary); font-size: 12px; font-style: italic; margin-top: 12px; }
+  .tbl-card {
+    background: var(--tv-card); border: 1px solid var(--tv-accent);
+    border-radius: 10px; padding: 0; margin: 18px 0; overflow: hidden;
+  }
+  .tbl-head {
+    background: var(--tv-rail); padding: 14px 22px;
+    display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid var(--tv-accent);
+  }
+  .tbl-head .name { font-family: "JetBrains Mono", monospace; color: var(--tv-stone); font-size: 15px; font-weight: 600; }
+  .tbl-body { padding: 0 22px 14px; }
+  .tbl-body table { margin-top: 14px; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="toc">
+  <div class="wordmark">TrueVi</div>
+  <div class="tagline">Data Model · M1.3</div>
+
+  <h2>Foundations</h2>
+  <a href="#overview">1 · Overview</a>
+  <a href="#er">2 · ER Diagram</a>
+  <a href="#conventions">3 · Conventions</a>
+  <a href="#storage">4 · Storage Strategy</a>
+
+  <h2>Authoring</h2>
+  <a href="#templates">5 · templates</a>
+  <a href="#components">6 · components</a>
+  <a href="#routes">7 · routes</a>
+  <a href="#selector_rules">8 · selector_rules</a>
+  <a href="#editorial">9 · editorial_overrides</a>
+
+  <h2>Experimentation</h2>
+  <a href="#experiments">10 · experiments</a>
+  <a href="#assignments">11 · experiment_assignments</a>
+
+  <h2>Content &amp; Library</h2>
+  <a href="#content_items">12 · content_items</a>
+  <a href="#ministries">13 · ministries</a>
+  <a href="#series">14 · series</a>
+  <a href="#subjects">15 · subjects</a>
+  <a href="#search_responses">16 · search_responses</a>
+
+  <h2>Behavior</h2>
+  <a href="#users">17 · users</a>
+  <a href="#identities">18 · identities</a>
+  <a href="#inferences">19 · inferences</a>
+  <a href="#activity_events">20 · activity_events</a>
+  <a href="#content_state">21 · content_state</a>
+
+  <h2>Plan</h2>
+  <a href="#migration">22 · Migration Plan</a>
+  <a href="../index.html" style="color:var(--tv-cta-bright)">← Back to index</a>
+</nav>
+
+<main>
+
+<div class="docmeta">
+  Document M1.3 · Data Model · v0.1 · 2026-05-11 ·
+  Owner: Brian (COO) · Sign-off: Bunker (CEO) ·
+  Audience: TrueVi engineering team
+</div>
+
+<h1>TrueVi Data Model</h1>
+<p class="lede">
+  The persistent shapes that back the architecture (M1.1) and serve the
+  API (M1.2). Seventeen tables, four logical domains, one migration plan
+  from the current SQLite-backed Console.
+</p>
+
+<div class="callout principle">
+  <h4>One sentence</h4>
+  <p style="margin:0">
+    <strong>Authoring</strong> shapes are normalized;
+    <strong>behavioral</strong> shapes are append-only;
+    <strong>content</strong> shapes are mirrored from the CMS; and
+    <strong>inferences</strong> are derived projections kept in their own store
+    so they can be regenerated from raw events at any time.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="overview">1 · Overview</h2>
+
+<table>
+  <thead><tr><th>Domain</th><th>Tables</th><th>Write pattern</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Authoring</strong></td><td>templates · components · routes · selector_rules · editorial_overrides</td><td>Low frequency, version-controlled, console-authored</td></tr>
+    <tr><td><strong>Experimentation</strong></td><td>experiments · experiment_assignments</td><td>Low frequency on experiments; high on assignments</td></tr>
+    <tr><td><strong>Content</strong></td><td>content_items · ministries · series · subjects · search_responses</td><td>Mirrored from CMS pipeline; search_responses written by Library</td></tr>
+    <tr><td><strong>Behavior</strong></td><td>users · identities · inferences · activity_events · content_state</td><td>High-volume, append-only on events; derived on inferences</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2 id="er">2 · ER Diagram</h2>
+
+<div class="diagram">
+<svg viewBox="0 0 980 720" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .tb { fill: #0A2830; stroke: #245F70; stroke-width: 1.5; rx: 8; }
+    .tb-hi { fill: #0A2830; stroke: #C9902A; stroke-width: 1.5; rx: 8; }
+    .ttl { fill: #E8E8E2; font-family: "JetBrains Mono", monospace; font-size: 12px; font-weight: 600; }
+    .row { fill: #C8E4E8; font-family: "JetBrains Mono", monospace; font-size: 10px; }
+    .lnk { stroke: #2E7A8A; stroke-width: 1.2; fill: none; }
+    .lnkGold { stroke: #C9902A; stroke-width: 1.2; fill: none; stroke-dasharray: 3,3; }
+    .dom { fill: #8FB8BE; font-family: Jost; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; }
+  </style>
+
+  <!-- AUTHORING DOMAIN -->
+  <text x="20" y="20" class="dom">Authoring</text>
+  <rect class="tb-hi" x="20" y="30" width="180" height="120"/>
+  <text x="32" y="50" class="ttl">templates</text>
+  <text x="32" y="68"  class="row">id (pk)</text>
+  <text x="32" y="82"  class="row">page_type</text>
+  <text x="32" y="96"  class="row">version</text>
+  <text x="32" y="110" class="row">status</text>
+  <text x="32" y="124" class="row">slots (json)</text>
+  <text x="32" y="138" class="row">inputs (json)</text>
+
+  <rect class="tb" x="220" y="30" width="180" height="100"/>
+  <text x="232" y="50" class="ttl">routes</text>
+  <text x="232" y="68"  class="row">id (pk)</text>
+  <text x="232" y="82"  class="row">path_pattern</text>
+  <text x="232" y="96"  class="row">page_type (fk)</text>
+  <text x="232" y="110" class="row">status</text>
+
+  <rect class="tb" x="420" y="30" width="180" height="120"/>
+  <text x="432" y="50" class="ttl">selector_rules</text>
+  <text x="432" y="68"  class="row">id (pk)</text>
+  <text x="432" y="82"  class="row">page_type</text>
+  <text x="432" y="96"  class="row">priority</text>
+  <text x="432" y="110" class="row">condition (json)</text>
+  <text x="432" y="124" class="row">template_id (fk)</text>
+
+  <rect class="tb" x="620" y="30" width="180" height="120"/>
+  <text x="632" y="50" class="ttl">components</text>
+  <text x="632" y="68"  class="row">id (pk)</text>
+  <text x="632" y="82"  class="row">type</text>
+  <text x="632" y="96"  class="row">version</text>
+  <text x="632" y="110" class="row">schema (json)</text>
+  <text x="632" y="124" class="row">status</text>
+
+  <rect class="tb" x="20" y="170" width="180" height="100"/>
+  <text x="32" y="190" class="ttl">editorial_overrides</text>
+  <text x="32" y="208"  class="row">id (pk)</text>
+  <text x="32" y="222"  class="row">type · pin/block/boost</text>
+  <text x="32" y="236"  class="row">target (json)</text>
+  <text x="32" y="250"  class="row">window (json)</text>
+
+  <!-- EXPERIMENTATION -->
+  <text x="220" y="170" class="dom">Experimentation</text>
+  <rect class="tb" x="220" y="180" width="180" height="100"/>
+  <text x="232" y="200" class="ttl">experiments</text>
+  <text x="232" y="218" class="row">id (pk)</text>
+  <text x="232" y="232" class="row">page_type</text>
+  <text x="232" y="246" class="row">variants (json)</text>
+  <text x="232" y="260" class="row">kpis (json)</text>
+
+  <rect class="tb" x="420" y="180" width="180" height="100"/>
+  <text x="432" y="200" class="ttl">experiment_assignments</text>
+  <text x="432" y="218" class="row">id (pk)</text>
+  <text x="432" y="232" class="row">experiment_id (fk)</text>
+  <text x="432" y="246" class="row">identity (fk)</text>
+  <text x="432" y="260" class="row">variant_id</text>
+
+  <!-- CONTENT -->
+  <text x="20" y="300" class="dom">Content</text>
+  <rect class="tb-hi" x="20" y="310" width="180" height="140"/>
+  <text x="32" y="330" class="ttl">content_items</text>
+  <text x="32" y="348"  class="row">id (pk)</text>
+  <text x="32" y="362"  class="row">type</text>
+  <text x="32" y="376"  class="row">title (json)</text>
+  <text x="32" y="390"  class="row">ministry_id (fk)</text>
+  <text x="32" y="404"  class="row">series_id (fk)</text>
+  <text x="32" y="418"  class="row">taxonomy (json)</text>
+  <text x="32" y="432"  class="row">theological_score</text>
+
+  <rect class="tb" x="220" y="310" width="180" height="120"/>
+  <text x="232" y="330" class="ttl">ministries</text>
+  <text x="232" y="348"  class="row">id (pk)</text>
+  <text x="232" y="362"  class="row">slug</text>
+  <text x="232" y="376"  class="row">name</text>
+  <text x="232" y="390"  class="row">pastor_name</text>
+  <text x="232" y="404"  class="row">youtube_channel_id</text>
+
+  <rect class="tb" x="420" y="310" width="180" height="120"/>
+  <text x="432" y="330" class="ttl">series</text>
+  <text x="432" y="348"  class="row">id (pk)</text>
+  <text x="432" y="362"  class="row">slug</text>
+  <text x="432" y="376"  class="row">ministry_id (fk)</text>
+  <text x="432" y="390"  class="row">episode_count</text>
+  <text x="432" y="404"  class="row">is_complete</text>
+
+  <rect class="tb" x="620" y="310" width="180" height="120"/>
+  <text x="632" y="330" class="ttl">subjects</text>
+  <text x="632" y="348"  class="row">id (pk)</text>
+  <text x="632" y="362"  class="row">slug</text>
+  <text x="632" y="376"  class="row">name</text>
+  <text x="632" y="390"  class="row">life_event_tags</text>
+
+  <rect class="tb-hi" x="820" y="310" width="150" height="120"/>
+  <text x="832" y="330" class="ttl">search_responses</text>
+  <text x="832" y="348" class="row">semantic_hash (pk)</text>
+  <text x="832" y="362" class="row">composition (json)</text>
+  <text x="832" y="376" class="row">share_count</text>
+  <text x="832" y="390" class="row">last_accessed</text>
+  <text x="832" y="404" class="row">tier</text>
+
+  <!-- BEHAVIOR -->
+  <text x="20" y="470" class="dom">Behavior</text>
+  <rect class="tb" x="20" y="480" width="180" height="120"/>
+  <text x="32" y="500" class="ttl">users</text>
+  <text x="32" y="518"  class="row">id (pk)</text>
+  <text x="32" y="532"  class="row">email</text>
+  <text x="32" y="546"  class="row">tier</text>
+  <text x="32" y="560"  class="row">created_at</text>
+
+  <rect class="tb" x="220" y="480" width="180" height="120"/>
+  <text x="232" y="500" class="ttl">identities</text>
+  <text x="232" y="518"  class="row">id (pk)</text>
+  <text x="232" y="532"  class="row">anonymous_id</text>
+  <text x="232" y="546"  class="row">user_id (fk)</text>
+  <text x="232" y="560"  class="row">device_id</text>
+
+  <rect class="tb-hi" x="420" y="480" width="180" height="140"/>
+  <text x="432" y="500" class="ttl">inferences</text>
+  <text x="432" y="518"  class="row">user_id (pk · fk)</text>
+  <text x="432" y="532"  class="row">inferred (json)</text>
+  <text x="432" y="546"  class="row">behavior (json)</text>
+  <text x="432" y="560"  class="row">confidence (json)</text>
+  <text x="432" y="574"  class="row">updated_at</text>
+  <text x="432" y="588"  class="row">computed_from_event_id</text>
+
+  <rect class="tb-hi" x="620" y="480" width="180" height="140"/>
+  <text x="632" y="500" class="ttl">activity_events</text>
+  <text x="632" y="518"  class="row">id (pk)</text>
+  <text x="632" y="532"  class="row">identity_id (fk)</text>
+  <text x="632" y="546"  class="row">event_type</text>
+  <text x="632" y="560"  class="row">timestamp</text>
+  <text x="632" y="574"  class="row">payload (json)</text>
+  <text x="632" y="588"  class="row">experiment_tags (json)</text>
+
+  <rect class="tb" x="820" y="480" width="150" height="120"/>
+  <text x="832" y="500" class="ttl">content_state</text>
+  <text x="832" y="518" class="row">id (pk)</text>
+  <text x="832" y="532" class="row">identity_id (fk)</text>
+  <text x="832" y="546" class="row">content_id (fk)</text>
+  <text x="832" y="560" class="row">watch_progress</text>
+  <text x="832" y="574" class="row">saved_at</text>
+
+  <!-- Relationships -->
+  <path class="lnk" d="M200 90 L 420 110"/>           <!-- selector_rules → templates -->
+  <path class="lnk" d="M220 80  L 200 80"/>           <!-- routes → templates -->
+  <path class="lnk" d="M510 280 L 510 180"/>          <!-- assignments → experiments -->
+  <path class="lnk" d="M200 380 L 220 380"/>          <!-- content_items → ministries -->
+  <path class="lnk" d="M200 400 L 420 380"/>          <!-- content_items → series -->
+  <path class="lnk" d="M400 380 L 420 380"/>          <!-- series → ministries -->
+  <path class="lnk" d="M310 480 L 310 600"/>          <!-- identities → users -->
+  <path class="lnk" d="M510 480 L 510 620"/>          <!-- inferences → activity_events -->
+  <path class="lnk" d="M910 480 L 910 600"/>          <!-- content_state → identities -->
+  <path class="lnkGold" d="M820 540 L 800 540"/>      <!-- content_state → identities -->
+</svg>
+<div class="diagram-caption">Figure 2.1 — Entity-relationship overview. Solid lines = foreign keys. Gold = derived/computed relationships. Highlighted boxes (gold border) are the four tables you should understand first.</div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="conventions">3 · Conventions</h2>
+
+<ul>
+  <li><strong>Primary keys</strong> — UUIDv7 (sortable by creation time). Single-column. Never composite.</li>
+  <li><strong>Foreign keys</strong> — always indexed. Cascade on delete only for owned children (e.g., experiment_assignments cascade with experiments).</li>
+  <li><strong>JSON columns</strong> — used for shapes that evolve (template slots, component config, event payloads). Validated at application layer; storage is type-loose.</li>
+  <li><strong>Timestamps</strong> — every table has <code>created_at</code> and <code>updated_at</code>. RFC 3339 UTC. Default <code>now()</code>.</li>
+  <li><strong>Soft delete</strong> — authoring tables (templates, components, etc.) carry <code>archived_at</code>; never hard-deleted. Behavioral tables are hard-deleted on data subject deletion request.</li>
+  <li><strong>Status field</strong> — authoring tables use <code>status enum('draft','published','archived')</code>.</li>
+  <li><strong>Versioning</strong> — templates and components have explicit <code>version</code> columns (semver-ish strings). Multiple versions coexist; only one is "published" at a time.</li>
+  <li><strong>Naming</strong> — table names are snake_case plural. Column names snake_case singular.</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="storage">4 · Storage Strategy</h2>
+
+<table>
+  <thead><tr><th>Domain</th><th>Engine</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Authoring</td>
+      <td>Postgres (Cloud SQL)</td>
+      <td>Low-volume, transactional, foreign-key heavy. Already in the GCP plan.</td>
+    </tr>
+    <tr>
+      <td>Experimentation</td>
+      <td>Postgres</td>
+      <td>Same row shape as authoring; reuse the cluster.</td>
+    </tr>
+    <tr>
+      <td>Content</td>
+      <td>Postgres + Vector index</td>
+      <td>Postgres for the row, an attached vector store (pgvector or external) for semantic embeddings.</td>
+    </tr>
+    <tr>
+      <td>Activity events</td>
+      <td>Append-only event store (BigQuery or Postgres partitioned)</td>
+      <td>Volume can exceed 10M rows/day at scale. Time-partitioned. Never UPDATE, only INSERT.</td>
+    </tr>
+    <tr>
+      <td>Inferences</td>
+      <td>Postgres + Redis hot cache</td>
+      <td>Postgres is the durable copy; Redis serves reads inside the request path.</td>
+    </tr>
+    <tr>
+      <td>Search responses</td>
+      <td>Postgres (hot) + Object storage (cold)</td>
+      <td>Recent and shared responses in Postgres; long-cold responses serialize to GCS and regenerate on demand.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <h4>Single Postgres instance for Phase 1</h4>
+  <p style="margin:0">
+    Phase 1 ships everything in one Postgres database. Activity events live
+    in a partitioned table. BigQuery moves in when volume justifies it
+    (likely Phase 3). The schema is designed so the move requires no
+    application-layer rewrites — only the event-write path changes.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="templates">5 · templates</h2>
+
+<div class="tbl-card">
+  <div class="tbl-head"><span class="name">templates</span><span class="pill new">new</span></div>
+  <div class="tbl-body">
+    <p>The shape of a page. A template is a page-type plus an ordered list of slots.</p>
+    <table>
+      <thead><tr><th style="width:20%">Column</th><th style="width:18%">Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code> <span class="pill pk">pk</span></td><td>uuid</td><td>UUIDv7</td></tr>
+        <tr><td><code>page_type</code></td><td>text</td><td>home · ministry · subject · series · search · search-response · custom</td></tr>
+        <tr><td><code>name</code></td><td>text</td><td>Human label for Console UI</td></tr>
+        <tr><td><code>version</code></td><td>text</td><td>e.g. "1.4.2"</td></tr>
+        <tr><td><code>status</code></td><td>enum</td><td>draft · published · archived</td></tr>
+        <tr><td><code>slots</code> <span class="pill json">json</span></td><td>jsonb</td><td>Array of SlotSpec (M1.2 §10)</td></tr>
+        <tr><td><code>inputs</code> <span class="pill json">json</span></td><td>jsonb</td><td>Typed slot variables: <code>[{name:"ministrySlug", type:"string"}]</code></td></tr>
+        <tr><td><code>tier_visibility</code> <span class="pill json">json</span></td><td>jsonb</td><td>Default tier set if no slot overrides</td></tr>
+        <tr><td><code>created_by</code></td><td>text</td><td>Admin user id</td></tr>
+        <tr><td><code>created_at, updated_at, archived_at</code></td><td>timestamptz</td><td></td></tr>
+      </tbody>
+    </table>
+    <h4>Indexes</h4>
+    <ul>
+      <li><code>(page_type, status)</code> — common lookup: "all published templates for home"</li>
+      <li><code>(page_type, status, version DESC)</code> — pick newest published version</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="components">6 · components</h2>
+
+<div class="tbl-card">
+  <div class="tbl-head"><span class="name">components</span><span class="pill new">new</span></div>
+  <div class="tbl-body">
+    <p>The registry of component types available to templates. Stores each component's allowed config and query schema.</p>
+    <table>
+      <thead><tr><th style="width:20%">Column</th><th style="width:18%">Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code> <span class="pill pk">pk</span></td><td>uuid</td><td></td></tr>
+        <tr><td><code>type</code></td><td>text</td><td>Hero · ContentRail · Grid · AskAnythingBlock · ScriptureBlock · etc.</td></tr>
+        <tr><td><code>version</code></td><td>text</td><td>Multiple versions coexist</td></tr>
+        <tr><td><code>config_schema</code> <span class="pill json">json</span></td><td>jsonb</td><td>JSON Schema for the <code>config</code> object</td></tr>
+        <tr><td><code>query_schema</code> <span class="pill json">json</span></td><td>jsonb</td><td>JSON Schema for the <code>query</code> object</td></tr>
+        <tr><td><code>allowed_signals</code> <span class="pill json">json</span></td><td>jsonb</td><td>Which DerivedSignals this component may consume</td></tr>
+        <tr><td><code>status</code></td><td>enum</td><td>active · deprecated · removed</td></tr>
+        <tr><td><code>preview_url</code></td><td>text</td><td>Reference image for the Console palette</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Unique:</strong> <code>(type, version)</code> — one row per version of a component.</p>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="routes">7 · routes</h2>
+
+<div class="tbl-card">
+  <div class="tbl-head"><span class="name">routes</span><span class="pill new">new</span></div>
+  <div class="tbl-body">
+    <p>Binds URL patterns to page types so the renderer knows which page type to ask for.</p>
+    <table>
+      <thead><tr><th style="width:22%">Column</th><th style="width:18%">Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code> <span class="pill pk">pk</span></td><td>uuid</td><td></td></tr>
+        <tr><td><code>path_pattern</code></td><td>text</td><td>e.g. <code>/ministry/[slug]</code></td></tr>
+        <tr><td><code>page_type</code></td><td>text</td><td></td></tr>
+        <tr><td><code>route_params</code> <span class="pill json">json</span></td><td>jsonb</td><td>Maps URL segments to template inputs</td></tr>
+        <tr><td><code>status</code></td><td>enum</td><td>active · disabled</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Unique:</strong> <code>(path_pattern)</code></p>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="selector_rules">8 · selector_rules</h2>
+
+<div class="tbl-card">
+  <div class="tbl-head"><span class="name">selector_rules</span><span class="pill new">new</span></div>
+  <div class="tbl-body">
+    <p>Admin-authored rules that decide which template fires for which user, per page type.</p>
+    <table>
+      <thead><tr><th style="width:22%">Column</th><th style="width:18%">Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code> <span class="pill pk">pk</span></td><td>uuid</td><td></td></tr>
+        <tr><td><code>page_type</code></td><td>text</td><td></td></tr>
+        <tr><td><code>name</code></td><td>text</td><td>Human label</td></tr>
+        <tr><td><code>priority</code></td><td>int</td><td>Lower wins; first match wins</td></tr>
+        <tr><td><code>condition</code> <span class="pill json">json</span></td><td>jsonb</td><td>Predicate against user context: <code>{visitorType:"first-visit"}</code></td></tr>
+        <tr><td><code>template_id</code> <span class="pill fk">fk</span></td><td>uuid</td><td>→ templates.id</td></tr>
+        <tr><td><code>status</code></td><td>enum</td><td>active · disabled</td></tr>
+      </tbody>
+    </table>
+    <h4>Indexes</h4>
+    <ul><li><code>(page_type, status, priority)</code> — rule evaluation</li></ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="editorial">9 · editorial_overrides</h2>
+
+<div class="tbl-card">
+  <div class="tbl-head"><span class="name">editorial_overrides</span><span class="pill new">new</span></div>
+  <div class="tbl-body">
+    <p>Pins, Blocks, and Boosts — the human escape hatch from Library decisions (M1.1 §13).</p>
+    <table>
+      <thead><tr><th style="width:22%">Column</th><th style="width:18%">Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code> <span class="pill pk">pk</span></td><td>uuid</td><td></td></tr>
+        <tr><td><code>type</code></td><td>enum</td><td>pin · block · boost</td></tr>
+        <tr><td><code>target</code> <span class="pill json">json</span></td><td>jsonb</td><td>What is being overridden: <code>{slotId, contentId}</code> for pin, <code>{contentId}</code> for block, <code>{ministrySlug, weight}</code> for boost</td></tr>
+        <tr><td><code>window</code> <span class="pill json">json</span></td><td>jsonb</td><td><code>{startAt, endAt}</code> — auto-expire for pins/boosts</td></tr>
+        <tr><td><code>audience</code> <span class="pill json">json</span></td><td>jsonb</td><td>Optional segment filter</td></tr>
+        <tr><td><code>reason</code></td><td>text</td><td>Audit log — why this exists</td></tr>
+        <tr><td><code>created_by</code></td><td>text</td><td>Admin user</td></tr>
+        <tr><td><code>status</code></td><td>enum</td><td>active · expired · revoked</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="experiments">10 · experiments</h2>
+
+<div class="tbl-card">
+  <div class="tbl-head"><span class="name">experiments</span><span class="pill new">new</span></div>
+  <div class="tbl-body">
+    <table>
+      <thead><tr><th style="width:22%">Column</th><th style="width:18%">Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code> <span class="pill pk">pk</span></td><td>uuid</td><td></td></tr>
+        <tr><td><code>name</code></td><td>text</td><td>Human label</td></tr>
+        <tr><td><code>page_type</code></td><td>text</td><td></td></tr>
+        <tr><td><code>status</code></td><td>enum</td><td>draft · live · paused · concluded</td></tr>
+        <tr><td><code>variants</code> <span class="pill json">json</span></td><td>jsonb</td><td>Array of <code>{id, templateId, allocation}</code></td></tr>
+        <tr><td><code>assignment_key</code></td><td>enum</td><td>userId · sessionId · deviceId</td></tr>
+        <tr><td><code>primary_kpi</code></td><td>text</td><td>watch_completion_rate · return_visit_7d · signup_conversion · ask_anything_engagement</td></tr>
+        <tr><td><code>secondary_kpis</code> <span class="pill json">json</span></td><td>jsonb</td><td></td></tr>
+        <tr><td><code>guardrail_kpis</code> <span class="pill json">json</span></td><td>jsonb</td><td>Auto-pause on regression</td></tr>
+        <tr><td><code>min_sample_size</code></td><td>int</td><td>Per variant</td></tr>
+        <tr><td><code>significance_threshold</code></td><td>numeric(3,2)</td><td>Default 0.95</td></tr>
+        <tr><td><code>started_at, ended_at</code></td><td>timestamptz</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="assignments">11 · experiment_assignments</h2>
+
+<div class="tbl-card">
+  <div class="tbl-head"><span class="name">experiment_assignments</span><span class="pill new">new</span></div>
+  <div class="tbl-body">
+    <p>Stable assignment of an identity to an experiment variant. Same user → same variant for the life of the experiment.</p>
+    <table>
+      <thead><tr><th style="width:22%">Column</th><th style="width:18%">Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code> <span class="pill pk">pk</span></td><td>uuid</td><td></td></tr>
+        <tr><td><code>experiment_id</code> <span class="pill fk">fk</span></td><td>uuid</td><td>→ experiments.id (cascade)</td></tr>
+        <tr><td><code>identity_id</code> <span class="pill fk">fk</span></td><td>uuid</td><td>→ identities.id</td></tr>
+        <tr><td><code>variant_id</code></td><td>text</td><td></td></tr>
+        <tr><td><code>assigned_at</code></td><td>timestamptz</td><td></td></tr>
+        <tr><td><code>migrated_from_anonymous</code></td><td>boolean</td><td>True if the assignment was inherited from an anonymous_id at signup</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Unique:</strong> <code>(experiment_id, identity_id)</code></p>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="content_items">12 · content_items</h2>
+
+<div class="tbl-card">
+  <div class="tbl-head"><span class="name">content_items</span><span class="pill ext">mirrored from CMS</span></div>
+  <div class="tbl-body">
+    <p>The canonical row for everything the Library returns as "content" (videos, series, ministries-as-content, subjects-as-content, scripture).</p>
+    <table>
+      <thead><tr><th style="width:24%">Column</th><th style="width:18%">Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code> <span class="pill pk">pk</span></td><td>uuid</td><td></td></tr>
+        <tr><td><code>type</code></td><td>enum</td><td>video · series · ministry · subject · scripture</td></tr>
+        <tr><td><code>title</code> <span class="pill json">json</span></td><td>jsonb</td><td>Locale-keyed</td></tr>
+        <tr><td><code>description</code> <span class="pill json">json</span></td><td>jsonb</td><td>Locale-keyed</td></tr>
+        <tr><td><code>duration_sec</code></td><td>int</td><td>Videos only</td></tr>
+        <tr><td><code>thumbnail_url</code></td><td>text</td><td></td></tr>
+        <tr><td><code>youtube_id</code></td><td>text</td><td>Videos only</td></tr>
+        <tr><td><code>ministry_id</code> <span class="pill fk">fk</span></td><td>uuid</td><td>→ ministries.id</td></tr>
+        <tr><td><code>series_id</code> <span class="pill fk">fk</span></td><td>uuid</td><td>→ series.id</td></tr>
+        <tr><td><code>episode_number</code></td><td>int</td><td></td></tr>
+        <tr><td><code>subjects</code> <span class="pill json">json</span></td><td>jsonb</td><td>Array of <code>{slug, weight}</code></td></tr>
+        <tr><td><code>faith_stage_alignment</code> <span class="pill json">json</span></td><td>jsonb</td><td></td></tr>
+        <tr><td><code>life_stage_alignment</code> <span class="pill json">json</span></td><td>jsonb</td><td></td></tr>
+        <tr><td><code>life_events</code> <span class="pill json">json</span></td><td>jsonb</td><td></td></tr>
+        <tr><td><code>denomination</code></td><td>text</td><td></td></tr>
+        <tr><td><code>theological_score</code></td><td>numeric(3,2)</td><td>0..1; guardrail floor = 0.75</td></tr>
+        <tr><td><code>content_warnings</code> <span class="pill json">json</span></td><td>jsonb</td><td></td></tr>
+        <tr><td><code>pastoral_review_status</code></td><td>enum</td><td>approved · pending · flagged</td></tr>
+        <tr><td><code>tier_requirement</code></td><td>enum</td><td>new · vine · plus · null</td></tr>
+        <tr><td><code>metrics</code> <span class="pill json">json</span></td><td>jsonb</td><td>Aggregate engagement counters; updated by hot tier</td></tr>
+        <tr><td><code>embedding</code></td><td>vector(1536)</td><td>For semantic search; nullable until embedding job runs</td></tr>
+        <tr><td><code>published_at, updated_at</code></td><td>timestamptz</td><td></td></tr>
+      </tbody>
+    </table>
+    <h4>Indexes</h4>
+    <ul>
+      <li><code>(type, published_at DESC)</code> — recent-content lookups</li>
+      <li><code>(ministry_id)</code>, <code>(series_id)</code></li>
+      <li><code>gin (subjects)</code>, <code>gin (faith_stage_alignment)</code> — taxonomy queries</li>
+      <li><code>ivfflat (embedding)</code> — vector similarity</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="ministries">13 · ministries</h2>
+
+<div class="tbl-card">
+  <div class="tbl-head"><span class="name">ministries</span><span class="pill ext">mirrored from mock-ministries.json today</span></div>
+  <div class="tbl-body">
+    <table>
+      <thead><tr><th style="width:24%">Column</th><th style="width:18%">Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code> <span class="pill pk">pk</span></td><td>uuid</td><td></td></tr>
+        <tr><td><code>slug</code></td><td>text</td><td>Unique</td></tr>
+        <tr><td><code>name</code></td><td>text</td><td></td></tr>
+        <tr><td><code>pastor_name</code></td><td>text</td><td></td></tr>
+        <tr><td><code>tagline</code></td><td>text</td><td></td></tr>
+        <tr><td><code>logo_url</code></td><td>text</td><td></td></tr>
+        <tr><td><code>youtube_channel_id</code></td><td>text</td><td></td></tr>
+        <tr><td><code>denomination</code></td><td>text</td><td></td></tr>
+        <tr><td><code>faith_stage_alignment</code> <span class="pill json">json</span></td><td>jsonb</td><td></td></tr>
+        <tr><td><code>content_tags</code> <span class="pill json">json</span></td><td>jsonb</td><td></td></tr>
+        <tr><td><code>permission_status</code></td><td>enum</td><td>granted · pending · denied</td></tr>
+        <tr><td><code>content_tier</code></td><td>enum</td><td>new · vine · plus</td></tr>
+        <tr><td><code>latest_upload_date</code></td><td>timestamptz</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="series">14 · series</h2>
+
+<div class="tbl-card">
+  <div class="tbl-head"><span class="name">series</span><span class="pill ext">mirrored from mock-series.json today</span></div>
+  <div class="tbl-body">
+    <table>
+      <thead><tr><th style="width:24%">Column</th><th style="width:18%">Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code> <span class="pill pk">pk</span></td><td>uuid</td><td></td></tr>
+        <tr><td><code>slug</code></td><td>text</td><td>Unique within ministry</td></tr>
+        <tr><td><code>ministry_id</code> <span class="pill fk">fk</span></td><td>uuid</td><td></td></tr>
+        <tr><td><code>name</code></td><td>text</td><td></td></tr>
+        <tr><td><code>description</code></td><td>text</td><td></td></tr>
+        <tr><td><code>episode_count</code></td><td>int</td><td></td></tr>
+        <tr><td><code>is_complete</code></td><td>boolean</td><td></td></tr>
+        <tr><td><code>faith_stage_alignment</code> <span class="pill json">json</span></td><td>jsonb</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="subjects">15 · subjects</h2>
+
+<div class="tbl-card">
+  <div class="tbl-head"><span class="name">subjects</span><span class="pill new">new</span></div>
+  <div class="tbl-body">
+    <p>The collections / topic taxonomy that powers Subject pages.</p>
+    <table>
+      <thead><tr><th style="width:24%">Column</th><th style="width:18%">Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code> <span class="pill pk">pk</span></td><td>uuid</td><td></td></tr>
+        <tr><td><code>slug</code></td><td>text</td><td>Unique</td></tr>
+        <tr><td><code>name</code> <span class="pill json">json</span></td><td>jsonb</td><td>Locale-keyed</td></tr>
+        <tr><td><code>description</code> <span class="pill json">json</span></td><td>jsonb</td><td>Locale-keyed</td></tr>
+        <tr><td><code>life_event_tags</code> <span class="pill json">json</span></td><td>jsonb</td><td>Maps to lifestage framework</td></tr>
+        <tr><td><code>scripture_anchors</code> <span class="pill json">json</span></td><td>jsonb</td><td>Default verse references</td></tr>
+        <tr><td><code>parent_subject_id</code> <span class="pill fk">fk</span></td><td>uuid</td><td>Hierarchy (self-fk, nullable)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="search_responses">16 · search_responses</h2>
+
+<div class="tbl-card">
+  <div class="tbl-head"><span class="name">search_responses</span><span class="pill new">new</span></div>
+  <div class="tbl-body">
+    <p>The semantic-hash cache for Ask Anything responses. See architecture §15.</p>
+    <table>
+      <thead><tr><th style="width:24%">Column</th><th style="width:18%">Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>semantic_hash</code> <span class="pill pk">pk</span></td><td>text</td><td>SHA-256 of the normalized query embedding bucket</td></tr>
+        <tr><td><code>normalized_query</code></td><td>text</td><td>For debugging — the canonical form used for hashing</td></tr>
+        <tr><td><code>example_queries</code> <span class="pill json">json</span></td><td>jsonb</td><td>Up to 10 raw queries that mapped to this hash (for analytics)</td></tr>
+        <tr><td><code>template_id</code></td><td>text</td><td>Which Search Response template was used</td></tr>
+        <tr><td><code>composition</code> <span class="pill json">json</span></td><td>jsonb</td><td>The full FilledInstance composition spec</td></tr>
+        <tr><td><code>intent</code></td><td>text</td><td>Classified intent (emotional-pain · theological-question · practical-help · ...)</td></tr>
+        <tr><td><code>share_count</code></td><td>int</td><td>How many times shared</td></tr>
+        <tr><td><code>last_accessed_at</code></td><td>timestamptz</td><td>Drives eviction</td></tr>
+        <tr><td><code>generated_at</code></td><td>timestamptz</td><td></td></tr>
+        <tr><td><code>tier</code></td><td>enum</td><td>hot · warm · cold (cold offloaded to GCS)</td></tr>
+      </tbody>
+    </table>
+    <h4>Indexes</h4>
+    <ul>
+      <li><code>(last_accessed_at)</code> — eviction sweep</li>
+      <li><code>(tier, last_accessed_at)</code> — tier transitions</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="users">17 · users</h2>
+
+<div class="tbl-card">
+  <div class="tbl-head"><span class="name">users</span><span class="pill ext">already exists in current schema</span></div>
+  <div class="tbl-body">
+    <table>
+      <thead><tr><th style="width:24%">Column</th><th style="width:18%">Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code> <span class="pill pk">pk</span></td><td>uuid</td><td></td></tr>
+        <tr><td><code>email</code></td><td>text</td><td>Unique</td></tr>
+        <tr><td><code>first_name, last_name</code></td><td>text</td><td></td></tr>
+        <tr><td><code>tier</code></td><td>enum</td><td>new · vine · plus</td></tr>
+        <tr><td><code>stripe_customer_id</code></td><td>text</td><td></td></tr>
+        <tr><td><code>locale</code></td><td>text</td><td>Default <code>en-US</code></td></tr>
+        <tr><td><code>consent_merge_anon_history</code></td><td>boolean</td><td>Captured at signup</td></tr>
+        <tr><td><code>created_at, updated_at</code></td><td>timestamptz</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="identities">18 · identities</h2>
+
+<div class="tbl-card">
+  <div class="tbl-head"><span class="name">identities</span><span class="pill new">new</span></div>
+  <div class="tbl-body">
+    <p>The single point of identity for the Library. Holds anonymous IDs, the optional link to a user, and the device-level anchor.</p>
+    <table>
+      <thead><tr><th style="width:24%">Column</th><th style="width:18%">Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code> <span class="pill pk">pk</span></td><td>uuid</td><td></td></tr>
+        <tr><td><code>anonymous_id</code></td><td>uuid</td><td>Unique; created on first visit</td></tr>
+        <tr><td><code>user_id</code> <span class="pill fk">fk</span></td><td>uuid</td><td>Nullable until signup → users.id</td></tr>
+        <tr><td><code>device_id</code></td><td>uuid</td><td>localStorage anchor</td></tr>
+        <tr><td><code>first_seen_at</code></td><td>timestamptz</td><td></td></tr>
+        <tr><td><code>last_seen_at</code></td><td>timestamptz</td><td></td></tr>
+        <tr><td><code>session_count</code></td><td>int</td><td>For visitor-type classification</td></tr>
+        <tr><td><code>merged_into_id</code> <span class="pill fk">fk</span></td><td>uuid</td><td>Nullable; set when this identity is collapsed into another</td></tr>
+      </tbody>
+    </table>
+    <h4>Indexes</h4>
+    <ul>
+      <li><code>(anonymous_id)</code> unique</li>
+      <li><code>(user_id)</code></li>
+      <li><code>(device_id)</code></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="inferences">19 · inferences</h2>
+
+<div class="tbl-card">
+  <div class="tbl-head"><span class="name">inferences</span><span class="pill new">new</span></div>
+  <div class="tbl-body">
+    <p>The user's derived signal profile (M1.2 §11). One row per identity. Updated by warm-tier processing.</p>
+    <table>
+      <thead><tr><th style="width:26%">Column</th><th style="width:18%">Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>identity_id</code> <span class="pill pk">pk</span> <span class="pill fk">fk</span></td><td>uuid</td><td>One inference row per identity</td></tr>
+        <tr><td><code>inferred</code> <span class="pill json">json</span></td><td>jsonb</td><td>faithStage, lifeStage, lifeEvents with confidences</td></tr>
+        <tr><td><code>behavior</code> <span class="pill json">json</span></td><td>jsonb</td><td>watchPatterns, exploredSubjects, visitedMinistries, searchHistory, etc.</td></tr>
+        <tr><td><code>session</code> <span class="pill json">json</span></td><td>jsonb</td><td>visitorType, sessionNumber — updated hot-tier</td></tr>
+        <tr><td><code>last_warm_run_at</code></td><td>timestamptz</td><td>Last time warm tier processed this identity</td></tr>
+        <tr><td><code>last_hot_update_at</code></td><td>timestamptz</td><td>Last sync update from event ingest</td></tr>
+        <tr><td><code>events_since_warm</code></td><td>int</td><td>Counter — when crosses threshold (default 10), warm re-runs</td></tr>
+        <tr><td><code>model_version</code></td><td>text</td><td>Inference model that produced this row; allows targeted recompute on retrain</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="activity_events">20 · activity_events</h2>
+
+<div class="tbl-card">
+  <div class="tbl-head"><span class="name">activity_events</span><span class="pill new">new · partitioned</span></div>
+  <div class="tbl-body">
+    <p>Append-only event log. Source of truth for the entire behavioral system. Inferences can always be regenerated from this table.</p>
+    <table>
+      <thead><tr><th style="width:24%">Column</th><th style="width:18%">Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code> <span class="pill pk">pk</span></td><td>uuid</td><td>UUIDv7 — sortable</td></tr>
+        <tr><td><code>identity_id</code> <span class="pill fk">fk</span></td><td>uuid</td><td></td></tr>
+        <tr><td><code>event_type</code></td><td>text</td><td>See M1.2 §19 taxonomy</td></tr>
+        <tr><td><code>timestamp</code></td><td>timestamptz</td><td>Client-supplied, validated server-side</td></tr>
+        <tr><td><code>page_type</code></td><td>text</td><td>For analytics rollups</td></tr>
+        <tr><td><code>slot_id</code></td><td>text</td><td>Nullable</td></tr>
+        <tr><td><code>component_instance_id</code></td><td>text</td><td>Nullable</td></tr>
+        <tr><td><code>content_id</code> <span class="pill fk">fk</span></td><td>uuid</td><td>Nullable → content_items.id</td></tr>
+        <tr><td><code>experiment_tags</code> <span class="pill json">json</span></td><td>jsonb</td><td>Active experiment+variant pairs at the time of the event</td></tr>
+        <tr><td><code>payload</code> <span class="pill json">json</span></td><td>jsonb</td><td>Event-type-specific shape (M1.2 §20)</td></tr>
+        <tr><td><code>request_envelope</code> <span class="pill json">json</span></td><td>jsonb</td><td>Device, locale, geo at time of event</td></tr>
+      </tbody>
+    </table>
+    <h4>Partitioning</h4>
+    <p>Partitioned by <code>RANGE (timestamp)</code> at one-day granularity. Old partitions can be detached and exported to BigQuery / GCS without app changes.</p>
+    <h4>Indexes (per partition)</h4>
+    <ul>
+      <li><code>(identity_id, timestamp DESC)</code> — per-user timeline</li>
+      <li><code>(event_type, timestamp DESC)</code> — type rollups</li>
+      <li><code>(content_id, timestamp DESC)</code> — per-content engagement</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="content_state">21 · content_state</h2>
+
+<div class="tbl-card">
+  <div class="tbl-head"><span class="name">content_state</span><span class="pill new">new</span></div>
+  <div class="tbl-body">
+    <p>Per-user state on a specific content item (watch progress, saves). Materialized from activity_events for fast read-path lookups. The "card state" badges (saved / in-progress / completed) come from this table.</p>
+    <table>
+      <thead><tr><th style="width:24%">Column</th><th style="width:18%">Type</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code> <span class="pill pk">pk</span></td><td>uuid</td><td></td></tr>
+        <tr><td><code>identity_id</code> <span class="pill fk">fk</span></td><td>uuid</td><td></td></tr>
+        <tr><td><code>content_id</code> <span class="pill fk">fk</span></td><td>uuid</td><td></td></tr>
+        <tr><td><code>watch_progress</code></td><td>numeric(4,3)</td><td>0..1</td></tr>
+        <tr><td><code>started_at</code></td><td>timestamptz</td><td></td></tr>
+        <tr><td><code>completed_at</code></td><td>timestamptz</td><td>Nullable</td></tr>
+        <tr><td><code>saved_at</code></td><td>timestamptz</td><td>Nullable — null = not saved</td></tr>
+        <tr><td><code>last_viewed_at</code></td><td>timestamptz</td><td></td></tr>
+      </tbody>
+    </table>
+    <p><strong>Unique:</strong> <code>(identity_id, content_id)</code></p>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="migration">22 · Migration Plan</h2>
+
+<p>The current codebase uses SQLite for the Presentation Console config and mock JSON for content. Migration is staged so the live POC keeps working at every step.</p>
+
+<table>
+  <thead><tr><th style="width:8%">Phase</th><th>Action</th><th>Risk</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>P1</strong></td>
+      <td>Stand up Postgres in GCP per the existing infra plan. Create all 17 tables in <code>truevi_library</code> schema. Empty.</td>
+      <td>Low — net-new database, parallel to SQLite</td>
+    </tr>
+    <tr>
+      <td><strong>P2</strong></td>
+      <td>Backfill: import <code>mock-ministries.json</code> → <code>ministries</code>, <code>mock-series.json</code> → <code>series</code>, <code>mock-content.json</code> → <code>content_items</code>. Generate slugs, validate FKs.</td>
+      <td>Low — read-only mocks become read-only seeds</td>
+    </tr>
+    <tr>
+      <td><strong>P3</strong></td>
+      <td>Author the v1 templates that mirror today's pages. Insert into <code>templates</code>. Wire up <code>routes</code> for current URL patterns.</td>
+      <td>Medium — first authoring path; needs Console builder (M2)</td>
+    </tr>
+    <tr>
+      <td><strong>P4</strong></td>
+      <td>Build the Library service. Implement <code>compose-page</code> using P3 templates + P2 content. Renderer reads from Library behind a feature flag, with fallback to current page code.</td>
+      <td>Medium — net-new service, gated rollout</td>
+    </tr>
+    <tr>
+      <td><strong>P5</strong></td>
+      <td>Wire activity event ingestion. Implement <code>identities</code> + <code>content_state</code> materialization. Card-state badges start working off the new tables.</td>
+      <td>Medium — write path goes live</td>
+    </tr>
+    <tr>
+      <td><strong>P6</strong></td>
+      <td>Build warm-tier inference. Populate <code>inferences</code>. Compose-page begins using personalization signals.</td>
+      <td>Higher — inference quality matters; A/B against P4 baseline</td>
+    </tr>
+    <tr>
+      <td><strong>P7</strong></td>
+      <td>Cut over fully: feature flag default flips to Library-served pages. Old page code becomes fallback. Console (M2) is the authoring path.</td>
+      <td>High but reversible — flag can flip back instantly</td>
+    </tr>
+    <tr>
+      <td><strong>P8</strong></td>
+      <td>Backfill remaining: experiments, editorial overrides, search responses, vector embeddings.</td>
+      <td>Low</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout warning">
+  <h4>The SQLite ConsoleConfig stays — for now</h4>
+  <p style="margin:0">
+    Today's Presentation Console writes to a SQLite-backed
+    <code>console_config</code> structure. This system stays intact during
+    P1-P5; it becomes redundant once Console v2 (M2) is live and pointed at
+    Postgres. The deprecation cutover is part of P7.
+  </p>
+</div>
+
+<hr/>
+
+<p style="color:var(--tv-secondary); font-size: 12px; text-align: center;">
+  Previous: <a href="01-api-contract.html" style="color:var(--tv-cta-bright)">01 · API Contract</a> ·
+  <a href="../index.html" style="color:var(--tv-cta-bright)">Index</a> ·
+  Next milestone: M2 (Management Console wireframes)
+</p>
+
+</main>
+</div>
+</body>
+</html>
