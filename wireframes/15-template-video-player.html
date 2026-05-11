@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TrueVi — Video Player Page (M3.9)</title>
+<style>
+  :root {
+    --tv-canvas:#030C0F; --tv-rail:#051318; --tv-card:#0A2830; --tv-card-hover:#112F38;
+    --tv-element-mid:#1A4E5C; --tv-accent:#245F70; --tv-glow:#2E7A8A;
+    --tv-cta:#C9902A; --tv-cta-bright:#E8A832; --tv-glacia:#C8E4E8;
+    --tv-secondary:#8FB8BE; --tv-stone:#E8E8E2; --tv-text-dark:#1A1A1A;
+  }
+  * { box-sizing:border-box; }
+  html, body { margin:0; padding:0; background:var(--tv-canvas); color:var(--tv-glacia); }
+  body { font-family:"Jost","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-weight:300; line-height:1.6; font-size:15px; }
+  .docpage { max-width:1280px; margin:0 auto; padding:48px 32px 96px; }
+  .docmeta { color:var(--tv-secondary); font-size:12px; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--tv-element-mid); }
+  .wordmark { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:22px; margin-bottom:4px; }
+  .tagline { font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; color:var(--tv-secondary); font-size:14px; margin-bottom:24px; }
+  h1 { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:36px; margin:0 0 8px; }
+  h2 { font-family:"Jost",sans-serif; font-weight:700; color:var(--tv-stone); font-size:22px; margin:56px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--tv-element-mid); }
+  h3 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-stone); font-size:16px; margin:28px 0 8px; }
+  h4 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-glacia); font-size:13px; text-transform:uppercase; letter-spacing:.1em; margin:18px 0 6px; }
+  p, li { color:var(--tv-glacia); }
+  strong { color:var(--tv-stone); font-weight:600; }
+  em { color:var(--tv-secondary); font-style:italic; }
+  .lede { font-size:17px; color:var(--tv-glacia); margin-bottom:24px; }
+  .crumb { color:var(--tv-secondary); font-size:13px; margin-bottom:8px; }
+  .crumb a { color:var(--tv-cta-bright); text-decoration:none; }
+  code { font-family:"JetBrains Mono","Consolas",monospace; background:var(--tv-card); color:var(--tv-glacia); padding:2px 6px; border-radius:4px; font-size:13px; }
+  pre { font-family:"JetBrains Mono",monospace; background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:8px; padding:16px 20px; overflow-x:auto; font-size:12px; line-height:1.5; }
+  pre code { background:transparent; padding:0; }
+  pre .k { color: var(--tv-cta-bright); } pre .s { color: var(--tv-glacia); } pre .c { color: var(--tv-secondary); font-style:italic; } pre .n { color: var(--tv-glow); }
+  .callout { background:var(--tv-card); border-left:3px solid var(--tv-cta); padding:14px 18px; margin:18px 0; border-radius:0 6px 6px 0; }
+  .callout.principle { border-left-color: var(--tv-glow); }
+  .callout.warning { border-left-color: var(--tv-cta-bright); }
+  .callout h4 { margin-top:0; color: var(--tv-stone); }
+  table { width:100%; border-collapse:collapse; margin:14px 0; font-size:13px; }
+  th { text-align:left; padding:9px 12px; background:var(--tv-rail); color:var(--tv-stone); font-weight:600; border-bottom:1px solid var(--tv-accent); }
+  td { padding:9px 12px; border-bottom:1px solid var(--tv-element-mid); color:var(--tv-glacia); vertical-align:top; }
+
+  .browser { background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:14px; overflow:hidden; margin:24px 0; box-shadow:0 12px 48px rgba(0,0,0,.4); }
+  .chrome { background:var(--tv-canvas); padding:10px 16px; border-bottom:1px solid var(--tv-element-mid); display:flex; align-items:center; gap:8px; font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--tv-secondary); }
+  .chrome .dot { width:9px; height:9px; border-radius:50%; background:var(--tv-accent); }
+  .chrome .url { margin-left:12px; }
+  .page-mock { padding:0; background:var(--tv-canvas); }
+  .slot-mark { position:absolute; left:-32px; width:24px; height:24px; background:var(--tv-cta); color:var(--tv-text-dark); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:"JetBrains Mono",monospace; font-weight:700; font-size:12px; }
+  .slot { position:relative; border-left:3px solid var(--tv-cta); padding:18px 22px 18px 28px; border-bottom:1px solid var(--tv-element-mid); }
+  .slot.dynamic { border-left-color:var(--tv-cta-bright); border-left-style:dashed; }
+  .slot-meta { color:var(--tv-secondary); font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.08em; margin-bottom:8px; }
+  .slot-meta .kind { display:inline-block; padding:2px 8px; border-radius:999px; font-weight:700; font-size:9px; letter-spacing:.12em; text-transform:uppercase; margin-right:8px; }
+  .slot-meta .kind.fixed { background:var(--tv-accent); color:var(--tv-stone); }
+  .slot-meta .kind.dynamic { background:var(--tv-cta); color:var(--tv-text-dark); }
+
+  .m-bread { color:var(--tv-secondary); font-size:12px; }
+  .m-bread a { color:var(--tv-cta-bright); }
+
+  /* video player */
+  .m-player-wrap { display:grid; grid-template-columns: 1fr 320px; gap:24px; align-items:start; }
+  @media (max-width: 900px) { .m-player-wrap { grid-template-columns: 1fr; } }
+  .m-player {
+    background:#000; border-radius:10px; aspect-ratio: 16/9; position:relative;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--tv-secondary); font-size:14px;
+    overflow:hidden;
+  }
+  .m-player::before {
+    content:""; position:absolute; inset:0;
+    background:radial-gradient(circle at center, rgba(46,122,138,.3), transparent 60%);
+  }
+  .m-player .play-btn {
+    width:74px; height:74px; border-radius:50%; background:var(--tv-cta);
+    color:var(--tv-text-dark); font-size:28px;
+    display:flex; align-items:center; justify-content:center;
+    z-index:1; cursor:pointer;
+  }
+  .m-player .yt-label {
+    position:absolute; bottom:14px; right:14px; color:var(--tv-secondary); font-size:10px;
+    background:rgba(0,0,0,.4); padding:3px 8px; border-radius:3px; z-index:1;
+    font-family:"JetBrains Mono",monospace;
+  }
+
+  .m-meta-side {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:10px;
+    padding:18px;
+  }
+  .m-meta-side h4 { color:var(--tv-stone); font-family:"Jost",sans-serif; font-weight:700; font-size:11px; letter-spacing:.14em; text-transform:uppercase; margin:0 0 10px; }
+  .m-action-row {
+    display:flex; gap:8px; margin-bottom:14px;
+  }
+  .m-action {
+    flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
+    background:transparent; border:1px solid var(--tv-accent); color:var(--tv-glacia);
+    padding:8px 10px; border-radius:6px; font-size:11px; cursor:pointer;
+  }
+  .m-action.primary { background:var(--tv-cta); color:var(--tv-text-dark); border-color:var(--tv-cta); font-weight:600; }
+  .m-meta-row { display:flex; justify-content:space-between; padding:6px 0; font-size:12px; }
+  .m-meta-row .label { color:var(--tv-secondary); }
+  .m-meta-row .value { color:var(--tv-stone); }
+
+  .m-title-bar {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:10px;
+    padding:18px 22px;
+  }
+  .m-title-bar .eyebrow { color:var(--tv-cta-bright); font-size:11px; letter-spacing:.14em; text-transform:uppercase; }
+  .m-title-bar h2 { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:24px; margin:6px 0 8px; line-height:1.2; border:none; padding:0; }
+  .m-title-bar .by { color:var(--tv-glacia); font-size:13px; }
+  .m-title-bar .by .pname { color:var(--tv-stone); font-weight:600; }
+  .m-title-bar .stats { color:var(--tv-secondary); font-size:11px; margin-top:8px; }
+  .m-title-bar .stats .sep { color:var(--tv-element-mid); margin:0 6px; }
+
+  .m-summary {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:10px;
+    padding:22px 26px;
+  }
+  .m-summary .eyebrow { color:var(--tv-secondary); font-size:10px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:8px; }
+  .m-summary .resp { color:var(--tv-stone); font-size:14px; line-height:1.7; }
+  .m-summary .resp em { color:var(--tv-cta-bright); font-style:normal; }
+  .m-summary .resp p { margin: 0 0 12px; }
+  .m-summary .resp p:last-child { margin-bottom:0; }
+  .m-summary .timestamps { margin-top:16px; padding-top:14px; border-top:1px solid var(--tv-element-mid); }
+  .m-summary .ts-row {
+    display:flex; gap:10px; padding:6px 0;
+    font-size:12px; color:var(--tv-glacia); cursor:pointer;
+  }
+  .m-summary .ts-row:hover { color:var(--tv-cta-bright); }
+  .m-summary .ts { font-family:"JetBrains Mono",monospace; color:var(--tv-cta-bright); font-weight:600; min-width:50px; }
+
+  .m-scripture-list { display:flex; flex-direction:column; gap:10px; }
+  .m-scripture {
+    background:var(--tv-card); border-left:3px solid var(--tv-cta); border-radius:0 8px 8px 0;
+    padding:14px 18px;
+  }
+  .m-scripture .verse { font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; color:var(--tv-glacia); font-size:14px; line-height:1.5; }
+  .m-scripture .ref { color:var(--tv-cta-bright); font-size:10px; letter-spacing:.12em; text-transform:uppercase; font-family:"Jost",sans-serif; margin-top:8px; display:block; font-weight:600; }
+  .m-scripture .ts-link { color:var(--tv-secondary); font-size:11px; margin-left:8px; }
+
+  .m-rail .title { color:var(--tv-stone); font-family:"Jost",sans-serif; font-weight:600; font-size:18px; margin-bottom:10px; }
+  .m-rail .subtitle { color:var(--tv-secondary); font-size:12px; margin-bottom:12px; font-style:italic; }
+  .m-cards-row { display:flex; gap:12px; overflow:hidden; }
+  .m-card {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:8px;
+    width:200px; flex-shrink:0; overflow:hidden;
+  }
+  .m-card .thumb { background:linear-gradient(135deg, var(--tv-element-mid), var(--tv-card)); height:110px; }
+  .m-card .body { padding:10px 12px; }
+  .m-card .ttl { color:var(--tv-stone); font-weight:600; font-size:13px; line-height:1.2; }
+  .m-card .meta { color:var(--tv-secondary); font-size:11px; margin-top:4px; }
+
+  .m-journey-prompt {
+    background:linear-gradient(135deg, rgba(46,122,138,.18), rgba(201,144,42,.10));
+    border:1px solid var(--tv-glow); border-radius:10px; padding:22px 26px;
+    display:flex; align-items:center; gap:20px;
+  }
+  .m-journey-prompt .icon {
+    width:48px; height:48px; border-radius:50%;
+    background:var(--tv-glow); color:var(--tv-stone);
+    display:flex; align-items:center; justify-content:center; font-size:22px;
+    flex-shrink:0;
+  }
+  .m-journey-prompt .eyebrow { color:var(--tv-cta-bright); font-size:10px; letter-spacing:.14em; text-transform:uppercase; }
+  .m-journey-prompt .head { color:var(--tv-stone); font-family:"Jost",sans-serif; font-size:16px; font-weight:600; margin-top:4px; }
+  .m-journey-prompt .desc { color:var(--tv-glacia); font-size:12px; margin-top:4px; }
+  .m-journey-prompt .actions { margin-left:auto; display:flex; gap:8px; flex-shrink:0; }
+  .m-journey-prompt .btn-ghost { background:transparent; border:1px solid var(--tv-accent); color:var(--tv-glacia); padding:7px 14px; border-radius:5px; font-size:11px; }
+  .m-journey-prompt .btn-primary { background:var(--tv-cta); color:var(--tv-text-dark); padding:7px 14px; border-radius:5px; font-size:11px; font-weight:600; }
+
+  .m-ask {
+    background:linear-gradient(135deg, rgba(46,122,138,.18), rgba(201,144,42,.10));
+    border:1px solid var(--tv-glow); border-radius:10px; padding:22px 26px;
+    text-align:center;
+  }
+  .m-ask .eyebrow { color:var(--tv-cta-bright); font-size:11px; letter-spacing:.14em; text-transform:uppercase; }
+  .m-ask .q { font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; color:var(--tv-stone); font-size:18px; margin:8px 0; }
+  .m-ask .input { background:var(--tv-canvas); border:1px solid var(--tv-accent); border-radius:6px; padding:10px 14px; color:var(--tv-secondary); font-size:12px; max-width:540px; margin:0 auto; text-align:left; }
+
+  .m-next-overlay {
+    background:var(--tv-card); border:2px dashed var(--tv-cta); border-radius:10px;
+    padding:18px 22px;
+    display:flex; align-items:center; gap:16px;
+  }
+  .m-next-overlay .ethumb { width:90px; height:55px; background:linear-gradient(135deg, var(--tv-element-mid), var(--tv-card)); border-radius:5px; flex-shrink:0; position:relative; }
+  .m-next-overlay .ethumb .badge { position:absolute; top:4px; left:4px; background:var(--tv-cta); color:var(--tv-text-dark); padding:1px 6px; border-radius:3px; font-size:9px; font-weight:700; }
+  .m-next-overlay .info { flex:1; }
+  .m-next-overlay .eyebrow { color:var(--tv-cta-bright); font-size:10px; letter-spacing:.14em; text-transform:uppercase; }
+  .m-next-overlay .ename { color:var(--tv-stone); font-weight:600; font-size:14px; margin-top:2px; }
+  .m-next-overlay .esub { color:var(--tv-secondary); font-size:11px; margin-top:2px; }
+  .m-next-overlay .countdown { color:var(--tv-glacia); font-size:11px; margin-top:6px; font-family:monospace; }
+  .m-next-overlay .actions { display:flex; gap:8px; flex-shrink:0; }
+  .m-next-overlay .btn-ghost { background:transparent; border:1px solid var(--tv-accent); color:var(--tv-glacia); padding:7px 12px; border-radius:5px; font-size:11px; }
+  .m-next-overlay .btn-primary { background:var(--tv-cta); color:var(--tv-text-dark); padding:7px 14px; border-radius:5px; font-size:11px; font-weight:600; }
+
+  .annot { display:flex; gap:14px; background:var(--tv-card); border-left:3px solid var(--tv-glow); padding:12px 16px; margin-bottom:10px; border-radius:0 6px 6px 0; font-size:13px; }
+  .annot .num { background:var(--tv-cta); color:var(--tv-text-dark); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0; font-family:"JetBrains Mono",monospace; }
+  .annot strong { color:var(--tv-stone); display:block; margin-bottom:2px; }
+
+  hr { border:none; border-top:1px solid var(--tv-element-mid); margin:36px 0; }
+  .navlinks { display:flex; justify-content:space-between; margin-top:32px; font-size:12px; color:var(--tv-secondary); }
+  .navlinks a { color:var(--tv-cta-bright); text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="docpage">
+
+<p class="crumb"><a href="../index.html">← Index</a> · M3 · Page Templates</p>
+<div class="docmeta">Document M3.9 · Video Player Page · v0.1 · 2026-05-11 · Owner: Brian (COO) · Audience: TrueVi engineering team + design contractors</div>
+
+<div class="wordmark">TrueVi</div>
+<div class="tagline">Page Template Wireframe · M3.9</div>
+
+<h1>Video Player Page</h1>
+<p class="lede">
+  The page where users actually watch a teaching. Bound to
+  <code>/watch/[contentId]</code>. YouTube iframe at top, curated
+  sermon summary (never labeled "AI"), Scripture references with
+  timestamp jumps, faith journey prompt, and related content
+  recommendations. The single most important page for retention.
+</p>
+
+<div class="callout principle">
+  <h4>One sentence</h4>
+  <p style="margin:0">
+    The video player page is where TrueVi <strong>delivers on its value
+    proposition</strong> — it's not just a video, it's a guided spiritual
+    experience around a teaching. The player is YouTube; everything
+    around it is TrueVi's proprietary layer.
+  </p>
+</div>
+
+<div class="callout warning">
+  <h4>YouTube TOS reminder (from CLAUDE.md)</h4>
+  <p style="margin:0">
+    The YouTube embed must remain freely playable. Never gate the player
+    behind a paywall. Tier-gated value-adds live in the surrounding
+    components (extended summary, scripture deep links, ScriptureViewer
+    access) — never the video itself.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2>Rendered page · annotated</h2>
+
+<div class="browser">
+  <div class="chrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="url">truevi.tv/watch/01919ab0-how-to-forgive</span>
+  </div>
+
+  <div class="page-mock">
+
+    <!-- Slot 1: breadcrumbs -->
+    <div class="slot">
+      <span class="slot-mark">1</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>breadcrumbs</code> · Breadcrumbs · conditional (varies by referrer)
+      </div>
+      <div class="m-bread">
+        <a>Home</a> &nbsp;›&nbsp; <a>Ministries</a> &nbsp;›&nbsp; <a>Mercy Hill</a> &nbsp;›&nbsp; <a>Forgiveness Series</a> &nbsp;›&nbsp; <span style="color:var(--tv-stone);">Episode 3 · The Choice to Forgive</span>
+      </div>
+    </div>
+
+    <!-- Slot 2: Player + side meta -->
+    <div class="slot">
+      <span class="slot-mark">2</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>player</code> · VideoPlayer · YouTube iframe embed
+      </div>
+      <div class="m-player-wrap">
+        <div class="m-player">
+          <div class="play-btn">▶</div>
+          <div class="yt-label">YouTube iframe · 31:48</div>
+        </div>
+        <div class="m-meta-side">
+          <h4>Your tools</h4>
+          <div class="m-action-row">
+            <span class="m-action">★ Save</span>
+            <span class="m-action">↗ Share</span>
+          </div>
+          <div class="m-meta-row"><span class="label">Watch progress</span><span class="value">62% · 12 min left</span></div>
+          <div class="m-meta-row"><span class="label">Tier required</span><span class="value">Free</span></div>
+          <div class="m-meta-row"><span class="label">Last watched</span><span class="value">Today</span></div>
+          <div class="m-meta-row"><span class="label">Times revisited</span><span class="value">2</span></div>
+
+          <h4 style="margin-top:18px;">More from this teaching</h4>
+          <div class="m-action-row" style="flex-direction:column; gap:6px; margin-bottom:0;">
+            <span class="m-action">View transcript</span>
+            <span class="m-action">Download for later (Plus)</span>
+            <span class="m-action">Discussion guide (Plus)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot 3: Title bar -->
+    <div class="slot">
+      <span class="slot-mark">3</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>title</code> · TextBlock (specialized variant)
+      </div>
+      <div class="m-title-bar">
+        <div class="eyebrow">Forgiveness Series · Episode 3 of 7</div>
+        <h2>The Choice to Forgive</h2>
+        <div class="by">Pastor <span class="pname">Jane Doe</span> · Mercy Hill Church</div>
+        <div class="stats">
+          31:48 <span class="sep">·</span>
+          Published 2026-02-15 <span class="sep">·</span>
+          12.4k views <span class="sep">·</span>
+          Subjects: Forgiveness · Reconciliation
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot 4: Curated sermon summary -->
+    <div class="slot">
+      <span class="slot-mark">4</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>summary</code> · AIResponseBlock (specialized · "sermon-summary" tone) · personalized framing
+      </div>
+      <div class="m-summary">
+        <div class="eyebrow">A guide to this teaching</div>
+        <div class="resp">
+          <p>Pastor Jane addresses the question that everyone wrestling with forgiveness eventually arrives at: <em>is forgiveness a feeling or a decision?</em> Her answer, drawn from Matthew 18, is that it is a decision — one we may have to make many times for the same wound.</p>
+          <p>She walks through the difference between <em>forgiveness</em> (releasing the debt) and <em>reconciliation</em> (rebuilding relationship), and is clear that the second is not always possible or safe. The teaching is especially relevant if you have been holding onto a wound that the other person is unwilling or unable to address directly.</p>
+        </div>
+        <div class="timestamps">
+          <div class="ts-row"><span class="ts">03:12</span><span>What forgiveness is and is not</span></div>
+          <div class="ts-row"><span class="ts">09:48</span><span>The seventy-seven times principle (Matthew 18:21-22)</span></div>
+          <div class="ts-row"><span class="ts">17:30</span><span>Forgiveness without reconciliation</span></div>
+          <div class="ts-row"><span class="ts">24:05</span><span>When the wound reopens</span></div>
+          <div class="ts-row"><span class="ts">28:20</span><span>Walking in mercy as a daily practice</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot 5: Scripture references -->
+    <div class="slot">
+      <span class="slot-mark">5</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>scripture-refs</code> · ScriptureBlock array · extracted from teaching with timestamps
+      </div>
+      <h3 style="margin-top:4px;">Scripture in this teaching</h3>
+      <div class="m-scripture-list">
+        <div class="m-scripture">
+          <div class="verse">"Then Peter came up and said to him, 'Lord, how often will my brother sin against me, and I forgive him? As many as seven times?' Jesus said to him, 'I do not say to you seven times, but seventy-seven times.'"</div>
+          <span class="ref">Matthew 18:21–22 · ESV <span class="ts-link">· referenced at 09:48 →</span></span>
+        </div>
+        <div class="m-scripture">
+          <div class="verse">"Bear with each other and forgive one another if any of you has a grievance against someone. Forgive as the Lord forgave you."</div>
+          <span class="ref">Colossians 3:13 · NIV <span class="ts-link">· referenced at 17:30 →</span></span>
+        </div>
+        <div class="m-scripture">
+          <div class="verse">"For if you forgive others their trespasses, your heavenly Father will also forgive you, but if you do not forgive others their trespasses, neither will your Father forgive your trespasses."</div>
+          <span class="ref">Matthew 6:14–15 · ESV <span class="ts-link">· referenced at 24:05 →</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot 6: Faith Journey prompt -->
+    <div class="slot">
+      <span class="slot-mark">6</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>journey-prompt</code> · CTABlock (specialized variant) · conditional on watch completion / replay signal
+      </div>
+      <div class="m-journey-prompt">
+        <div class="icon">✦</div>
+        <div>
+          <div class="eyebrow">Where you are</div>
+          <div class="head">Is this speaking to where you are?</div>
+          <div class="desc">If this teaching is meeting you in something real, we can help you go deeper. Save it. Ask a follow-up. Or just let it sit with you for a while.</div>
+        </div>
+        <div class="actions">
+          <span class="btn-ghost">★ Save</span>
+          <span class="btn-primary">Ask a follow-up</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot 7: Related content -->
+    <div class="slot dynamic">
+      <span class="slot-mark">7</span>
+      <div class="slot-meta">
+        <span class="kind dynamic">Dynamic</span>
+        <code>related</code> · allows: ContentRail · SeriesRail · Library returned 2 rails
+      </div>
+
+      <div class="m-rail" style="margin-bottom:22px;">
+        <div class="title">Continue the series</div>
+        <div class="m-cards-row">
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Episode 4 · Forgiveness Without Reconciliation</div><div class="meta">29 min · up next</div></div></div>
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Episode 5 · Forgiving Yourself</div><div class="meta">26 min</div></div></div>
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Episode 6 · The Long Work</div><div class="meta">28 min</div></div></div>
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Episode 7 · Walking in Mercy</div><div class="meta">23 min</div></div></div>
+        </div>
+      </div>
+
+      <div class="m-rail">
+        <div class="title">More on forgiveness</div>
+        <div class="subtitle">From other ministries in our partner network</div>
+        <div class="m-cards-row">
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">When Forgiveness Feels Impossible</div><div class="meta">Redemption Hill · 26 min</div></div></div>
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">The Prodigal Father</div><div class="meta">Gospel Coalition · 24 min</div></div></div>
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Grace for the Wounded</div><div class="meta">Mercy Hill · 28 min</div></div></div>
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Choosing Peace</div><div class="meta">Mercy Hill · 19 min</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot 8: Ask Anything -->
+    <div class="slot">
+      <span class="slot-mark">8</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>ask-anything</code> · AskAnythingBlock (variant: inline)
+      </div>
+      <div class="m-ask">
+        <div class="eyebrow">Make it personal</div>
+        <div class="q">"What's your specific question about this?"</div>
+        <div class="input">e.g. "How do I begin to forgive my father?" — get a tailored response</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>The "up next" overlay (post-completion)</h2>
+
+<p>When the YouTube player fires <code>video_completed</code>, a "next episode" overlay appears over the player. User can accept, defer, or pick something different.</p>
+
+<div class="m-next-overlay">
+  <div class="ethumb"><span class="badge">Next</span></div>
+  <div class="info">
+    <div class="eyebrow">Up next in the Forgiveness Series</div>
+    <div class="ename">Episode 4 · Forgiveness Without Reconciliation</div>
+    <div class="esub">Pastor Jane Doe · 29 min</div>
+    <div class="countdown">Auto-plays in 8s · or pick something different</div>
+  </div>
+  <div class="actions">
+    <span class="btn-ghost">Watch later</span>
+    <span class="btn-primary">▶ Play next</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Annotated walkthrough</h2>
+
+<div class="annot">
+  <span class="num">1</span>
+  <div>
+    <strong>Breadcrumbs · referrer-aware</strong>
+    The breadcrumb chain reflects how the user arrived. From the Series
+    page: Home › Ministries › Mercy Hill › Forgiveness Series › Episode 3.
+    From a Subject page: Home › Subjects › Forgiveness › Episode 3. From
+    a Search Response: Home › Answer · "How do I forgive" › Episode 3.
+    Personalized navigation that respects the user's path.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">2</span>
+  <div>
+    <strong>Video Player · YouTube iframe + side meta</strong>
+    The actual player is a YouTube embed (architectural decision —
+    CLAUDE.md). Side panel surfaces per-user state: progress, save,
+    share, transcript, tier-gated downloads. The video itself is
+    <strong>always free</strong>; only the surrounding tools are
+    tier-gated. The side panel collapses below the player on mobile.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">3</span>
+  <div>
+    <strong>Title bar</strong>
+    Series context if applicable, video title in display type, pastor
+    attribution, statistics. The "Subjects" tags link to subject
+    collection pages (M3.6).
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">4</span>
+  <div>
+    <strong>Curated sermon summary · the differentiator</strong>
+    The TrueVi value-add above all others. AIResponseBlock with the
+    "sermon-summary" tone. Includes a personalized framing ("This will be
+    especially relevant if...") tuned to the user's inferred life events
+    and faith stage. Timestamps are clickable — they seek the YouTube
+    player to that point. Generation strategy: precomputed at content
+    ingestion, NOT per-user per-render. Personalization is in the framing
+    paragraph only, not the substantive content. <em>Never labeled "AI."</em>
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">5</span>
+  <div>
+    <strong>Scripture references · extracted with timestamps</strong>
+    Pulled from the sermon transcript at ingestion. Each reference shows
+    the verse, translation, and a deep-link timestamp into the player.
+    For TrueVi+ users, the reference itself opens the ScriptureViewer
+    (deferred — see CLAUDE.md backlog · Bible API commercial license
+    required first). Free-tier users see the verse but no expanded view.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">6</span>
+  <div>
+    <strong>Faith Journey prompt · the soul of the page</strong>
+    A gentle, non-pushy invitation to engage. Appears conditionally:
+    after watching ≥60% of the video OR on second visit OR if signals
+    suggest emotional engagement (high dwell time, scripture references
+    clicked). Copy avoids "AI" language — frames the moment as <em>"is
+    this speaking to where you are?"</em> Save and Ask-a-follow-up are
+    the two CTAs.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">7</span>
+  <div>
+    <strong>Related content · DYNAMIC slot</strong>
+    For series videos, the first rail is "Continue the series" with
+    remaining episodes. The second rail is Library-personalized
+    cross-ministry content on the same subject. For non-series videos,
+    the Library decides what rails to surface (typically one same-pastor
+    rail and one cross-ministry subject rail).
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">8</span>
+  <div>
+    <strong>Ask Anything · inline · context-prefilled</strong>
+    The video's subjects pre-fill the AskAnything context. When the user
+    submits, the Search Response can reference both their question AND
+    the video they were just watching. Powerful for follow-up
+    multi-turn conversations.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Template definition</h2>
+
+<pre><code>{
+  <span class="k">"templateId"</span>: <span class="s">"video-player-v1"</span>,
+  <span class="k">"pageType"</span>:   <span class="s">"video-player"</span>,
+  <span class="k">"name"</span>:       <span class="s">"Video Player v1"</span>,
+  <span class="k">"inputs"</span>: [
+    { <span class="k">"name"</span>: <span class="s">"contentId"</span>, <span class="k">"type"</span>: <span class="s">"uuid"</span>, <span class="k">"required"</span>: <span class="n">true</span> }
+  ],
+  <span class="k">"slots"</span>: [
+    { <span class="k">"slotId"</span>: <span class="s">"breadcrumbs"</span>, <span class="k">"kind"</span>: <span class="s">"FIXED"</span>, <span class="k">"component"</span>: <span class="s">"Breadcrumbs"</span>,
+      <span class="k">"instance"</span>: { <span class="k">"config"</span>: { <span class="k">"useReferrerChain"</span>: <span class="n">true</span> } } },
+
+    {
+      <span class="k">"slotId"</span>:    <span class="s">"player"</span>,
+      <span class="k">"kind"</span>:      <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"VideoPlayer"</span>,     <span class="c">// player is a new component; see below</span>
+      <span class="k">"instance"</span>: {
+        <span class="k">"config"</span>: {
+          <span class="k">"provider"</span>:           <span class="s">"youtube"</span>,
+          <span class="k">"showSidePanel"</span>:      <span class="n">true</span>,
+          <span class="k">"showProgressOnReturn"</span>: <span class="n">true</span>,
+          <span class="k">"autoplayNextInSeries"</span>: <span class="n">true</span>,
+          <span class="k">"countdownSec"</span>:        <span class="n">8</span>
+        },
+        <span class="k">"query"</span>: { <span class="k">"contentId"</span>: <span class="s">"${input.contentId}"</span> }
+      }
+    },
+
+    { <span class="k">"slotId"</span>: <span class="s">"title"</span>, <span class="k">"kind"</span>: <span class="s">"FIXED"</span>, <span class="k">"component"</span>: <span class="s">"TextBlock"</span>,
+      <span class="k">"instance"</span>: { <span class="k">"config"</span>: { <span class="k">"variant"</span>: <span class="s">"content-title-bar"</span> }, <span class="k">"query"</span>: { <span class="k">"contentId"</span>: <span class="s">"${input.contentId}"</span> } } },
+
+    {
+      <span class="k">"slotId"</span>: <span class="s">"summary"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"AIResponseBlock"</span>,
+      <span class="k">"instance"</span>: {
+        <span class="k">"config"</span>: {
+          <span class="k">"tone"</span>:                  <span class="s">"sermon-summary"</span>,
+          <span class="k">"showTimestamps"</span>:        <span class="n">true</span>,
+          <span class="k">"personalizedFraming"</span>:   <span class="n">true</span>,
+          <span class="k">"maxLength"</span>:             <span class="n">400</span>
+        },
+        <span class="k">"query"</span>: { <span class="k">"contentId"</span>: <span class="s">"${input.contentId}"</span>, <span class="k">"source"</span>: <span class="s">"content.curatedSummary"</span> }
+      }
+    },
+
+    {
+      <span class="k">"slotId"</span>: <span class="s">"scripture-refs"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"ScriptureBlock"</span>,
+      <span class="k">"instance"</span>: {
+        <span class="k">"config"</span>: { <span class="k">"variant"</span>: <span class="s">"list"</span>, <span class="k">"showTimestamps"</span>: <span class="n">true</span>, <span class="k">"deepLinkPlayer"</span>: <span class="n">true</span> },
+        <span class="k">"query"</span>:  { <span class="k">"contentId"</span>: <span class="s">"${input.contentId}"</span>, <span class="k">"source"</span>: <span class="s">"content.scriptureRefs"</span> }
+      }
+    },
+
+    {
+      <span class="k">"slotId"</span>: <span class="s">"journey-prompt"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"CTABlock"</span>,
+      <span class="k">"instance"</span>: {
+        <span class="k">"config"</span>: { <span class="k">"variant"</span>: <span class="s">"journey-prompt"</span> },
+        <span class="k">"conditionalRender"</span>: <span class="s">"watchProgress &gt;= 0.6 OR visitCount &gt;= 2 OR (dwell &gt; 5min AND scriptureClicked)"</span>
+      }
+    },
+
+    {
+      <span class="k">"slotId"</span>: <span class="s">"related"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"DYNAMIC"</span>,
+      <span class="k">"allows"</span>: [<span class="s">"ContentRail"</span>, <span class="s">"SeriesRail"</span>],
+      <span class="k">"minCount"</span>: <span class="n">1</span>,
+      <span class="k">"maxCount"</span>: <span class="n">3</span>,
+      <span class="k">"slotInput"</span>: { <span class="k">"relatedToContent"</span>: <span class="s">"${input.contentId}"</span> }
+    },
+
+    {
+      <span class="k">"slotId"</span>: <span class="s">"ask-anything"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"AskAnythingBlock"</span>,
+      <span class="k">"instance"</span>: { <span class="k">"config"</span>: { <span class="k">"variant"</span>: <span class="s">"inline"</span>, <span class="k">"contentContext"</span>: <span class="s">"${input.contentId}"</span> } }
+    }
+  ]
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2>New component · VideoPlayer</h2>
+
+<p>The video player is a new component that wasn't in the M3.1 Component Library. Adding it now:</p>
+
+<table>
+  <thead><tr><th>Aspect</th><th>Detail</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Component name</strong></td><td><code>VideoPlayer</code> · v1.0.0</td></tr>
+    <tr><td><strong>Category</strong></td><td>Content (new sub-category: <em>Media</em>)</td></tr>
+    <tr><td><strong>Purpose</strong></td><td>Embed a YouTube iframe with TrueVi-controlled side panel</td></tr>
+    <tr><td><strong>Config</strong></td><td>provider · showSidePanel · showProgressOnReturn · autoplayNextInSeries · countdownSec · pipMode (picture-in-picture on scroll)</td></tr>
+    <tr><td><strong>Query</strong></td><td>contentId — returns video metadata + sidebar state from <code>content_state</code></td></tr>
+    <tr><td><strong>Events emitted</strong></td><td><code>video_started</code> · <code>video_progress</code> (at 10/25/50/75/95%) · <code>video_completed</code> · <code>video_abandoned</code> · <code>scripture_seek</code> · <code>timestamp_jumped</code></td></tr>
+    <tr><td><strong>Where used</strong></td><td>Video Player Template (primary use)</td></tr>
+  </tbody>
+</table>
+
+<p>The Component Library (M3.1) should be amended to include this in its next revision.</p>
+
+<!-- ============================================================ -->
+<h2>Curated sermon summary · how it's generated</h2>
+
+<p>This is the most technically involved part of the page. The summary is <strong>not</strong> regenerated per request. It's precomputed during content ingestion via the Content Library pipeline (referenced in CLAUDE.md):</p>
+
+<pre><code><span class="c">// During content ingestion (CLAUDE.md content-library architecture)</span>
+1. Video is added to TrueVi catalog (from YouTube channel ingestion or manual)
+2. YouTube transcript downloaded
+3. Library processes transcript:
+   a) Generates curated summary (~400 chars) — single canonical version
+   b) Extracts scripture references with timestamps
+   c) Extracts subjects/tags (already part of existing CMS pipeline)
+   d) Generates 5 outline timestamps for navigation
+4. Pastoral Board review (theological guardrails)
+5. Published into content_items table
+
+<span class="c">// At render time on the Video Player page</span>
+1. Renderer requests /library/compose-page
+2. Library loads content's curatedSummary, scriptureRefs, outlineTimestamps
+3. Library generates a *personalized framing paragraph* (~100 chars)
+   based on the user's inferred faith stage and life events
+4. Renderer composes: framing + curated summary + timestamps + scripture refs</code></pre>
+
+<div class="callout">
+  <h4>Why precomputed</h4>
+  <p style="margin:0">
+    Per-render AI generation for every video view would be expensive and
+    slow. Once-at-ingestion generation gives users instant page loads. The
+    only per-user generation is the brief framing sentence — &lt;100 chars,
+    cheap, can be cached by inferred-stage cohort.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2>Scripture timestamp deep-linking</h2>
+
+<p>Both the summary timestamps and the scripture references include clickable timestamps that seek the YouTube player. The mechanic:</p>
+
+<pre><code><span class="c">// User clicks a timestamp like "09:48"</span>
+
+1. Renderer calls YouTube iframe API: player.seekTo(588, true)
+2. Player jumps to second 588 of the video
+3. Emits <span class="k">"timestamp_jumped"</span> event with { contentId, fromTimestamp, toSec }
+4. Library logs this as engagement signal — boosts content's
+   "navigated-to-scripture" score for personalization</code></pre>
+
+<p>This pattern works for any timestamp in any TrueVi UI — the outline timestamps in the summary, the scripture reference timestamps, and (future) discussion guide section headings.</p>
+
+<!-- ============================================================ -->
+<h2>Tier-gated tools</h2>
+
+<table>
+  <thead><tr><th>Tool</th><th>Free (new)</th><th>Vine</th><th>Plus</th></tr></thead>
+  <tbody>
+    <tr><td>Video playback</td><td>Yes · always</td><td>Yes</td><td>Yes</td></tr>
+    <tr><td>Save to My Journey</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+    <tr><td>Share URL</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+    <tr><td>Curated summary</td><td>First 200 chars + "see more" upgrade teaser</td><td>Full summary</td><td>Full summary + audio version</td></tr>
+    <tr><td>Outline timestamps</td><td>Hidden</td><td>Visible</td><td>Visible</td></tr>
+    <tr><td>Scripture references</td><td>Visible (read-only)</td><td>Visible · jump to player</td><td>Visible · jump + open ScriptureViewer</td></tr>
+    <tr><td>Transcript view</td><td>Hidden</td><td>Hidden</td><td>Visible</td></tr>
+    <tr><td>Discussion guide</td><td>Hidden</td><td>Hidden</td><td>Visible · downloadable PDF</td></tr>
+    <tr><td>Download for offline</td><td>Hidden</td><td>Hidden</td><td>Visible (where licensed)</td></tr>
+    <tr><td>Ask Anything from video</td><td>Visible</td><td>Visible</td><td>Visible</td></tr>
+    <tr><td>Faith Journey prompt</td><td>Visible</td><td>Visible</td><td>Visible</td></tr>
+  </tbody>
+</table>
+
+<p>When <code>monetizationMode = "open-all"</code> (M2.4), every Vine and Plus tool is visible to free users. Once the platform flips to <code>tier-gated</code>, the table above applies.</p>
+
+<!-- ============================================================ -->
+<h2>State persistence · per-user progress</h2>
+
+<table>
+  <thead><tr><th>State</th><th>Source</th><th>What it drives</th></tr></thead>
+  <tbody>
+    <tr><td><code>watch_progress</code></td><td>video_progress events → content_state</td><td>Resume position · "62% watched" badge</td></tr>
+    <tr><td><code>saved_at</code></td><td>save_added event → content_state</td><td>Save button toggled · appears in My Journey</td></tr>
+    <tr><td><code>completed_at</code></td><td>video_completed event → content_state</td><td>"Watched" badge · suppression in recommendations · next-episode auto-play</td></tr>
+    <tr><td><code>visit_count</code></td><td>page_view events aggregated</td><td>Journey prompt conditional · "Times revisited" stat</td></tr>
+    <tr><td><code>scripture_clicked</code></td><td>scripture_seek events</td><td>Journey prompt conditional · engagement signal</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Anonymous user behavior</h2>
+
+<p>
+  Free browsing requires no signup (YouTube TOS, CLAUDE.md). Anonymous users get:
+</p>
+
+<ul>
+  <li><strong>Full video playback</strong> — no degradation</li>
+  <li><strong>Curated summary visible</strong> — basic free-tier version</li>
+  <li><strong>Watch progress NOT persisted</strong> — refresh resets to start</li>
+  <li><strong>Save button</strong> → "Sign up to save" prompt</li>
+  <li><strong>Share works</strong> — share URL is just the canonical content URL</li>
+  <li><strong>Faith Journey prompt</strong> appears but with copy: "Sign up to track where you are"</li>
+  <li><strong>Related content rails</strong> — personalized by anonymous behavioral cookie</li>
+</ul>
+
+<p>When the anonymous user signs up, their behavioral history (tagged with anonymousId) merges into their userId via the identity merge protocol (M1.1 §12).</p>
+
+<!-- ============================================================ -->
+<h2>Auto-advance behavior</h2>
+
+<p>When the YouTube player fires <code>video_completed</code>:</p>
+
+<ol>
+  <li>If video is part of a series AND there's a next episode AND <code>autoplayNextInSeries = true</code>, the "up next" overlay appears (shown above).</li>
+  <li>Countdown ticks 8 seconds. User can:
+    <ul>
+      <li><strong>Click Play next</strong> — navigate immediately to next episode</li>
+      <li><strong>Wait</strong> — navigate automatically at 0s</li>
+      <li><strong>Click Watch later</strong> — overlay dismisses, page stays</li>
+    </ul>
+  </li>
+  <li>If video is NOT in a series, the related content rail scrolls into view and the journey prompt becomes prominent.</li>
+  <li>For the FINAL episode of a series, the overlay shows: <em>"Series complete. Here's what comes next:"</em> with a CTABlock to a recommended next series.</li>
+</ol>
+
+<!-- ============================================================ -->
+<h2>Template variants</h2>
+
+<table>
+  <thead><tr><th>Template ID</th><th>When selected</th><th>Differs from <code>video-player-v1</code></th></tr></thead>
+  <tbody>
+    <tr><td><code>video-player-v1</code></td><td>Default · all videos</td><td>Baseline</td></tr>
+    <tr><td><code>video-player-series-v1</code></td><td>Video is part of a series · series context visible</td><td>Adds an episode-list sidebar on desktop; primary CTA is "next episode" not "Ask Anything"</td></tr>
+    <tr><td><code>video-player-anonymous-v1</code></td><td>Anonymous viewer</td><td>Adds a "sign up to save your place" CTABlock prominently; journey prompt phrased as conversion push</td></tr>
+    <tr><td><code>video-player-completed-v1</code></td><td>User has already completed this video</td><td>Title bar shows "✓ Watched · revisit"; related content shows "If this still speaks to you..." framing</td></tr>
+    <tr><td><code>video-player-embed-v1</code></td><td>Loaded as an embed from external partner site</td><td>Suppresses NavBar + Footer via shell override (M3.8); minimal "Powered by TrueVi" attribution</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Empty &amp; edge states</h2>
+
+<h3>Video not found</h3>
+<p>404 with a fallback page showing similar content based on the URL slug if extractable.</p>
+
+<h3>Curated summary not yet generated</h3>
+<p>Summary slot renders a placeholder: <em>"A guide to this teaching is being prepared. Watch and we'll have it ready next time."</em> Editorial team is notified. Page is otherwise fully functional.</p>
+
+<h3>No scripture references found</h3>
+<p>Scripture refs slot is hidden. Pastoral review queue notified that the video may have missed a tagging pass.</p>
+
+<h3>Content tier-gated AND user is below required tier</h3>
+<p>Player renders but shows a tier-gate overlay BEFORE playback: <em>"This teaching is part of TrueVi Vine. Start a free 14-day trial to watch."</em> — never blocks free content, only the gated subset.</p>
+
+<h3>Video pulled by ministry permission revocation</h3>
+<p>404 with: <em>"This teaching is no longer available on TrueVi. Here are similar teachings from the same ministry:"</em> + ContentRail.</p>
+
+<h3>YouTube iframe fails to load</h3>
+<p>Player area shows: <em>"Unable to load video. Watch on YouTube directly:"</em> + link. All other slots continue to render normally.</p>
+
+<!-- ============================================================ -->
+<h2>Activity events emitted</h2>
+
+<table>
+  <thead><tr><th>Event</th><th>Frequency · trigger</th></tr></thead>
+  <tbody>
+    <tr><td><code>page_view</code></td><td>Once on render</td></tr>
+    <tr><td><code>impression</code></td><td>Per slot entering viewport</td></tr>
+    <tr><td><code>video_started</code></td><td>Player play event</td></tr>
+    <tr><td><code>video_progress</code></td><td>At 10 · 25 · 50 · 75 · 95% quartile marks</td></tr>
+    <tr><td><code>video_completed</code></td><td>End-of-video or &gt;95% watched</td></tr>
+    <tr><td><code>video_abandoned</code></td><td>Player closed or page navigated away before completion</td></tr>
+    <tr><td><code>timestamp_jumped</code></td><td>User clicks a timestamp in summary or scripture ref</td></tr>
+    <tr><td><code>scripture_viewed</code></td><td>User opens ScriptureViewer (Plus tier)</td></tr>
+    <tr><td><code>save_added</code> · <code>save_removed</code></td><td>Save button toggle</td></tr>
+    <tr><td><code>share_initiated</code></td><td>Share button click</td></tr>
+    <tr><td><code>ask_anything_submitted</code></td><td>Follow-up question from this page; carries <code>contentContext</code></td></tr>
+    <tr><td><code>upgrade_teaser_shown</code> · <code>_clicked</code> · <code>_dismissed</code></td><td>Per tier-gated tool the free user sees</td></tr>
+    <tr><td><code>journey_prompt_shown</code></td><td>When the conditional fires</td></tr>
+    <tr><td><code>journey_prompt_actioned</code></td><td>User clicks Save or Ask a follow-up from the prompt</td></tr>
+  </tbody>
+</table>
+
+<hr/>
+<div class="navlinks">
+  <a href="14-page-shell.html">← M3.8 · Page Shell</a>
+  <a href="../index.html">Index · spec complete →</a>
+</div>
+
+</div>
+</body>
+</html>

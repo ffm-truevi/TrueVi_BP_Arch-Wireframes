@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TrueVi — Page Shell (NavBar + Footer) (M3.8)</title>
+<style>
+  :root {
+    --tv-canvas:#030C0F; --tv-rail:#051318; --tv-card:#0A2830; --tv-card-hover:#112F38;
+    --tv-element-mid:#1A4E5C; --tv-accent:#245F70; --tv-glow:#2E7A8A;
+    --tv-cta:#C9902A; --tv-cta-bright:#E8A832; --tv-glacia:#C8E4E8;
+    --tv-secondary:#8FB8BE; --tv-stone:#E8E8E2; --tv-text-dark:#1A1A1A;
+  }
+  * { box-sizing:border-box; }
+  html, body { margin:0; padding:0; background:var(--tv-canvas); color:var(--tv-glacia); }
+  body { font-family:"Jost","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-weight:300; line-height:1.6; font-size:15px; }
+  .docpage { max-width:1280px; margin:0 auto; padding:48px 32px 96px; }
+  .docmeta { color:var(--tv-secondary); font-size:12px; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--tv-element-mid); }
+  .wordmark { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:22px; margin-bottom:4px; }
+  .tagline { font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; color:var(--tv-secondary); font-size:14px; margin-bottom:24px; }
+  h1 { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:36px; margin:0 0 8px; }
+  h2 { font-family:"Jost",sans-serif; font-weight:700; color:var(--tv-stone); font-size:22px; margin:56px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--tv-element-mid); }
+  h3 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-stone); font-size:16px; margin:28px 0 8px; }
+  h4 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-glacia); font-size:13px; text-transform:uppercase; letter-spacing:.1em; margin:18px 0 6px; }
+  p, li { color:var(--tv-glacia); }
+  strong { color:var(--tv-stone); font-weight:600; }
+  em { color:var(--tv-secondary); font-style:italic; }
+  .lede { font-size:17px; color:var(--tv-glacia); margin-bottom:24px; }
+  .crumb { color:var(--tv-secondary); font-size:13px; margin-bottom:8px; }
+  .crumb a { color:var(--tv-cta-bright); text-decoration:none; }
+  code { font-family:"JetBrains Mono","Consolas",monospace; background:var(--tv-card); color:var(--tv-glacia); padding:2px 6px; border-radius:4px; font-size:13px; }
+  pre { font-family:"JetBrains Mono",monospace; background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:8px; padding:16px 20px; overflow-x:auto; font-size:12px; line-height:1.5; }
+  pre code { background:transparent; padding:0; }
+  pre .k { color: var(--tv-cta-bright); } pre .s { color: var(--tv-glacia); } pre .c { color: var(--tv-secondary); font-style:italic; } pre .n { color: var(--tv-glow); }
+  .callout { background:var(--tv-card); border-left:3px solid var(--tv-cta); padding:14px 18px; margin:18px 0; border-radius:0 6px 6px 0; }
+  .callout.principle { border-left-color: var(--tv-glow); }
+  .callout.warning { border-left-color: var(--tv-cta-bright); }
+  .callout h4 { margin-top:0; color: var(--tv-stone); }
+  table { width:100%; border-collapse:collapse; margin:14px 0; font-size:13px; }
+  th { text-align:left; padding:9px 12px; background:var(--tv-rail); color:var(--tv-stone); font-weight:600; border-bottom:1px solid var(--tv-accent); }
+  td { padding:9px 12px; border-bottom:1px solid var(--tv-element-mid); color:var(--tv-glacia); vertical-align:top; }
+
+  .browser { background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:14px; overflow:hidden; margin:24px 0; box-shadow:0 12px 48px rgba(0,0,0,.4); }
+  .chrome { background:var(--tv-canvas); padding:10px 16px; border-bottom:1px solid var(--tv-element-mid); display:flex; align-items:center; gap:8px; font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--tv-secondary); }
+  .chrome .dot { width:9px; height:9px; border-radius:50%; background:var(--tv-accent); }
+  .chrome .url { margin-left:12px; }
+
+  /* page shell mock */
+  .shell-frame {
+    background:var(--tv-canvas); padding:0;
+  }
+  .nav-mock {
+    background:var(--tv-rail); border-bottom:1px solid var(--tv-element-mid);
+    padding:16px 28px;
+    display:flex; align-items:center; gap:32px;
+  }
+  .nav-mock .brand {
+    font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:22px; letter-spacing:-0.01em;
+  }
+  .nav-mock .nav-links { display:flex; gap:24px; }
+  .nav-mock .nav-link {
+    color:var(--tv-glacia); font-size:13px; font-weight:500; cursor:pointer;
+    padding:6px 0; border-bottom:2px solid transparent;
+  }
+  .nav-mock .nav-link.active { color:var(--tv-stone); border-bottom-color:var(--tv-cta); }
+  .nav-mock .nav-link:hover { color:var(--tv-stone); }
+  .nav-mock .spacer { flex:1; }
+  .nav-mock .nav-search {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:6px;
+    padding:7px 14px; color:var(--tv-secondary); font-size:12px; min-width:240px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .nav-mock .nav-search .icon { color:var(--tv-cta-bright); }
+  .nav-mock .nav-action {
+    background:transparent; border:1px solid var(--tv-accent);
+    color:var(--tv-glacia); padding:7px 14px; border-radius:6px; font-size:12px;
+  }
+  .nav-mock .nav-cta {
+    background:var(--tv-cta); color:var(--tv-text-dark);
+    padding:7px 16px; border-radius:6px; font-size:12px; font-weight:600;
+  }
+  .nav-mock .avatar {
+    width:32px; height:32px; border-radius:50%; background:var(--tv-element-mid);
+  }
+
+  .shell-body {
+    padding:32px;
+    background:var(--tv-canvas);
+    border-bottom:1px dashed var(--tv-accent);
+    min-height:200px;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--tv-secondary); font-style:italic; font-size:14px;
+  }
+
+  /* Footer mock */
+  .footer-mock {
+    background:var(--tv-rail); border-top:1px solid var(--tv-element-mid);
+    padding:36px 32px 20px;
+  }
+  .footer-cols { display:grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap:32px; }
+  .footer-brand .brand-mark { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:22px; }
+  .footer-brand .tagline-italic { font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; color:var(--tv-secondary); font-size:13px; margin-top:4px; }
+  .footer-brand .blurb { color:var(--tv-glacia); font-size:12px; line-height:1.6; margin-top:14px; max-width:280px; }
+  .footer-col h5 {
+    color:var(--tv-stone); font-family:"Jost",sans-serif; font-weight:600;
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    margin:0 0 12px;
+  }
+  .footer-col ul { list-style:none; padding:0; margin:0; }
+  .footer-col li { padding:5px 0; }
+  .footer-col li a { color:var(--tv-glacia); font-size:13px; text-decoration:none; }
+  .footer-col li a:hover { color:var(--tv-cta-bright); }
+  .footer-bottom {
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:28px; padding-top:18px;
+    border-top:1px solid var(--tv-element-mid);
+    color:var(--tv-secondary); font-size:11px;
+  }
+
+  /* annotated markup */
+  .annot-zone { position:relative; }
+  .zone-mark {
+    position:absolute; left:-32px; width:24px; height:24px;
+    background:var(--tv-cta); color:var(--tv-text-dark); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:"JetBrains Mono",monospace; font-weight:700; font-size:12px;
+  }
+  .zone-label {
+    position:absolute; right:14px; top:14px; z-index:2;
+    background:var(--tv-cta); color:var(--tv-text-dark);
+    padding:3px 10px; border-radius:999px; font-size:10px;
+    letter-spacing:.1em; text-transform:uppercase; font-weight:700;
+  }
+  .zone-label.template { background:var(--tv-glow); color:var(--tv-stone); }
+
+  /* annotations */
+  .annot { display:flex; gap:14px; background:var(--tv-card); border-left:3px solid var(--tv-glow); padding:12px 16px; margin-bottom:10px; border-radius:0 6px 6px 0; font-size:13px; }
+  .annot .num { background:var(--tv-cta); color:var(--tv-text-dark); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0; font-family:"JetBrains Mono",monospace; }
+  .annot strong { color:var(--tv-stone); display:block; margin-bottom:2px; }
+
+  /* console editor mock */
+  .ui-topbar { display:flex; align-items:center; gap:16px; padding:14px 22px; background:var(--tv-rail); border-bottom:1px solid var(--tv-element-mid); font-size:13px; }
+  .ui-topbar .breadcrumb { color:var(--tv-secondary); }
+  .ui-topbar .breadcrumb .current { color:var(--tv-stone); font-weight:600; }
+  .ui-topbar .spacer { flex:1; }
+  .ui-btn { padding:7px 16px; border-radius:6px; font-family:inherit; font-size:13px; font-weight:600; border:none; cursor:pointer; }
+  .ui-btn.ghost { background:transparent; color:var(--tv-glacia); border:1px solid var(--tv-accent); }
+  .ui-btn.primary { background:var(--tv-cta); color:var(--tv-text-dark); }
+
+  .editor-grid { display:grid; grid-template-columns: 1fr 360px; }
+  .editor-canvas {
+    background:var(--tv-canvas); padding:32px;
+    min-height:520px;
+  }
+  .editor-props {
+    background:var(--tv-rail); border-left:1px solid var(--tv-element-mid);
+    padding:20px 22px; overflow-y:auto;
+  }
+  .editor-props h5 { font-family:"Jost",sans-serif; font-weight:700; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--tv-stone); margin:0 0 4px; }
+  .editor-props .props-sub { color:var(--tv-secondary); font-size:11px; margin-bottom:18px; }
+  .prop-section { margin: 16px 0 10px; }
+  .prop-section h6 { margin: 0 0 6px; font-family:"Jost",sans-serif; font-weight:600; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--tv-secondary); }
+  .prop-row { display:flex; align-items:center; gap:8px; padding:5px 0; }
+  .prop-row .label { color:var(--tv-secondary); font-size:11px; min-width:80px; }
+  .field { background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:4px; padding:6px 10px; font-family:inherit; font-size:11px; color:var(--tv-glacia); flex:1; }
+  .nav-link-row { display:grid; grid-template-columns: 24px 1fr 1fr 1fr 30px; gap:8px; align-items:center; padding:8px 0; border-top:1px solid var(--tv-element-mid); font-size:11px; }
+  .nav-link-row:first-of-type { border-top:none; }
+  .nav-link-row .grip { color:var(--tv-secondary); cursor:grab; font-family:monospace; }
+  .nav-link-row .field { padding:4px 8px; }
+  .nav-link-row .x { color:var(--tv-secondary); text-align:center; cursor:pointer; }
+  .add-link-btn { display:block; width:100%; padding:8px; border:1px dashed var(--tv-accent); border-radius:6px; color:var(--tv-secondary); font-family:inherit; font-size:11px; background:transparent; cursor:pointer; margin-top:8px; text-align:center; }
+  .tier-chip { padding:4px 10px; border-radius:999px; font-size:10px; font-weight:600; background:transparent; border:1px solid var(--tv-accent); color:var(--tv-glacia); cursor:pointer; }
+  .tier-chip.on { background:var(--tv-cta); color:var(--tv-text-dark); border-color:var(--tv-cta); }
+
+  hr { border:none; border-top:1px solid var(--tv-element-mid); margin:36px 0; }
+  .navlinks { display:flex; justify-content:space-between; margin-top:32px; font-size:12px; color:var(--tv-secondary); }
+  .navlinks a { color:var(--tv-cta-bright); text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="docpage">
+
+<p class="crumb"><a href="../index.html">← Index</a> · M3 · Page Templates</p>
+<div class="docmeta">Document M3.8 · Page Shell (NavBar + Footer) · v0.1 · 2026-05-11 · Owner: Brian (COO) · Audience: TrueVi engineering team + design contractors</div>
+
+<div class="wordmark">TrueVi</div>
+<div class="tagline">Page Shell Wireframe · M3.8</div>
+
+<h1>Page Shell — NavBar &amp; Footer</h1>
+<p class="lede">
+  The global chrome that wraps every page on the platform. NavBar at the
+  top, Footer at the bottom, template content in between. Authored once,
+  rendered everywhere, editable in the Management Console. Not a template
+  — a <strong>layer above templates</strong>.
+</p>
+
+<div class="callout principle">
+  <h4>One sentence</h4>
+  <p style="margin:0">
+    NavBar and Footer are <strong>page shell</strong> — universal chrome
+    that wraps the templated body of every page. Authored in one place,
+    rendered everywhere, never duplicated into templates.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2>Where the shell fits in the rendering model</h2>
+
+<p>
+  Until this doc, templates were treated as the entire page. They are not.
+  Every page actually has three layers: the shell wraps the template
+  body.
+</p>
+
+<pre><code>┌─────────────────────────────────────────────────────────┐
+│  NavBar      ← Page Shell · global · always present     │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  Template body   ← M3.2-M3.7 + M3.9 · per route         │
+│  (Home, Ministry, Search Response, Series, etc.)        │
+│                                                         │
+├─────────────────────────────────────────────────────────┤
+│  Footer      ← Page Shell · global · always present     │
+└─────────────────────────────────────────────────────────┘</code></pre>
+
+<p>This model aligns with how every modern CMS handles global chrome (Webflow, Builder.io, Sanity, Contentful).</p>
+
+<!-- ============================================================ -->
+<h2>Rendered page with shell · annotated</h2>
+
+<p>Using the Home template (M3.2) inside the shell. The shell renders identically on every page; the body region swaps per route.</p>
+
+<div class="browser">
+  <div class="chrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="url">truevi.tv/</span>
+  </div>
+
+  <div class="shell-frame annot-zone">
+
+    <!-- NavBar -->
+    <div style="position:relative;">
+      <span class="zone-mark" style="top:14px;">1</span>
+      <span class="zone-label">Shell · NavBar</span>
+      <div class="nav-mock">
+        <div class="brand">TrueVi</div>
+        <div class="nav-links">
+          <span class="nav-link active">Home</span>
+          <span class="nav-link">Ministries</span>
+          <span class="nav-link">Subjects</span>
+          <span class="nav-link">My Journey</span>
+        </div>
+        <div class="spacer"></div>
+        <div class="nav-search">
+          <span class="icon">🔍</span>
+          <span>Search teachings…</span>
+        </div>
+        <span class="nav-action">Sign in</span>
+        <span class="nav-cta">Get guidance</span>
+      </div>
+    </div>
+
+    <!-- Body (template renders here) -->
+    <div style="position:relative;">
+      <span class="zone-mark" style="top:14px;">2</span>
+      <span class="zone-label template">Template body</span>
+      <div class="shell-body">
+        Template content renders here · slot-based composition from M3.2 (Home), M3.5 (Ministry), M3.9 (Video Player), etc.
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="position:relative;">
+      <span class="zone-mark" style="top:14px;">3</span>
+      <span class="zone-label">Shell · Footer</span>
+      <div class="footer-mock">
+        <div class="footer-cols">
+          <div class="footer-brand">
+            <div class="brand-mark">TrueVi</div>
+            <div class="tagline-italic">Rooted in Truth. Guided by Grace.</div>
+            <div class="blurb">An AI-powered streaming platform that meets you where your faith and life journeys intersect. Teachings from trusted ministries, anchored in Scripture.</div>
+          </div>
+          <div class="footer-col">
+            <h5>Discover</h5>
+            <ul>
+              <li><a>Browse Ministries</a></li>
+              <li><a>Subjects</a></li>
+              <li><a>Featured Series</a></li>
+              <li><a>Ask Anything</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h5>Account</h5>
+            <ul>
+              <li><a>Sign in</a></li>
+              <li><a>My Journey</a></li>
+              <li><a>Subscription tiers</a></li>
+              <li><a>Help &amp; support</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h5>About</h5>
+            <ul>
+              <li><a>Our mission</a></li>
+              <li><a>Partner ministries</a></li>
+              <li><a>Theological framework</a></li>
+              <li><a>Contact</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <div>© 2026 Faith Forward Media, Inc.</div>
+          <div style="display:flex; gap:18px;">
+            <a style="color:var(--tv-secondary); text-decoration:none;">Privacy</a>
+            <a style="color:var(--tv-secondary); text-decoration:none;">Terms</a>
+            <a style="color:var(--tv-secondary); text-decoration:none;">Theological guardrails</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Annotated walkthrough</h2>
+
+<div class="annot">
+  <span class="num">1</span>
+  <div>
+    <strong>NavBar · global, sticky</strong>
+    Always present at the top of every page. Contains the wordmark, primary
+    navigation, search affordance, account state, and the primary CTA.
+    Sticks to the viewport top on scroll. Auth state (signed-in / out)
+    swaps the right-side elements. Tier-aware: free-tier users see "Get
+    guidance" CTA; subscribed users see avatar + tier badge.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">2</span>
+  <div>
+    <strong>Template body · slot composition</strong>
+    The renderer calls <code>POST /library/compose-page</code> based on
+    the route, gets back the template composition, and renders the
+    slots into this region. The shell wraps but never enters this region.
+    Templates do not need to author NavBar or Footer slots — they're
+    handled outside.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">3</span>
+  <div>
+    <strong>Footer · global, multi-column</strong>
+    Always present at the bottom of every page. Three columns of links
+    plus brand block, with a bottom bar for copyright, privacy, terms.
+    Editorial content — admin-authored, not personalized. Tier-aware:
+    "Subscription tiers" link only appears for free users; "Account
+    settings" replaces it for subscribers.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>What's in the NavBar</h2>
+
+<table>
+  <thead><tr><th style="width:18%">Element</th><th style="width:18%">Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Wordmark</strong></td><td>Fixed</td><td>TrueVi · Jost 800 · Stone White · always links to <code>/</code></td></tr>
+    <tr><td><strong>Primary nav links</strong></td><td>Editable list</td><td>Admin-authored. Each link: label, destination, tier visibility, active-state matcher</td></tr>
+    <tr><td><strong>Search affordance</strong></td><td>Component</td><td>Inline-mini search input or icon-only on mobile. Submits to <code>/search?q=…</code></td></tr>
+    <tr><td><strong>Auth state</strong></td><td>Conditional</td><td>Signed-out: "Sign in" link + primary CTA. Signed-in: avatar + dropdown menu</td></tr>
+    <tr><td><strong>Primary CTA</strong></td><td>Editable</td><td>Free-tier: "Get guidance" → signup. Subscribed: hidden (or replaced with feature shortcut)</td></tr>
+    <tr><td><strong>Notification dot</strong></td><td>Conditional</td><td>Subscribed users only. Indicates new content from saved ministries or completed series follow-ups</td></tr>
+  </tbody>
+</table>
+
+<h3>Mobile NavBar</h3>
+<ul>
+  <li>Wordmark stays left</li>
+  <li>Primary nav collapses into a hamburger menu (slides in from left)</li>
+  <li>Search collapses to an icon (opens full-screen search overlay on tap)</li>
+  <li>Primary CTA persists if free-tier; auth state moves into the hamburger menu</li>
+  <li>Height reduces from 64px to 56px</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2>What's in the Footer</h2>
+
+<table>
+  <thead><tr><th style="width:18%">Element</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Brand block</strong></td><td>Wordmark · tagline · short blurb. Admin-authored copy. Locale-keyed.</td></tr>
+    <tr><td><strong>Link columns</strong></td><td>Admin-authored. 3 columns (Discover · Account · About) on desktop, collapsed to accordion on mobile. Each link has tier visibility.</td></tr>
+    <tr><td><strong>Bottom bar</strong></td><td>Copyright string · privacy · terms · theological guardrails link (public-facing read-only view)</td></tr>
+    <tr><td><strong>Social links</strong></td><td>Optional. If present, render between bottom bar items.</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Console editor · Page Shell</h2>
+
+<p>Page Shell is edited at <code>/console/shell</code> — a dedicated screen alongside the Template Builder. Two-pane layout: live preview + properties panel.</p>
+
+<div class="browser">
+  <div class="chrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="url">my.truevi.tv/console/shell</span>
+  </div>
+
+  <div class="ui-topbar">
+    <div class="breadcrumb">Console &nbsp;›&nbsp; <span class="current">Page Shell</span></div>
+    <span style="background:transparent; color:var(--tv-secondary); border:1px solid var(--tv-accent); padding:3px 10px; border-radius:999px; font-size:10px; letter-spacing:.1em; text-transform:uppercase; font-weight:600;">Draft</span>
+    <span style="color:var(--tv-secondary); font-size:11px;">Last saved 4 min ago</span>
+    <div class="spacer"></div>
+    <select class="ui-btn ghost" style="font-size:11px; padding:6px 12px;">
+      <option>View as · Free user (signed out)</option>
+      <option>View as · Free user (signed in)</option>
+      <option>View as · Vine subscriber</option>
+      <option>View as · Plus subscriber</option>
+    </select>
+    <button class="ui-btn ghost">Preview</button>
+    <button class="ui-btn primary">Publish</button>
+  </div>
+
+  <div class="editor-grid">
+
+    <div class="editor-canvas">
+      <!-- mini preview of shell -->
+      <div style="border:1px solid var(--tv-element-mid); border-radius:8px; overflow:hidden;">
+        <div class="nav-mock" style="padding:12px 20px;">
+          <div class="brand" style="font-size:18px;">TrueVi</div>
+          <div class="nav-links" style="gap:18px;">
+            <span class="nav-link active" style="font-size:12px;">Home</span>
+            <span class="nav-link" style="font-size:12px;">Ministries</span>
+            <span class="nav-link" style="font-size:12px;">Subjects</span>
+            <span class="nav-link" style="font-size:12px;">My Journey</span>
+          </div>
+          <div class="spacer"></div>
+          <div class="nav-search" style="min-width:160px; padding:5px 10px; font-size:11px;">
+            <span class="icon">🔍</span><span>Search</span>
+          </div>
+          <span class="nav-action" style="padding:5px 10px; font-size:11px;">Sign in</span>
+          <span class="nav-cta" style="padding:5px 12px; font-size:11px;">Get guidance</span>
+        </div>
+        <div style="padding:36px; background:var(--tv-canvas); text-align:center; color:var(--tv-secondary); font-style:italic; font-size:12px;">
+          — Template body renders here for the current route —
+        </div>
+        <div class="footer-mock" style="padding:20px;">
+          <div class="footer-cols" style="gap:18px;">
+            <div class="footer-brand">
+              <div class="brand-mark" style="font-size:16px;">TrueVi</div>
+              <div class="tagline-italic" style="font-size:11px;">Rooted in Truth. Guided by Grace.</div>
+            </div>
+            <div class="footer-col">
+              <h5 style="font-size:10px;">Discover</h5>
+              <ul><li><a style="font-size:11px;">Browse Ministries</a></li><li><a style="font-size:11px;">Subjects</a></li></ul>
+            </div>
+            <div class="footer-col">
+              <h5 style="font-size:10px;">Account</h5>
+              <ul><li><a style="font-size:11px;">Sign in</a></li><li><a style="font-size:11px;">My Journey</a></li></ul>
+            </div>
+            <div class="footer-col">
+              <h5 style="font-size:10px;">About</h5>
+              <ul><li><a style="font-size:11px;">Our mission</a></li><li><a style="font-size:11px;">Contact</a></li></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p style="color:var(--tv-secondary); font-size:11px; font-style:italic; margin-top:14px; text-align:center;">
+        Live preview · changes update as you edit
+      </p>
+    </div>
+
+    <div class="editor-props">
+      <h5>NavBar</h5>
+      <p class="props-sub">Edit primary navigation, CTA, and tier-aware behavior.</p>
+
+      <div class="prop-section">
+        <h6>Primary nav links</h6>
+        <div class="nav-link-row">
+          <span class="grip">⋮⋮</span>
+          <input class="field" value="Home"/>
+          <input class="field" value="/"/>
+          <span class="tier-chip on">all</span>
+          <span class="x">✕</span>
+        </div>
+        <div class="nav-link-row">
+          <span class="grip">⋮⋮</span>
+          <input class="field" value="Ministries"/>
+          <input class="field" value="/browse/ministries"/>
+          <span class="tier-chip on">all</span>
+          <span class="x">✕</span>
+        </div>
+        <div class="nav-link-row">
+          <span class="grip">⋮⋮</span>
+          <input class="field" value="Subjects"/>
+          <input class="field" value="/browse/subjects"/>
+          <span class="tier-chip on">all</span>
+          <span class="x">✕</span>
+        </div>
+        <div class="nav-link-row">
+          <span class="grip">⋮⋮</span>
+          <input class="field" value="My Journey"/>
+          <input class="field" value="/journey"/>
+          <span class="tier-chip on">vine+</span>
+          <span class="x">✕</span>
+        </div>
+        <button class="add-link-btn">+ Add nav link</button>
+      </div>
+
+      <div class="prop-section">
+        <h6>Primary CTA (signed out)</h6>
+        <div class="prop-row">
+          <span class="label">Label</span>
+          <input class="field" value="Get guidance"/>
+        </div>
+        <div class="prop-row">
+          <span class="label">Destination</span>
+          <input class="field" value="/signup"/>
+        </div>
+        <div class="prop-row">
+          <span class="label">Visible to</span>
+          <span class="tier-chip on">new</span>
+        </div>
+      </div>
+
+      <div class="prop-section">
+        <h6>Search affordance</h6>
+        <div class="prop-row"><span class="label">Show</span><select class="field"><option>Inline mini</option><option>Icon only</option><option>Hidden</option></select></div>
+        <div class="prop-row"><span class="label">Placeholder</span><input class="field" value="Search teachings…"/></div>
+      </div>
+
+      <h5 style="margin-top:24px;">Footer</h5>
+      <p class="props-sub">Edit columns, brand block, bottom bar.</p>
+
+      <div class="prop-section">
+        <h6>Brand blurb</h6>
+        <textarea class="field" rows="3" style="resize:vertical; font-family:inherit;">An AI-powered streaming platform that meets you where your faith and life journeys intersect. Teachings from trusted ministries, anchored in Scripture.</textarea>
+      </div>
+
+      <div class="prop-section">
+        <h6>Columns</h6>
+        <select class="field"><option>3 columns (Discover · Account · About)</option><option>2 columns</option><option>4 columns</option></select>
+        <p style="color:var(--tv-secondary); font-size:11px; margin-top:6px; font-style:italic;">Edit individual column links by selecting the column in preview.</p>
+      </div>
+
+      <div class="prop-section">
+        <h6>Bottom bar</h6>
+        <div class="prop-row"><span class="label">Copyright</span><input class="field" value="© 2026 Faith Forward Media, Inc."/></div>
+        <div class="prop-row"><span class="label">Privacy URL</span><input class="field" value="/privacy"/></div>
+        <div class="prop-row"><span class="label">Terms URL</span><input class="field" value="/terms"/></div>
+      </div>
+
+      <div class="prop-section">
+        <h6>Global</h6>
+        <div class="prop-row"><span class="label">Sticky nav</span><select class="field"><option>Yes</option><option>No</option></select></div>
+        <div class="prop-row"><span class="label">Tier shown</span>
+          <span class="tier-chip on">new</span>
+          <span class="tier-chip on">vine</span>
+          <span class="tier-chip on">plus</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Tier-aware shell rules</h2>
+
+<p>The shell adapts to the viewing user's tier the same way components do. Common patterns:</p>
+
+<table>
+  <thead><tr><th>Element</th><th>Free (new)</th><th>Vine</th><th>Plus</th></tr></thead>
+  <tbody>
+    <tr><td>"My Journey" nav link</td><td>Hidden</td><td>Visible</td><td>Visible</td></tr>
+    <tr><td>"Sign in" link (when signed out)</td><td>Visible</td><td>n/a (signed in)</td><td>n/a (signed in)</td></tr>
+    <tr><td>"Get guidance" CTA</td><td>Visible</td><td>Hidden</td><td>Hidden</td></tr>
+    <tr><td>Account avatar</td><td>Visible if signed in</td><td>Visible</td><td>Visible (with Plus badge)</td></tr>
+    <tr><td>Notification dot</td><td>Hidden</td><td>Visible</td><td>Visible</td></tr>
+    <tr><td>Footer "Subscription tiers" link</td><td>Visible</td><td>Hidden (replaced by "Manage subscription")</td><td>Hidden (replaced by "Manage subscription")</td></tr>
+  </tbody>
+</table>
+
+<p>When <code>monetizationMode = "open-all"</code> globally, tier visibility rules still save but enforce only on auth-state, not paid-tier checks. The "Get guidance" CTA still hides for signed-in users; it just doesn't enforce tier subscription state.</p>
+
+<!-- ============================================================ -->
+<h2>Per-page shell suppression</h2>
+
+<p>
+  In rare cases, a template needs to suppress part of the shell. The
+  primary use case: <strong>embed views</strong> and <strong>kiosk
+  modes</strong>. Templates can declare suppression on a per-instance
+  basis.
+</p>
+
+<pre><code>{
+  <span class="k">"templateId"</span>: <span class="s">"embed-video-v1"</span>,
+  <span class="k">"shellOverride"</span>: {
+    <span class="k">"hideNavBar"</span>: <span class="n">true</span>,
+    <span class="k">"hideFooter"</span>: <span class="n">true</span>
+  },
+  <span class="k">"slots"</span>: [ ... ]
+}</code></pre>
+
+<p>Examples of templates that suppress:</p>
+
+<ul>
+  <li><strong>Embed-Video</strong> — when TrueVi videos are embedded on external partner sites; only the player renders</li>
+  <li><strong>Kiosk-mode</strong> — full-screen experience for church-foyer displays (future)</li>
+  <li><strong>Print view</strong> — a sermon's text representation, no chrome (future)</li>
+</ul>
+
+<p>By default no template suppresses anything. Suppression is opt-in, per template.</p>
+
+<!-- ============================================================ -->
+<h2>Data model</h2>
+
+<p>Page Shell config lives in a single-row table (or settings key) — there is only one shell at a time. Shell changes are versioned like templates.</p>
+
+<pre><code><span class="c">// page_shell — single canonical row</span>
+{
+  <span class="k">"id"</span>:     <span class="s">"shell-current"</span>,
+  <span class="k">"version"</span>: <span class="s">"4.2.0"</span>,
+  <span class="k">"status"</span>: <span class="s">"published"</span>,
+
+  <span class="k">"navbar"</span>: {
+    <span class="k">"sticky"</span>:       <span class="n">true</span>,
+    <span class="k">"showWordmark"</span>: <span class="n">true</span>,
+    <span class="k">"links"</span>: [
+      { <span class="k">"id"</span>: <span class="s">"home"</span>,       <span class="k">"label"</span>: { <span class="k">"en"</span>: <span class="s">"Home"</span> },        <span class="k">"destination"</span>: <span class="s">"/"</span>,                  <span class="k">"tiers"</span>: [<span class="s">"new"</span>, <span class="s">"vine"</span>, <span class="s">"plus"</span>] },
+      { <span class="k">"id"</span>: <span class="s">"ministries"</span>, <span class="k">"label"</span>: { <span class="k">"en"</span>: <span class="s">"Ministries"</span> },  <span class="k">"destination"</span>: <span class="s">"/browse/ministries"</span>, <span class="k">"tiers"</span>: [<span class="s">"new"</span>, <span class="s">"vine"</span>, <span class="s">"plus"</span>] },
+      { <span class="k">"id"</span>: <span class="s">"subjects"</span>,   <span class="k">"label"</span>: { <span class="k">"en"</span>: <span class="s">"Subjects"</span> },    <span class="k">"destination"</span>: <span class="s">"/browse/subjects"</span>,   <span class="k">"tiers"</span>: [<span class="s">"new"</span>, <span class="s">"vine"</span>, <span class="s">"plus"</span>] },
+      { <span class="k">"id"</span>: <span class="s">"journey"</span>,    <span class="k">"label"</span>: { <span class="k">"en"</span>: <span class="s">"My Journey"</span> },  <span class="k">"destination"</span>: <span class="s">"/journey"</span>,           <span class="k">"tiers"</span>: [<span class="s">"vine"</span>, <span class="s">"plus"</span>] }
+    ],
+    <span class="k">"search"</span>: {
+      <span class="k">"mode"</span>:        <span class="s">"inline-mini"</span>,
+      <span class="k">"placeholder"</span>: { <span class="k">"en"</span>: <span class="s">"Search teachings…"</span> }
+    },
+    <span class="k">"primaryCta"</span>: {
+      <span class="k">"label"</span>:       { <span class="k">"en"</span>: <span class="s">"Get guidance"</span> },
+      <span class="k">"destination"</span>: <span class="s">"/signup"</span>,
+      <span class="k">"tiers"</span>:       [<span class="s">"new"</span>]
+    },
+    <span class="k">"authMenu"</span>: {
+      <span class="k">"showAvatar"</span>:       <span class="n">true</span>,
+      <span class="k">"showNotifications"</span>: <span class="n">true</span>,
+      <span class="k">"notificationsTiers"</span>: [<span class="s">"vine"</span>, <span class="s">"plus"</span>]
+    }
+  },
+
+  <span class="k">"footer"</span>: {
+    <span class="k">"brand"</span>: {
+      <span class="k">"blurb"</span>: { <span class="k">"en"</span>: <span class="s">"An AI-powered streaming platform that meets you..."</span> }
+    },
+    <span class="k">"columns"</span>: [
+      {
+        <span class="k">"id"</span>:    <span class="s">"discover"</span>,
+        <span class="k">"label"</span>: { <span class="k">"en"</span>: <span class="s">"Discover"</span> },
+        <span class="k">"links"</span>: [
+          { <span class="k">"label"</span>: { <span class="k">"en"</span>: <span class="s">"Browse Ministries"</span> }, <span class="k">"destination"</span>: <span class="s">"/browse/ministries"</span>, <span class="k">"tiers"</span>: [<span class="s">"new"</span>, <span class="s">"vine"</span>, <span class="s">"plus"</span>] },
+          { <span class="k">"label"</span>: { <span class="k">"en"</span>: <span class="s">"Subjects"</span> },          <span class="k">"destination"</span>: <span class="s">"/browse/subjects"</span>,   <span class="k">"tiers"</span>: [<span class="s">"new"</span>, <span class="s">"vine"</span>, <span class="s">"plus"</span>] }
+        ]
+      },
+      { <span class="k">"id"</span>: <span class="s">"account"</span>, <span class="k">"label"</span>: { <span class="k">"en"</span>: <span class="s">"Account"</span> }, <span class="k">"links"</span>: [ ... ] },
+      { <span class="k">"id"</span>: <span class="s">"about"</span>,   <span class="k">"label"</span>: { <span class="k">"en"</span>: <span class="s">"About"</span> },   <span class="k">"links"</span>: [ ... ] }
+    ],
+    <span class="k">"bottomBar"</span>: {
+      <span class="k">"copyright"</span>:    { <span class="k">"en"</span>: <span class="s">"© 2026 Faith Forward Media, Inc."</span> },
+      <span class="k">"privacyUrl"</span>:   <span class="s">"/privacy"</span>,
+      <span class="k">"termsUrl"</span>:     <span class="s">"/terms"</span>,
+      <span class="k">"guardrailsUrl"</span>: <span class="s">"/guardrails"</span>
+    },
+    <span class="k">"social"</span>: []
+  }
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2>API integration</h2>
+
+<p>Two endpoints support the shell:</p>
+
+<table>
+  <thead><tr><th>Endpoint</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>GET /library/shell</code></td>
+      <td>
+        Called by the Renderer once per session to fetch the published
+        shell config. Returns the full <code>page_shell</code> record
+        with <strong>tier-filtered</strong> nav links and footer links
+        already removed per the current user's tier. Cached aggressively
+        (Edge-cacheable for signed-out traffic).
+      </td>
+    </tr>
+    <tr>
+      <td><code>GET /console/shell</code> · <code>PATCH /console/shell</code> · <code>POST /console/shell/publish</code></td>
+      <td>Admin endpoints for the Console editor. Same draft → publish flow as templates.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  The shell is <em>not</em> part of the <code>compose-page</code>
+  response. It is fetched separately and cached. This keeps every
+  template render fast even when the shell config is large.
+</p>
+
+<!-- ============================================================ -->
+<h2>Responsive behavior</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Desktop</th><th>Tablet</th><th>Mobile</th></tr></thead>
+  <tbody>
+    <tr><td>NavBar height</td><td>64px</td><td>60px</td><td>56px</td></tr>
+    <tr><td>Primary nav links</td><td>Inline horizontal</td><td>Inline horizontal (smaller)</td><td>Hamburger drawer</td></tr>
+    <tr><td>Search</td><td>Inline mini</td><td>Inline mini (narrower)</td><td>Icon → opens overlay</td></tr>
+    <tr><td>Primary CTA</td><td>Inline button</td><td>Inline button</td><td>Persists, smaller</td></tr>
+    <tr><td>Footer columns</td><td>4 columns side-by-side</td><td>2 × 2 grid</td><td>Accordion (collapsed by default)</td></tr>
+    <tr><td>Footer brand</td><td>Left column, full blurb</td><td>Top, full blurb</td><td>Top, truncated blurb</td></tr>
+    <tr><td>Bottom bar</td><td>Horizontal</td><td>Horizontal</td><td>Stacked vertical</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Edge cases</h2>
+
+<h3>Shell config fails to load</h3>
+<p>
+  Renderer falls back to a hardcoded baseline shell — wordmark only on
+  top, copyright + privacy + terms in a minimal footer. Page still
+  renders.
+</p>
+
+<h3>User in mid-experiment, shell changed during their session</h3>
+<p>
+  Shell version is captured per session. If the shell is republished
+  mid-session, the user keeps their original shell until next page load
+  (or until session expiry). Prevents jarring layout shifts.
+</p>
+
+<h3>Locale not supported</h3>
+<p>
+  Per the global locale settings (M2.4), unsupported locales fall back
+  to <code>en</code> automatically. The shell editor warns admins when
+  they publish without translations for all supported locales.
+</p>
+
+<h3>Template suppresses NavBar but page is shareable</h3>
+<p>
+  Embed templates that hide NavBar must include their own minimal
+  navigation (typically a "Powered by TrueVi" attribution with a link
+  back to the canonical page). Enforced at publish-time validation.
+</p>
+
+<!-- ============================================================ -->
+<h2>Why not just put NavBar and Footer in every template?</h2>
+
+<div class="callout warning">
+  <h4>The case for keeping shell separate</h4>
+  <p style="margin:0">
+    We considered making NavBar and Footer mandatory FIXED slots in
+    every template. Rejected because:
+  </p>
+</div>
+
+<ul>
+  <li><strong>Duplication.</strong> Twenty-plus templates would each have to author identical nav and footer slots.</li>
+  <li><strong>Drift.</strong> An admin updating nav links would have to remember every template — guaranteed inconsistency.</li>
+  <li><strong>Performance.</strong> Shell can be cached aggressively (mostly static); per-template caching would re-fetch it constantly.</li>
+  <li><strong>Mental model.</strong> Templates are <em>about a page type's content</em>. Chrome belongs above.</li>
+  <li><strong>Industry norm.</strong> Every modern CMS treats chrome as a separate layer for the same reasons.</li>
+</ul>
+
+<p>Net: the shell pattern is unambiguously the right architecture. Templates stay focused on what they're for; the shell is a single source of truth.</p>
+
+<hr/>
+<div class="navlinks">
+  <a href="13-template-series.html">← M3.7 · Series Template</a>
+  <a href="15-template-video-player.html">M3.9 · Video Player Page →</a>
+</div>
+
+</div>
+</body>
+</html>

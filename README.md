@@ -14,7 +14,7 @@ in any browser via GitHub Pages.
 ## Audience
 
 - **TrueVi internal team** — Brian (COO), Bunker (CEO)
-- **TrueVi engineering** — Devon and incoming engineers
+- **TrueVi engineering** — Devin and incoming engineers
 - **External design and engineering contractors**
 
 This repository is intentionally separated from the TrueVi codebase so
