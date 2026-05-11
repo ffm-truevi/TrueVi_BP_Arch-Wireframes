@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TrueVi — Console: Template Selector Rules (M2.2)</title>
+<style>
+  :root {
+    --tv-canvas:#030C0F; --tv-rail:#051318; --tv-card:#0A2830; --tv-card-hover:#112F38;
+    --tv-element-mid:#1A4E5C; --tv-accent:#245F70; --tv-glow:#2E7A8A;
+    --tv-cta:#C9902A; --tv-cta-bright:#E8A832; --tv-glacia:#C8E4E8;
+    --tv-secondary:#8FB8BE; --tv-stone:#E8E8E2; --tv-text-dark:#1A1A1A;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--tv-canvas); color: var(--tv-glacia); }
+  body { font-family: "Jost","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-weight:300; line-height:1.6; font-size:15px; }
+  .docpage { max-width: 1280px; margin: 0 auto; padding: 48px 32px 96px; }
+  .docmeta { color: var(--tv-secondary); font-size:12px; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--tv-element-mid); }
+  .wordmark { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:22px; letter-spacing:-.01em; margin-bottom:4px; }
+  .tagline { font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; color:var(--tv-secondary); font-size:14px; margin-bottom:24px; }
+  h1 { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:36px; line-height:1.15; margin:0 0 8px; }
+  h2 { font-family:"Jost",sans-serif; font-weight:700; color:var(--tv-stone); font-size:22px; margin:56px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--tv-element-mid); }
+  h3 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-stone); font-size:16px; margin:28px 0 8px; }
+  h4 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-glacia); font-size:13px; text-transform:uppercase; letter-spacing:.1em; margin:20px 0 6px; }
+  p, li { color: var(--tv-glacia); }
+  strong { color: var(--tv-stone); font-weight: 600; }
+  em { color: var(--tv-secondary); font-style: italic; }
+  .lede { font-size:17px; color:var(--tv-glacia); margin-bottom:24px; }
+  .crumb { color:var(--tv-secondary); font-size:13px; margin-bottom:8px; }
+  .crumb a { color:var(--tv-cta-bright); text-decoration:none; }
+  code { font-family:"JetBrains Mono","Consolas",monospace; background:var(--tv-card); color:var(--tv-glacia); padding:2px 6px; border-radius:4px; font-size:13px; }
+  pre { font-family:"JetBrains Mono",monospace; background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:8px; padding:16px 20px; overflow-x:auto; font-size:12px; line-height:1.5; }
+  pre code { background:transparent; padding:0; }
+  pre .k { color: var(--tv-cta-bright); }
+  pre .s { color: var(--tv-glacia); }
+  pre .c { color: var(--tv-secondary); font-style:italic; }
+  pre .n { color: var(--tv-glow); }
+  .callout { background:var(--tv-card); border-left:3px solid var(--tv-cta); padding:16px 20px; margin:18px 0; border-radius:0 8px 8px 0; }
+  .callout.principle { border-left-color: var(--tv-glow); }
+  .callout h4 { margin-top:0; color: var(--tv-stone); }
+
+  /* UI */
+  .ui-wrap { background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:14px; overflow:hidden; margin:28px 0 32px; box-shadow:0 12px 48px rgba(0,0,0,.4); }
+  .ui-browser-chrome { background:var(--tv-canvas); padding:10px 16px; border-bottom:1px solid var(--tv-element-mid); display:flex; align-items:center; gap:8px; font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--tv-secondary); }
+  .ui-browser-chrome .dot { width:9px; height:9px; border-radius:50%; background:var(--tv-accent); }
+  .ui-browser-chrome .url { margin-left:12px; }
+  .ui-topbar { display:flex; align-items:center; gap:16px; padding:14px 22px; background:var(--tv-rail); border-bottom:1px solid var(--tv-element-mid); font-size:13px; }
+  .ui-topbar .breadcrumb { color:var(--tv-secondary); }
+  .ui-topbar .breadcrumb .current { color:var(--tv-stone); font-weight:600; }
+  .ui-topbar .spacer { flex:1; }
+  .ui-btn { padding:7px 16px; border-radius:6px; font-family:inherit; font-size:13px; font-weight:600; border:none; cursor:pointer; }
+  .ui-btn.ghost { background:transparent; color:var(--tv-glacia); border:1px solid var(--tv-accent); }
+  .ui-btn.primary { background:var(--tv-cta); color:var(--tv-text-dark); }
+
+  .ui-tabs { display:flex; gap:0; background:var(--tv-rail); border-bottom:1px solid var(--tv-element-mid); padding:0 22px; }
+  .ui-tab { padding:14px 18px; color:var(--tv-secondary); font-size:13px; font-weight:500; cursor:pointer; border-bottom:2px solid transparent; }
+  .ui-tab.active { color:var(--tv-stone); border-bottom-color:var(--tv-cta); }
+  .ui-tab:hover:not(.active) { color:var(--tv-glacia); }
+
+  .ui-body { background:var(--tv-canvas); padding:24px 28px; min-height: 580px; }
+
+  .rules-header { display:flex; align-items:baseline; gap:14px; margin-bottom:18px; }
+  .rules-header .title { font-family:"Jost",sans-serif; color:var(--tv-stone); font-size:18px; font-weight:600; }
+  .rules-header .meta { color:var(--tv-secondary); font-size:12px; }
+
+  .rule-list { display:flex; flex-direction:column; gap:10px; }
+  .rule {
+    display:grid; grid-template-columns: 30px 50px 1fr 220px 90px 60px;
+    align-items:center; gap:16px;
+    background:var(--tv-card); border:1px solid var(--tv-accent);
+    border-radius:10px; padding:14px 18px;
+  }
+  .rule .grip { color:var(--tv-secondary); font-family:monospace; cursor:grab; }
+  .rule .priority {
+    font-family:"JetBrains Mono",monospace;
+    color:var(--tv-cta); font-weight:700; font-size:14px;
+  }
+  .rule .info { color:var(--tv-glacia); font-size:13px; }
+  .rule .info .name { color:var(--tv-stone); font-weight:600; margin-bottom:2px; }
+  .rule .info .cond { font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--tv-secondary); }
+  .rule .target { color:var(--tv-glacia); font-size:12px; }
+  .rule .target .label { color:var(--tv-secondary); font-size:11px; }
+  .rule .target .tpl { font-family:"JetBrains Mono",monospace; color:var(--tv-stone); }
+  .rule .status-toggle {
+    display:inline-flex; align-items:center; gap:6px;
+    color:var(--tv-glacia); font-size:11px;
+  }
+  .toggle-pill { width:34px; height:18px; border-radius:999px; background:var(--tv-element-mid); position:relative; }
+  .toggle-pill.on { background:var(--tv-cta); }
+  .toggle-pill::after { content:""; position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%; background:var(--tv-stone); }
+  .toggle-pill.on::after { left:18px; }
+  .rule .controls { text-align:right; color:var(--tv-secondary); font-size:12px; }
+
+  .rule-default {
+    display:grid; grid-template-columns: 30px 50px 1fr 220px 90px 60px;
+    align-items:center; gap:16px;
+    background:transparent; border:1px dashed var(--tv-accent);
+    border-radius:10px; padding:14px 18px; margin-top:14px;
+  }
+  .rule-default .default-label { color:var(--tv-secondary); font-style:italic; font-size:13px; }
+
+  .add-rule-btn { display:flex; align-items:center; justify-content:center; width:100%; padding:14px; border:1px dashed var(--tv-accent); border-radius:10px; color:var(--tv-secondary); font-family:inherit; font-size:13px; font-weight:500; background:transparent; cursor:pointer; margin-top:18px; }
+  .add-rule-btn:hover { border-color:var(--tv-cta); color:var(--tv-cta-bright); }
+
+  /* Editor modal */
+  .editor-modal {
+    background:var(--tv-rail); border:1px solid var(--tv-cta);
+    border-radius:12px; padding:0; margin:24px 0;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+  }
+  .editor-head { padding:16px 22px; border-bottom:1px solid var(--tv-element-mid); display:flex; align-items:center; }
+  .editor-head .t { font-family:"Jost",sans-serif; color:var(--tv-stone); font-size:16px; font-weight:600; }
+  .editor-head .x { margin-left:auto; color:var(--tv-secondary); cursor:pointer; }
+  .editor-body { padding:22px; }
+  .editor-section { margin-bottom:24px; }
+  .editor-section h6 { font-family:"Jost",sans-serif; font-weight:600; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--tv-secondary); margin:0 0 10px; }
+  .editor-row { display:flex; gap:12px; align-items:center; margin-bottom:10px; }
+  .editor-row .label { color:var(--tv-secondary); font-size:12px; min-width:90px; }
+  .field {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:5px;
+    padding:7px 10px; font-family:inherit; font-size:12px; color:var(--tv-glacia); flex:1;
+  }
+  .editor-foot { padding:14px 22px; border-top:1px solid var(--tv-element-mid); display:flex; gap:10px; justify-content:flex-end; }
+
+  /* condition builder */
+  .cond-builder {
+    background:var(--tv-card); border:1px solid var(--tv-accent);
+    border-radius:8px; padding:14px 16px;
+  }
+  .cond-row { display:grid; grid-template-columns: 1.2fr 0.8fr 1.2fr 30px; gap:8px; align-items:center; margin-bottom:8px; }
+  .cond-row:last-child { margin-bottom:0; }
+  .cond-add { margin-top:8px; color:var(--tv-cta-bright); font-size:12px; cursor:pointer; }
+  .cond-conj { text-align:center; color:var(--tv-cta); font-size:11px; font-family:monospace; font-weight:700; }
+
+  /* annotations */
+  .annot { display:flex; gap:14px; background:var(--tv-card); border-left:3px solid var(--tv-glow); padding:12px 16px; margin:18px 0; border-radius:0 6px 6px 0; font-size:13px; }
+  .annot .num { background:var(--tv-glow); color:var(--tv-stone); width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; flex-shrink:0; }
+  .annot strong { color: var(--tv-stone); display:block; margin-bottom:2px; }
+
+  table { width:100%; border-collapse: collapse; margin:16px 0; font-size:13px; }
+  th { text-align:left; padding:9px 12px; background:var(--tv-rail); color:var(--tv-stone); font-weight:600; border-bottom:1px solid var(--tv-accent); }
+  td { padding:9px 12px; border-bottom:1px solid var(--tv-element-mid); color:var(--tv-glacia); vertical-align:top; }
+
+  hr { border:none; border-top:1px solid var(--tv-element-mid); margin:40px 0; }
+  .navlinks { display:flex; justify-content:space-between; margin-top:32px; font-size:12px; color:var(--tv-secondary); }
+  .navlinks a { color: var(--tv-cta-bright); text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="docpage">
+
+<p class="crumb"><a href="../index.html">← Index</a> · M2 · Management Console</p>
+
+<div class="docmeta">
+  Document M2.2 · Template Selector Rules · v0.1 · 2026-05-11 ·
+  Owner: Brian (COO) · Audience: TrueVi engineering team
+</div>
+
+<div class="wordmark">TrueVi</div>
+<div class="tagline">Console Wireframe · M2.2</div>
+
+<h1>Template Selector Rules</h1>
+<p class="lede">
+  Admin-authored rules that decide which template fires for which user, per
+  page type. Priority-ordered. First match wins. A default template always
+  exists as the fallback. This is where the Library learns the admin's
+  intent for how templates should be deployed.
+</p>
+
+<div class="callout principle">
+  <h4>One sentence</h4>
+  <p style="margin:0">
+    Selector rules are <strong>opinionated routing</strong> over the user
+    context. Experiments override rules; rules override the default
+    template. See M1.1 §8 for the selection precedence.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2>The screen</h2>
+
+<div class="ui-wrap">
+  <div class="ui-browser-chrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="url">my.truevi.tv/console/template-selector</span>
+  </div>
+
+  <div class="ui-topbar">
+    <div class="breadcrumb">Console &nbsp;›&nbsp; <span class="current">Template Selector</span></div>
+    <div class="spacer"></div>
+    <button class="ui-btn ghost">Test cohort</button>
+    <button class="ui-btn primary">+ New rule</button>
+  </div>
+
+  <div class="ui-tabs">
+    <div class="ui-tab active">Home <span style="opacity:.6; font-size:11px;">· 3</span></div>
+    <div class="ui-tab">Ministry <span style="opacity:.6; font-size:11px;">· 2</span></div>
+    <div class="ui-tab">Subject <span style="opacity:.6; font-size:11px;">· 1</span></div>
+    <div class="ui-tab">Series <span style="opacity:.6; font-size:11px;">· 1</span></div>
+    <div class="ui-tab">Search <span style="opacity:.6; font-size:11px;">· 0</span></div>
+    <div class="ui-tab">Search Response <span style="opacity:.6; font-size:11px;">· 2</span></div>
+  </div>
+
+  <div class="ui-body">
+    <div class="rules-header">
+      <span class="title">Home page · selector rules</span>
+      <span class="meta">3 rules · 1 default · evaluated top-down</span>
+    </div>
+
+    <div class="rule-list">
+
+      <div class="rule">
+        <span class="grip">⋮⋮</span>
+        <span class="priority">#10</span>
+        <div class="info">
+          <div class="name">First-visit discovery</div>
+          <div class="cond">visitorType == "first-visit"</div>
+        </div>
+        <div class="target">
+          <div class="label">→ template</div>
+          <div class="tpl">home-discovery-v1</div>
+        </div>
+        <div class="status-toggle"><span class="toggle-pill on"></span> active</div>
+        <div class="controls">⋯</div>
+      </div>
+
+      <div class="rule">
+        <span class="grip">⋮⋮</span>
+        <span class="priority">#20</span>
+        <div class="info">
+          <div class="name">Power user — minimal hero</div>
+          <div class="cond">visitorType == "power" AND sessionCount &gt; 30</div>
+        </div>
+        <div class="target">
+          <div class="label">→ template</div>
+          <div class="tpl">home-power-v2</div>
+        </div>
+        <div class="status-toggle"><span class="toggle-pill on"></span> active</div>
+        <div class="controls">⋯</div>
+      </div>
+
+      <div class="rule">
+        <span class="grip">⋮⋮</span>
+        <span class="priority">#30</span>
+        <div class="info">
+          <div class="name">TrueVi+ subscriber — premium experience</div>
+          <div class="cond">tier == "plus"</div>
+        </div>
+        <div class="target">
+          <div class="label">→ template</div>
+          <div class="tpl">home-plus-v1</div>
+        </div>
+        <div class="status-toggle"><span class="toggle-pill on"></span> active</div>
+        <div class="controls">⋯</div>
+      </div>
+
+    </div>
+
+    <div class="rule-default">
+      <span style="color:var(--tv-cta-bright); font-family:monospace; font-size:13px;">★</span>
+      <span class="priority" style="color:var(--tv-secondary);">DEF</span>
+      <div class="default-label">Default — used when no rule matches</div>
+      <div class="target">
+        <div class="label">→ template</div>
+        <div class="tpl">home-v3</div>
+      </div>
+      <div class="status-toggle"><span class="toggle-pill on"></span> required</div>
+      <div class="controls">⋯</div>
+    </div>
+
+    <button class="add-rule-btn">+ Add rule for Home</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Rule editor</h2>
+
+<p>Opens as an inline panel (or modal on smaller screens) when a rule is created or edited.</p>
+
+<div class="editor-modal">
+  <div class="editor-head">
+    <span class="t">Edit rule · Power user — minimal hero</span>
+    <span class="x">✕</span>
+  </div>
+  <div class="editor-body">
+
+    <div class="editor-section">
+      <h6>Identity</h6>
+      <div class="editor-row">
+        <span class="label">Name</span>
+        <input class="field" value="Power user — minimal hero"/>
+      </div>
+      <div class="editor-row">
+        <span class="label">Page type</span>
+        <select class="field"><option>home</option><option>ministry</option><option>subject</option><option>series</option><option>search</option><option>search-response</option></select>
+      </div>
+      <div class="editor-row">
+        <span class="label">Priority</span>
+        <input class="field" value="20" style="max-width:80px;"/>
+        <span style="color:var(--tv-secondary); font-size:11px;">Lower number = evaluated first. First match wins.</span>
+      </div>
+    </div>
+
+    <div class="editor-section">
+      <h6>Condition</h6>
+      <div class="cond-builder">
+        <div class="cond-row">
+          <select class="field"><option>visitorType</option><option>tier</option><option>sessionCount</option><option>inferredFaithStage</option><option>inferredLifeStage</option><option>deviceClass</option><option>locale</option><option>geoCountry</option></select>
+          <select class="field"><option>==</option><option>!=</option><option>&gt;</option><option>&gt;=</option><option>&lt;</option><option>in</option><option>not in</option></select>
+          <input class="field" value="power"/>
+          <span style="color:var(--tv-secondary); cursor:pointer; text-align:center;">✕</span>
+        </div>
+        <div class="cond-conj">AND</div>
+        <div class="cond-row">
+          <select class="field"><option selected>sessionCount</option></select>
+          <select class="field"><option>==</option><option>!=</option><option>&gt;</option><option selected>&gt;</option><option>&gt;=</option><option>&lt;</option></select>
+          <input class="field" value="30"/>
+          <span style="color:var(--tv-secondary); cursor:pointer; text-align:center;">✕</span>
+        </div>
+        <div class="cond-add">+ Add condition (AND)</div>
+      </div>
+    </div>
+
+    <div class="editor-section">
+      <h6>Target template</h6>
+      <div class="editor-row">
+        <span class="label">Template</span>
+        <select class="field"><option>home-power-v2 (published)</option><option>home-v3 (published)</option><option>home-discovery-v1 (published)</option><option>home-plus-v1 (published)</option></select>
+      </div>
+      <div class="editor-row">
+        <span class="label">Status</span>
+        <select class="field"><option>active</option><option>disabled</option></select>
+      </div>
+    </div>
+
+    <div class="editor-section">
+      <h6>Test this rule</h6>
+      <div class="editor-row">
+        <span class="label">Cohort</span>
+        <select class="field"><option>First-visit user</option><option>Returning user</option><option selected>Power user · 32 sessions</option><option>TrueVi+ subscriber</option></select>
+        <button class="ui-btn ghost">Test</button>
+      </div>
+      <div style="background:var(--tv-card); padding:10px 14px; border-radius:6px; border-left:3px solid var(--tv-cta); margin-top:6px; font-size:12px;">
+        <strong style="color:var(--tv-stone);">✓ Match</strong> ·
+        This rule would fire for the selected cohort. Rule #10 (First-visit discovery) does not match, so this rule wins.
+      </div>
+    </div>
+
+  </div>
+  <div class="editor-foot">
+    <button class="ui-btn ghost">Cancel</button>
+    <button class="ui-btn ghost" style="border-color:#6e2828; color:#ff8a8a;">Delete</button>
+    <button class="ui-btn primary">Save rule</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Annotated walkthrough</h2>
+
+<div class="annot">
+  <span class="num">1</span>
+  <div>
+    <strong>Page type tabs</strong>
+    Selector rules are scoped per page type. Each tab shows a count
+    of active rules. Clicking a tab swaps the rule list below.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">2</span>
+  <div>
+    <strong>Priority column</strong>
+    Lower priority value = evaluated first. Drag the grip handle to
+    reorder. Reordering visually rewrites the <code>priority</code>
+    integer in 10-unit increments (#10, #20, #30, …) so new rules can be
+    inserted between existing ones without renumbering everything.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">3</span>
+  <div>
+    <strong>Condition shorthand</strong>
+    The rule row shows the human-readable condition. The full predicate
+    lives in the rule's <code>condition</code> JSON column. The editor
+    panel translates the JSON to and from the builder UI.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">4</span>
+  <div>
+    <strong>The default rule is required</strong>
+    Every page type has a non-deletable default template that fires
+    when no rule matches. The default status toggle is locked on.
+    Admins can swap which template is the default but cannot remove it.
+    The Library returns <code>422 NO_TEMPLATE_FOR_PAGE_TYPE</code> if
+    a default is missing (M1.2 §4).
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">5</span>
+  <div>
+    <strong>Test this rule</strong>
+    Pick a synthetic cohort and evaluate. The system runs the entire
+    rule chain against the cohort and reports which rule would win
+    plus why earlier rules did not. Critical for catching ordering
+    mistakes.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Condition predicates</h2>
+
+<p>Conditions are evaluated against the merged user context (DerivedSignals + RequestEnvelope from M1.2 §5–6 + §11). All fields available in the picker:</p>
+
+<table>
+  <thead><tr><th style="width:24%">Field</th><th style="width:20%">Type</th><th>Source</th></tr></thead>
+  <tbody>
+    <tr><td><code>visitorType</code></td><td>enum</td><td>first-visit · returning · regular · power</td></tr>
+    <tr><td><code>tier</code></td><td>enum</td><td>new · vine · plus</td></tr>
+    <tr><td><code>sessionCount</code></td><td>int</td><td>From identities table</td></tr>
+    <tr><td><code>inferredFaithStage</code></td><td>enum</td><td>From inferences.inferred — confidence threshold applied</td></tr>
+    <tr><td><code>inferredLifeStage</code></td><td>enum</td><td>From inferences.inferred</td></tr>
+    <tr><td><code>inferredLifeEvents</code></td><td>set</td><td>Used with <code>in</code> / <code>not in</code></td></tr>
+    <tr><td><code>deviceClass</code></td><td>enum</td><td>desktop · tablet · mobile · tv</td></tr>
+    <tr><td><code>locale</code></td><td>string</td><td>e.g. en-US</td></tr>
+    <tr><td><code>geoCountry</code></td><td>ISO-3166-1</td><td>From IP, country-level only</td></tr>
+    <tr><td><code>referrerType</code></td><td>enum</td><td>direct · search · social · partner</td></tr>
+    <tr><td><code>utmCampaign</code></td><td>string</td><td>From request envelope</td></tr>
+    <tr><td><code>lastActiveMinistry</code></td><td>string</td><td>Slug</td></tr>
+    <tr><td><code>watchCompletionRate</code></td><td>numeric</td><td>0..1</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Operators: <code>==</code>, <code>!=</code>, <code>&gt;</code>,
+  <code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code>,
+  <code>in</code>, <code>not in</code>, <code>matches</code> (regex).
+</p>
+
+<p>
+  Multiple conditions on the same rule are joined with <code>AND</code>.
+  <code>OR</code> is achieved by creating multiple rules at the same
+  priority — both will match independently; the first written wins.
+</p>
+
+<!-- ============================================================ -->
+<h2>Data contract</h2>
+
+<h3>Stored shape</h3>
+<pre><code><span class="c">// selector_rules row — see M1.3 §8</span>
+{
+  <span class="k">"id"</span>:          <span class="s">"01919..."</span>,
+  <span class="k">"page_type"</span>:   <span class="s">"home"</span>,
+  <span class="k">"name"</span>:        <span class="s">"Power user — minimal hero"</span>,
+  <span class="k">"priority"</span>:    <span class="n">20</span>,
+  <span class="k">"condition"</span>: {
+    <span class="k">"all"</span>: [
+      { <span class="k">"field"</span>: <span class="s">"visitorType"</span>, <span class="k">"op"</span>: <span class="s">"=="</span>, <span class="k">"value"</span>: <span class="s">"power"</span> },
+      { <span class="k">"field"</span>: <span class="s">"sessionCount"</span>, <span class="k">"op"</span>: <span class="s">"&gt;"</span>, <span class="k">"value"</span>: <span class="n">30</span> }
+    ]
+  },
+  <span class="k">"template_id"</span>: <span class="s">"01919..."</span>,
+  <span class="k">"status"</span>:      <span class="s">"active"</span>
+}</code></pre>
+
+<h3>Endpoints</h3>
+<table>
+  <thead><tr><th>Endpoint</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>GET /console/selector-rules?pageType=home</code></td><td>List rules</td></tr>
+    <tr><td><code>POST /console/selector-rules</code></td><td>Create</td></tr>
+    <tr><td><code>PATCH /console/selector-rules/:id</code></td><td>Update</td></tr>
+    <tr><td><code>DELETE /console/selector-rules/:id</code></td><td>Delete (cannot delete default)</td></tr>
+    <tr><td><code>POST /console/selector-rules/test</code></td><td>Evaluate a cohort against the rule chain; return winning rule + trace</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Interactions</h2>
+
+<h3>Reordering by priority</h3>
+<p>
+  Drag the grip handle vertically. The dragged rule animates to the new
+  slot. On drop, all affected rules' <code>priority</code> values are
+  rewritten in the 10-unit grid. Persisted on drop.
+</p>
+
+<h3>Deleting a rule</h3>
+<p>
+  Confirmed via the ⋯ menu. Selector rules are hard-deleted (no soft
+  delete). Deleting the default is blocked — admin must first promote
+  another rule to default.
+</p>
+
+<h3>Promoting a rule to default</h3>
+<p>
+  Right-click ⋯ → "Make default." Swaps the rule's pinned position. The
+  previous default becomes a regular high-priority rule.
+</p>
+
+<h3>Interaction with experiments</h3>
+<p>
+  Selector rules are <strong>bypassed entirely</strong> when a user is
+  enrolled in a live experiment for the same page type. The experiment
+  variant overrides any rule decision (M1.1 §11). The UI shows a banner
+  on the relevant tab: <em>"2 active experiments override these rules
+  for some users."</em>
+</p>
+
+<hr/>
+<div class="navlinks">
+  <a href="03-console-template-builder.html">← M2.1 · Template Builder</a>
+  <a href="05-console-experiments.html">M2.3 · Experiments →</a>
+</div>
+
+</div>
+</body>
+</html>

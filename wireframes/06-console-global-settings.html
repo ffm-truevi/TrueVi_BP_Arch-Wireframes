@@ -1,0 +1,718 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TrueVi — Console: Global Settings (M2.4)</title>
+<style>
+  :root {
+    --tv-canvas:#030C0F; --tv-rail:#051318; --tv-card:#0A2830; --tv-card-hover:#112F38;
+    --tv-element-mid:#1A4E5C; --tv-accent:#245F70; --tv-glow:#2E7A8A;
+    --tv-cta:#C9902A; --tv-cta-bright:#E8A832; --tv-glacia:#C8E4E8;
+    --tv-secondary:#8FB8BE; --tv-stone:#E8E8E2; --tv-text-dark:#1A1A1A;
+    --tv-win:#5fa860;
+  }
+  * { box-sizing:border-box; }
+  html, body { margin:0; padding:0; background:var(--tv-canvas); color:var(--tv-glacia); }
+  body { font-family:"Jost","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-weight:300; line-height:1.6; font-size:15px; }
+  .docpage { max-width:1280px; margin:0 auto; padding:48px 32px 96px; }
+  .docmeta { color:var(--tv-secondary); font-size:12px; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--tv-element-mid); }
+  .wordmark { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:22px; margin-bottom:4px; }
+  .tagline { font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; color:var(--tv-secondary); font-size:14px; margin-bottom:24px; }
+  h1 { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:36px; margin:0 0 8px; }
+  h2 { font-family:"Jost",sans-serif; font-weight:700; color:var(--tv-stone); font-size:22px; margin:56px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--tv-element-mid); }
+  h3 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-stone); font-size:16px; margin:28px 0 8px; }
+  h4 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-glacia); font-size:13px; text-transform:uppercase; letter-spacing:.1em; margin:20px 0 6px; }
+  p, li { color:var(--tv-glacia); }
+  strong { color:var(--tv-stone); font-weight:600; }
+  em { color:var(--tv-secondary); font-style:italic; }
+  .lede { font-size:17px; color:var(--tv-glacia); margin-bottom:24px; }
+  .crumb { color:var(--tv-secondary); font-size:13px; margin-bottom:8px; }
+  .crumb a { color:var(--tv-cta-bright); text-decoration:none; }
+  code { font-family:"JetBrains Mono","Consolas",monospace; background:var(--tv-card); color:var(--tv-glacia); padding:2px 6px; border-radius:4px; font-size:13px; }
+  pre { font-family:"JetBrains Mono",monospace; background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:8px; padding:16px 20px; overflow-x:auto; font-size:12px; line-height:1.5; }
+  pre code { background:transparent; padding:0; }
+  pre .k { color: var(--tv-cta-bright); } pre .s { color:var(--tv-glacia); } pre .c { color: var(--tv-secondary); font-style:italic; } pre .n { color: var(--tv-glow); }
+  .callout { background:var(--tv-card); border-left:3px solid var(--tv-cta); padding:16px 20px; margin:18px 0; border-radius:0 8px 8px 0; }
+  .callout.principle { border-left-color: var(--tv-glow); }
+  .callout.warning { border-left-color: var(--tv-cta-bright); }
+  .callout h4 { margin-top:0; color: var(--tv-stone); }
+
+  .ui-wrap { background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:14px; overflow:hidden; margin:28px 0 32px; box-shadow:0 12px 48px rgba(0,0,0,.4); }
+  .ui-browser-chrome { background:var(--tv-canvas); padding:10px 16px; border-bottom:1px solid var(--tv-element-mid); display:flex; align-items:center; gap:8px; font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--tv-secondary); }
+  .ui-browser-chrome .dot { width:9px; height:9px; border-radius:50%; background:var(--tv-accent); }
+  .ui-browser-chrome .url { margin-left:12px; }
+  .ui-topbar { display:flex; align-items:center; gap:16px; padding:14px 22px; background:var(--tv-rail); border-bottom:1px solid var(--tv-element-mid); font-size:13px; }
+  .ui-topbar .breadcrumb { color:var(--tv-secondary); }
+  .ui-topbar .breadcrumb .current { color:var(--tv-stone); font-weight:600; }
+  .ui-topbar .spacer { flex:1; }
+  .ui-btn { padding:7px 16px; border-radius:6px; font-family:inherit; font-size:13px; font-weight:600; border:none; cursor:pointer; }
+  .ui-btn.ghost { background:transparent; color:var(--tv-glacia); border:1px solid var(--tv-accent); }
+  .ui-btn.primary { background:var(--tv-cta); color:var(--tv-text-dark); }
+
+  .settings-layout { display:grid; grid-template-columns: 220px 1fr; min-height:680px; }
+  .settings-nav { background:var(--tv-rail); border-right:1px solid var(--tv-element-mid); padding:18px 14px; }
+  .settings-nav a {
+    display:block; padding:10px 14px; color:var(--tv-glacia); text-decoration:none;
+    font-size:13px; border-radius:6px; margin-bottom:4px;
+  }
+  .settings-nav a.active { background:var(--tv-card); color:var(--tv-stone); border-left:3px solid var(--tv-cta); padding-left:11px; }
+  .settings-nav a:hover:not(.active) { background:var(--tv-card-hover); color:var(--tv-stone); }
+  .settings-nav h6 { font-family:"Jost",sans-serif; font-weight:600; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--tv-secondary); margin:18px 0 8px 14px; }
+  .settings-nav h6:first-of-type { margin-top:0; }
+
+  .settings-body { background:var(--tv-canvas); padding:28px 36px; overflow-y:auto; }
+
+  .setting-card {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:10px;
+    padding:20px 22px; margin-bottom:18px;
+  }
+  .setting-card h3 { margin:0 0 4px; }
+  .setting-card .sub { color:var(--tv-secondary); font-size:13px; margin-bottom:14px; }
+
+  .toggle-row {
+    display:grid; grid-template-columns: 1fr 220px; gap:24px; align-items:center;
+    padding:14px 0; border-top:1px solid var(--tv-element-mid);
+  }
+  .toggle-row:first-child { border-top:none; padding-top:4px; }
+  .toggle-row .label { color:var(--tv-stone); font-weight:600; font-size:13px; margin-bottom:2px; }
+  .toggle-row .desc { color:var(--tv-secondary); font-size:12px; }
+  .toggle-row .control { text-align:right; }
+
+  .switch-bigtoggle {
+    display:inline-flex; gap:0; background:var(--tv-rail); border:1px solid var(--tv-accent);
+    border-radius:8px; padding:3px; font-size:12px; font-weight:600;
+  }
+  .switch-bigtoggle .opt { padding:8px 16px; border-radius:6px; cursor:pointer; color:var(--tv-glacia); }
+  .switch-bigtoggle .opt.active { background:var(--tv-cta); color:var(--tv-text-dark); }
+
+  .field { background:var(--tv-rail); border:1px solid var(--tv-accent); border-radius:5px; padding:7px 10px; font-family:inherit; font-size:12px; color:var(--tv-glacia); width:120px; }
+  .field-wide { width:200px; }
+
+  .tier-toggle { display:inline-flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+  .tier-chip {
+    padding:5px 12px; border-radius:999px; font-size:11px; font-weight:600;
+    background:transparent; border:1px solid var(--tv-accent); color:var(--tv-glacia); cursor:pointer;
+  }
+  .tier-chip.on { background:var(--tv-cta); color:var(--tv-text-dark); border-color:var(--tv-cta); }
+
+  /* guardrails table */
+  .guardrail-tbl {
+    background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:8px;
+    overflow:hidden; margin-top:10px;
+  }
+  .guardrail-tbl .gh {
+    display:grid; grid-template-columns: 2fr 1fr 1fr 90px;
+    padding:10px 14px; background:var(--tv-rail); border-bottom:1px solid var(--tv-element-mid);
+    color:var(--tv-secondary); font-size:11px; text-transform:uppercase; letter-spacing:.1em; font-weight:600;
+  }
+  .guardrail-tbl .gr {
+    display:grid; grid-template-columns: 2fr 1fr 1fr 90px;
+    padding:11px 14px; border-top:1px solid var(--tv-element-mid);
+    color:var(--tv-glacia); font-size:12px; align-items:center;
+  }
+  .guardrail-tbl .gr:first-of-type { border-top:none; }
+  .guardrail-tbl .gr .name { color:var(--tv-stone); font-weight:600; }
+  .guardrail-tbl .gr .sub { color:var(--tv-secondary); font-size:11px; font-family:monospace; }
+  .guardrail-tbl .ro {
+    display:inline-block; padding:2px 8px; border-radius:999px; font-size:10px;
+    letter-spacing:.1em; text-transform:uppercase; font-weight:700;
+    background:transparent; color:var(--tv-secondary); border:1px solid var(--tv-accent);
+  }
+  .guardrail-tbl .threshold { font-family:"JetBrains Mono",monospace; color:var(--tv-stone); }
+
+  .audit-row {
+    display:grid; grid-template-columns: 130px 1fr 120px;
+    gap:12px; padding:10px 0; border-top:1px solid var(--tv-element-mid);
+    color:var(--tv-glacia); font-size:12px;
+  }
+  .audit-row:first-of-type { border-top:none; }
+  .audit-row .ts { color:var(--tv-secondary); font-family:monospace; font-size:11px; }
+  .audit-row .who { color:var(--tv-glacia); font-family:monospace; font-size:11px; text-align:right; }
+
+  .annot { display:flex; gap:14px; background:var(--tv-card); border-left:3px solid var(--tv-glow); padding:12px 16px; margin:18px 0; border-radius:0 6px 6px 0; font-size:13px; }
+  .annot .num { background:var(--tv-glow); color:var(--tv-stone); width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; flex-shrink:0; }
+  .annot strong { color: var(--tv-stone); display:block; margin-bottom:2px; }
+
+  table { width:100%; border-collapse:collapse; margin:16px 0; font-size:13px; }
+  th { text-align:left; padding:9px 12px; background:var(--tv-rail); color:var(--tv-stone); font-weight:600; border-bottom:1px solid var(--tv-accent); }
+  td { padding:9px 12px; border-bottom:1px solid var(--tv-element-mid); color:var(--tv-glacia); vertical-align:top; }
+
+  hr { border:none; border-top:1px solid var(--tv-element-mid); margin:40px 0; }
+  .navlinks { display:flex; justify-content:space-between; margin-top:32px; font-size:12px; color:var(--tv-secondary); }
+  .navlinks a { color:var(--tv-cta-bright); text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="docpage">
+
+<p class="crumb"><a href="../index.html">← Index</a> · M2 · Management Console</p>
+
+<div class="docmeta">
+  Document M2.4 · Global Settings · v0.1 · 2026-05-11 ·
+  Owner: Brian (COO) · Audience: TrueVi engineering team
+</div>
+
+<div class="wordmark">TrueVi</div>
+<div class="tagline">Console Wireframe · M2.4</div>
+
+<h1>Global Settings</h1>
+<p class="lede">
+  Console-wide controls that affect every template, every render, every
+  experiment. The monetization mode toggle. Default cache TTLs. The
+  read-only theological guardrails view. Component version pinning.
+  Locale defaults. Routes registry. An audit log of every change.
+</p>
+
+<div class="callout principle">
+  <h4>One sentence</h4>
+  <p style="margin:0">
+    Settings here are <strong>system-wide</strong>. Changes ripple to every
+    page render on the next cache window. Two of them
+    (<em>monetization mode</em> and <em>theological guardrails</em>) are
+    so consequential they require an explicit confirm step.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2>The screen</h2>
+
+<div class="ui-wrap">
+  <div class="ui-browser-chrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="url">my.truevi.tv/console/settings</span>
+  </div>
+
+  <div class="ui-topbar">
+    <div class="breadcrumb">Console &nbsp;›&nbsp; <span class="current">Global Settings</span></div>
+    <div class="spacer"></div>
+    <span style="color:var(--tv-secondary); font-size:11px;">Auto-saved · last change 4 min ago by <code style="font-size:11px;">brian</code></span>
+  </div>
+
+  <div class="settings-layout">
+
+    <!-- LEFT NAV -->
+    <div class="settings-nav">
+      <h6>Platform</h6>
+      <a href="#" class="active">Monetization</a>
+      <a href="#">Routes</a>
+      <a href="#">Locale &amp; i18n</a>
+
+      <h6>Library</h6>
+      <a href="#">Caching</a>
+      <a href="#">Inference</a>
+      <a href="#">Components</a>
+
+      <h6>Editorial</h6>
+      <a href="#">Theological guardrails</a>
+      <a href="#">Pins, Blocks, Boosts</a>
+
+      <h6>Audit</h6>
+      <a href="#">Change log</a>
+      <a href="#">Roles &amp; access</a>
+    </div>
+
+    <!-- BODY -->
+    <div class="settings-body">
+
+      <!-- ============= MONETIZATION ============= -->
+      <div class="setting-card">
+        <h3>Monetization mode</h3>
+        <p class="sub">Controls whether tier-gated components and content are enforced platform-wide. Use <em>open-all</em> pre-launch to expose every feature; flip to <em>tier-gated</em> when you start charging.</p>
+
+        <div class="toggle-row">
+          <div>
+            <div class="label">Platform mode</div>
+            <div class="desc">When <strong>open-all</strong>, every user sees every feature regardless of tier. When <strong>tier-gated</strong>, the Library enforces tier visibility on every component instance.</div>
+          </div>
+          <div class="control">
+            <div class="switch-bigtoggle">
+              <div class="opt active">Open-all</div>
+              <div class="opt">Tier-gated</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <div class="label">Default tier for new signups</div>
+            <div class="desc">The subscription tier assigned to a user immediately after signup, before any payment.</div>
+          </div>
+          <div class="control">
+            <select class="field field-wide"><option>new</option><option>vine (free trial)</option><option>plus (free trial)</option></select>
+          </div>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <div class="label">Free-trial duration</div>
+            <div class="desc">If new signups get a Vine or Plus trial, how many days before downgrade.</div>
+          </div>
+          <div class="control">
+            <input class="field" value="14"/> <span style="color:var(--tv-secondary); font-size:11px;">days</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============= ROUTES ============= -->
+      <div class="setting-card">
+        <h3>Route registry</h3>
+        <p class="sub">URL patterns and the page type each one renders. New routes appear here automatically when a developer registers them; admins can disable a route or remap its page type without code changes.</p>
+
+        <div class="guardrail-tbl">
+          <div class="gh">
+            <div>Path pattern</div>
+            <div>Page type</div>
+            <div>Template inputs</div>
+            <div>Status</div>
+          </div>
+          <div class="gr">
+            <div><span class="name">/</span></div>
+            <div>home</div>
+            <div class="sub">none</div>
+            <div><span class="ro" style="background:var(--tv-cta); color:var(--tv-text-dark); border:none;">Active</span></div>
+          </div>
+          <div class="gr">
+            <div><span class="name">/ministry/[slug]</span></div>
+            <div>ministry</div>
+            <div class="sub">ministrySlug</div>
+            <div><span class="ro" style="background:var(--tv-cta); color:var(--tv-text-dark); border:none;">Active</span></div>
+          </div>
+          <div class="gr">
+            <div><span class="name">/ministry/[slug]/series/[seriesSlug]</span></div>
+            <div>series</div>
+            <div class="sub">ministrySlug · seriesSlug</div>
+            <div><span class="ro" style="background:var(--tv-cta); color:var(--tv-text-dark); border:none;">Active</span></div>
+          </div>
+          <div class="gr">
+            <div><span class="name">/subject/[slug]</span></div>
+            <div>subject</div>
+            <div class="sub">subjectSlug</div>
+            <div><span class="ro" style="background:var(--tv-cta); color:var(--tv-text-dark); border:none;">Active</span></div>
+          </div>
+          <div class="gr">
+            <div><span class="name">/search</span></div>
+            <div>search</div>
+            <div class="sub">q (optional) · ministry (optional)</div>
+            <div><span class="ro" style="background:var(--tv-cta); color:var(--tv-text-dark); border:none;">Active</span></div>
+          </div>
+          <div class="gr">
+            <div><span class="name">/answer/[hash]</span></div>
+            <div>search-response</div>
+            <div class="sub">responseId</div>
+            <div><span class="ro" style="background:var(--tv-cta); color:var(--tv-text-dark); border:none;">Active</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============= LOCALE ============= -->
+      <div class="setting-card">
+        <h3>Locale &amp; internationalization</h3>
+        <p class="sub">Locale defaults and the locales the system considers "supported." Every user-visible copy field is keyed by locale; unsupported locales fall back to <code>en</code>.</p>
+
+        <div class="toggle-row">
+          <div>
+            <div class="label">Default locale</div>
+            <div class="desc">Fallback when a user's browser locale has no translation available.</div>
+          </div>
+          <div class="control">
+            <select class="field field-wide"><option>en (English)</option></select>
+          </div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Supported locales</div>
+            <div class="desc">Locales considered "supported" — Console copy editors get translation fields for these.</div>
+          </div>
+          <div class="control tier-toggle">
+            <span class="tier-chip on">en</span>
+            <span class="tier-chip">es</span>
+            <span class="tier-chip">pt</span>
+            <span class="tier-chip">fr</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============= CACHING ============= -->
+      <div class="setting-card">
+        <h3>Caching</h3>
+        <p class="sub">Default TTLs for the composition cache. Per-component overrides set in the Template Builder take precedence. Lower values feel more "alive" but cost more inference compute.</p>
+
+        <div class="toggle-row">
+          <div>
+            <div class="label">Composition cache TTL</div>
+            <div class="desc">How long a personalized page composition is reused for the same user before re-fetching.</div>
+          </div>
+          <div class="control">
+            <input class="field" value="900"/> <span style="color:var(--tv-secondary); font-size:11px;">seconds</span>
+          </div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Content cache TTL</div>
+            <div class="desc">How long Library content queries are cached. Independent of personalization.</div>
+          </div>
+          <div class="control">
+            <input class="field" value="3600"/> <span style="color:var(--tv-secondary); font-size:11px;">seconds</span>
+          </div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Edge cache TTL (anonymous)</div>
+            <div class="desc">CDN-level cache for cold, unauthenticated traffic only. Doesn't affect logged-in users.</div>
+          </div>
+          <div class="control">
+            <input class="field" value="300"/> <span style="color:var(--tv-secondary); font-size:11px;">seconds</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============= INFERENCE ============= -->
+      <div class="setting-card">
+        <h3>Inference engine</h3>
+        <p class="sub">Tuning for the warm-tier model. See architecture M1.1 §7. Hot and Cold tiers are not configurable from this screen.</p>
+
+        <div class="toggle-row">
+          <div>
+            <div class="label">Warm-tier event threshold</div>
+            <div class="desc">User is re-inferred after this many new events arrive.</div>
+          </div>
+          <div class="control"><input class="field" value="10"/> <span style="color:var(--tv-secondary); font-size:11px;">events</span></div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Warm-tier stale threshold</div>
+            <div class="desc">Force re-inference if a user has not been re-inferred for this long, even with no new events.</div>
+          </div>
+          <div class="control"><input class="field" value="24"/> <span style="color:var(--tv-secondary); font-size:11px;">hours</span></div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Confidence threshold for personalization</div>
+            <div class="desc">Below this, the Library treats the inference as low-confidence and blends with trending content.</div>
+          </div>
+          <div class="control"><input class="field" value="0.30"/></div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Confidence threshold for "trust"</div>
+            <div class="desc">Above this, the Library uses the inference without blending.</div>
+          </div>
+          <div class="control"><input class="field" value="0.60"/></div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Cold-tier nightly window</div>
+            <div class="desc">When the nightly decay + cohort recompute runs.</div>
+          </div>
+          <div class="control">
+            <select class="field field-wide"><option>02:00 UTC</option><option>03:00 UTC</option><option>04:00 UTC</option></select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============= COMPONENTS ============= -->
+      <div class="setting-card">
+        <h3>Component version policy</h3>
+        <p class="sub">How aggressively to recommend templates upgrade to newer component versions when they're published.</p>
+
+        <div class="toggle-row">
+          <div>
+            <div class="label">Auto-upgrade policy</div>
+            <div class="desc">Templates pin component versions. When a new version is published, what should the Console do?</div>
+          </div>
+          <div class="control">
+            <select class="field field-wide">
+              <option>Notify only (recommended)</option>
+              <option>Warn on publish</option>
+              <option>Auto-upgrade patch versions</option>
+            </select>
+          </div>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="label">Deprecated component grace period</div>
+            <div class="desc">How long templates can keep using a deprecated component before publish is blocked.</div>
+          </div>
+          <div class="control">
+            <input class="field" value="90"/> <span style="color:var(--tv-secondary); font-size:11px;">days</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============= THEOLOGICAL GUARDRAILS ============= -->
+      <div class="setting-card">
+        <h3>Theological guardrails <span style="color:var(--tv-cta-bright); font-size:11px; font-weight:600; margin-left:8px;">READ-ONLY</span></h3>
+        <p class="sub">The hard editorial rules enforced by the Library at query time. <strong>Cannot be edited from this screen.</strong> Changes require Pastoral Board sign-off and a separate review workflow.</p>
+
+        <div class="guardrail-tbl">
+          <div class="gh"><div>Rule</div><div>Type</div><div>Threshold</div><div>Status</div></div>
+          <div class="gr">
+            <div>
+              <div class="name">Minimum theological score</div>
+              <div class="sub">content_items.theological_score &gt;= floor</div>
+            </div>
+            <div>floor</div>
+            <div class="threshold">0.75</div>
+            <div><span class="ro" style="background:var(--tv-win); color:#0c2110; border:none;">Active</span></div>
+          </div>
+          <div class="gr">
+            <div>
+              <div class="name">Pastoral review required</div>
+              <div class="sub">pastoral_review_status == approved</div>
+            </div>
+            <div>required</div>
+            <div class="threshold">approved only</div>
+            <div><span class="ro" style="background:var(--tv-win); color:#0c2110; border:none;">Active</span></div>
+          </div>
+          <div class="gr">
+            <div>
+              <div class="name">Prosperity gospel block</div>
+              <div class="sub">content_warnings includes "prosperity-gospel" → reject</div>
+            </div>
+            <div>block</div>
+            <div class="threshold">any match</div>
+            <div><span class="ro" style="background:var(--tv-win); color:#0c2110; border:none;">Active</span></div>
+          </div>
+          <div class="gr">
+            <div>
+              <div class="name">Personality-cult content block</div>
+              <div class="sub">content_warnings includes "personality-cult" → reject</div>
+            </div>
+            <div>block</div>
+            <div class="threshold">any match</div>
+            <div><span class="ro" style="background:var(--tv-win); color:#0c2110; border:none;">Active</span></div>
+          </div>
+          <div class="gr">
+            <div>
+              <div class="name">Nicene Creed alignment</div>
+              <div class="sub">content tagged with denomination outside accepted set → reject</div>
+            </div>
+            <div>block</div>
+            <div class="threshold">accepted list</div>
+            <div><span class="ro" style="background:var(--tv-win); color:#0c2110; border:none;">Active</span></div>
+          </div>
+        </div>
+
+        <p style="font-size:12px; color:var(--tv-secondary); margin-top:12px; font-style:italic;">
+          Pastoral Board contact: pastoral-board@truevi.tv ·
+          Last reviewed 2026-04-22 · Next review 2026-07-22
+        </p>
+      </div>
+
+      <!-- ============= AUDIT ============= -->
+      <div class="setting-card">
+        <h3>Recent setting changes</h3>
+        <p class="sub">All edits to global settings are recorded. Shows the last 5 changes; full log on the Audit page.</p>
+
+        <div class="audit-row">
+          <span class="ts">2026-05-11 14:08</span>
+          <span><strong style="color:var(--tv-stone);">Warm-tier event threshold</strong> changed from <code>15</code> to <code>10</code></span>
+          <span class="who">brian</span>
+        </div>
+        <div class="audit-row">
+          <span class="ts">2026-05-10 09:42</span>
+          <span><strong style="color:var(--tv-stone);">Composition cache TTL</strong> changed from <code>1800</code> to <code>900</code></span>
+          <span class="who">brian</span>
+        </div>
+        <div class="audit-row">
+          <span class="ts">2026-05-08 16:30</span>
+          <span><strong style="color:var(--tv-stone);">Route</strong> <code>/answer/[hash]</code> activated</span>
+          <span class="who">devon</span>
+        </div>
+        <div class="audit-row">
+          <span class="ts">2026-04-22 11:15</span>
+          <span><strong style="color:var(--tv-stone);">Theological guardrails</strong> reviewed and confirmed by Pastoral Board (read-only update)</span>
+          <span class="who">pastoral-board</span>
+        </div>
+        <div class="audit-row">
+          <span class="ts">2026-04-15 08:00</span>
+          <span><strong style="color:var(--tv-stone);">Platform mode</strong> set to <code>open-all</code> (initial launch config)</span>
+          <span class="who">bunker</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Annotated walkthrough</h2>
+
+<div class="annot">
+  <span class="num">1</span>
+  <div>
+    <strong>Settings nav · grouped by domain</strong>
+    Platform, Library, Editorial, Audit. Order matters: most-frequently-changed
+    settings first, irreversible/sensitive settings later.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">2</span>
+  <div>
+    <strong>Monetization mode toggle</strong>
+    The single most consequential switch in the entire Console. Flipping
+    from <em>open-all</em> to <em>tier-gated</em> immediately hides
+    tier-restricted components from free-tier users on the next cache
+    window. The UI requires a confirm dialog and a "I understand this
+    will change the experience for thousands of users" checkbox.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">3</span>
+  <div>
+    <strong>Route registry is mostly auto-managed</strong>
+    Developers register routes via code; this screen displays them. Admins
+    can disable a route (returns 404) or change its bound page type — but
+    cannot invent new path patterns from this UI.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">4</span>
+  <div>
+    <strong>Inference tuning</strong>
+    These knobs change the felt personalization quality. Lower thresholds
+    = more aggressive personalization but more cold-start mistakes. Higher
+    thresholds = safer but slower to feel personalized. Defaults are
+    conservative; A/B test before changing in production.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">5</span>
+  <div>
+    <strong>Theological guardrails — display only</strong>
+    A read-only mirror of the rules enforced by the Library. Edits require
+    a separate Pastoral Board workflow. This screen exists to make the
+    rules visible to admins and engineers without giving them the ability
+    to disable them. From the architecture (M1.1 §9): guardrails are
+    always on, even for experiments.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">6</span>
+  <div>
+    <strong>Audit log on the same page</strong>
+    The last 5 changes appear inline so admins notice if a setting changed
+    unexpectedly. Full chronological audit log is on its own subpage.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Data contract</h2>
+
+<h3>Stored shape</h3>
+<pre><code><span class="c">// global_settings — a single-row table or a key/value store</span>
+{
+  <span class="k">"monetization"</span>: {
+    <span class="k">"mode"</span>:                <span class="s">"open-all" | "tier-gated"</span>,
+    <span class="k">"defaultTierOnSignup"</span>: <span class="s">"new"</span>,
+    <span class="k">"freeTrialDays"</span>:       <span class="n">14</span>
+  },
+  <span class="k">"locale"</span>: {
+    <span class="k">"default"</span>:    <span class="s">"en"</span>,
+    <span class="k">"supported"</span>:  [<span class="s">"en"</span>]
+  },
+  <span class="k">"caching"</span>: {
+    <span class="k">"compositionTtlSec"</span>: <span class="n">900</span>,
+    <span class="k">"contentTtlSec"</span>:     <span class="n">3600</span>,
+    <span class="k">"edgeTtlSec"</span>:        <span class="n">300</span>
+  },
+  <span class="k">"inference"</span>: {
+    <span class="k">"warmEventThreshold"</span>:        <span class="n">10</span>,
+    <span class="k">"warmStaleHours"</span>:            <span class="n">24</span>,
+    <span class="k">"confidenceLowThreshold"</span>:    <span class="n">0.30</span>,
+    <span class="k">"confidenceTrustThreshold"</span>:  <span class="n">0.60</span>,
+    <span class="k">"coldNightlyUtcHour"</span>:        <span class="n">2</span>
+  },
+  <span class="k">"components"</span>: {
+    <span class="k">"versionPolicy"</span>:           <span class="s">"notify"</span>,
+    <span class="k">"deprecatedGracePeriodDays"</span>: <span class="n">90</span>
+  }
+
+  <span class="c">// guardrails are NOT stored here — they live in their own</span>
+  <span class="c">// pastoral-board-managed table with separate access control</span>
+}</code></pre>
+
+<h3>Endpoints</h3>
+<table>
+  <thead><tr><th>Endpoint</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>GET /console/settings</code></td><td>Read all settings</td></tr>
+    <tr><td><code>PATCH /console/settings</code></td><td>Partial update — autosave per field</td></tr>
+    <tr><td><code>POST /console/settings/confirm-mode-change</code></td><td>Special endpoint for the monetization-mode toggle; requires acknowledgment payload</td></tr>
+    <tr><td><code>GET /console/settings/audit?limit=50</code></td><td>Audit log</td></tr>
+    <tr><td><code>GET /console/guardrails</code></td><td>Read-only theological guardrails (no PATCH)</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Propagation rules</h2>
+
+<table>
+  <thead><tr><th>Setting</th><th>Takes effect</th><th>Affects</th></tr></thead>
+  <tbody>
+    <tr><td>Monetization mode</td><td>Next composition cache TTL expiry (≤ 15 min)</td><td>Every render</td></tr>
+    <tr><td>Default tier on signup</td><td>Immediately</td><td>New signups only</td></tr>
+    <tr><td>Caching TTLs</td><td>Next cache write after save</td><td>All renders</td></tr>
+    <tr><td>Inference thresholds</td><td>Next warm-tier run</td><td>Per-user, as inferences refresh</td></tr>
+    <tr><td>Locale default/supported</td><td>Immediately</td><td>Console editor UI; renderer fallback chain</td></tr>
+    <tr><td>Route status</td><td>Within ~60s (route table refresh)</td><td>Only the toggled route</td></tr>
+    <tr><td>Component version policy</td><td>Next template publish action</td><td>Validation warnings</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Confirm-required actions</h2>
+
+<p>Two settings require an explicit confirmation step before the change is committed.</p>
+
+<div class="callout warning">
+  <h4>Monetization mode</h4>
+  <p style="margin:0">
+    Flipping from <em>open-all</em> to <em>tier-gated</em> hides
+    tier-restricted components from free-tier users — potentially the
+    majority of the audience. The confirm dialog:
+    <em>"This will hide premium components from N free-tier users on the
+    next cache window. Type CONFIRM to proceed."</em>
+  </p>
+</div>
+
+<div class="callout warning">
+  <h4>Route deactivation</h4>
+  <p style="margin:0">
+    Disabling a route causes it to return 404 for all users.
+    Confirm dialog notes inbound traffic from the last 24 hours so the
+    admin can see what they're about to break.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2>Empty / first-run state</h2>
+
+<p>
+  On a fresh install, settings are seeded with the defaults shown above.
+  The first admin to visit the page sees a one-time banner:
+</p>
+<div class="callout">
+  <p style="margin:0;">
+    <strong>Welcome.</strong> Your platform is in <em>open-all</em> mode —
+    every feature is visible to every visitor. When you're ready to start
+    monetizing, flip the Platform mode toggle. Until then, the tier-gated
+    settings on each component are saved but not enforced.
+  </p>
+</div>
+
+<hr/>
+<div class="navlinks">
+  <a href="05-console-experiments.html">← M2.3 · Experiments</a>
+  <a href="../index.html">Index · M3 begins next →</a>
+</div>
+
+</div>
+</body>
+</html>

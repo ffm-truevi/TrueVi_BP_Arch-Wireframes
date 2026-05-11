@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TrueVi — Console: Experiments (M2.3)</title>
+<style>
+  :root {
+    --tv-canvas:#030C0F; --tv-rail:#051318; --tv-card:#0A2830; --tv-card-hover:#112F38;
+    --tv-element-mid:#1A4E5C; --tv-accent:#245F70; --tv-glow:#2E7A8A;
+    --tv-cta:#C9902A; --tv-cta-bright:#E8A832; --tv-glacia:#C8E4E8;
+    --tv-secondary:#8FB8BE; --tv-stone:#E8E8E2; --tv-text-dark:#1A1A1A;
+    --tv-win:#5fa860; --tv-loss:#b04545;
+  }
+  * { box-sizing:border-box; }
+  html, body { margin:0; padding:0; background:var(--tv-canvas); color:var(--tv-glacia); }
+  body { font-family:"Jost","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-weight:300; line-height:1.6; font-size:15px; }
+  .docpage { max-width:1280px; margin:0 auto; padding:48px 32px 96px; }
+  .docmeta { color:var(--tv-secondary); font-size:12px; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--tv-element-mid); }
+  .wordmark { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:22px; margin-bottom:4px; }
+  .tagline { font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; color:var(--tv-secondary); font-size:14px; margin-bottom:24px; }
+  h1 { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:36px; margin:0 0 8px; }
+  h2 { font-family:"Jost",sans-serif; font-weight:700; color:var(--tv-stone); font-size:22px; margin:56px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--tv-element-mid); }
+  h3 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-stone); font-size:16px; margin:28px 0 8px; }
+  h4 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-glacia); font-size:13px; text-transform:uppercase; letter-spacing:.1em; margin:20px 0 6px; }
+  p, li { color:var(--tv-glacia); }
+  strong { color:var(--tv-stone); font-weight:600; }
+  em { color:var(--tv-secondary); font-style:italic; }
+  .lede { font-size:17px; color:var(--tv-glacia); margin-bottom:24px; }
+  .crumb { color:var(--tv-secondary); font-size:13px; margin-bottom:8px; }
+  .crumb a { color:var(--tv-cta-bright); text-decoration:none; }
+  code { font-family:"JetBrains Mono","Consolas",monospace; background:var(--tv-card); color:var(--tv-glacia); padding:2px 6px; border-radius:4px; font-size:13px; }
+  pre { font-family:"JetBrains Mono",monospace; background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:8px; padding:16px 20px; overflow-x:auto; font-size:12px; line-height:1.5; }
+  pre code { background:transparent; padding:0; }
+  pre .k { color:var(--tv-cta-bright); } pre .s { color:var(--tv-glacia); } pre .c { color:var(--tv-secondary); font-style:italic; } pre .n { color:var(--tv-glow); }
+  .callout { background:var(--tv-card); border-left:3px solid var(--tv-cta); padding:16px 20px; margin:18px 0; border-radius:0 8px 8px 0; }
+  .callout.principle { border-left-color:var(--tv-glow); }
+  .callout h4 { margin-top:0; color:var(--tv-stone); }
+
+  /* UI */
+  .ui-wrap { background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:14px; overflow:hidden; margin:28px 0 32px; box-shadow:0 12px 48px rgba(0,0,0,.4); }
+  .ui-browser-chrome { background:var(--tv-canvas); padding:10px 16px; border-bottom:1px solid var(--tv-element-mid); display:flex; align-items:center; gap:8px; font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--tv-secondary); }
+  .ui-browser-chrome .dot { width:9px; height:9px; border-radius:50%; background:var(--tv-accent); }
+  .ui-browser-chrome .url { margin-left:12px; }
+  .ui-topbar { display:flex; align-items:center; gap:16px; padding:14px 22px; background:var(--tv-rail); border-bottom:1px solid var(--tv-element-mid); font-size:13px; }
+  .ui-topbar .breadcrumb { color:var(--tv-secondary); }
+  .ui-topbar .breadcrumb .current { color:var(--tv-stone); font-weight:600; }
+  .ui-topbar .spacer { flex:1; }
+  .ui-btn { padding:7px 16px; border-radius:6px; font-family:inherit; font-size:13px; font-weight:600; border:none; cursor:pointer; }
+  .ui-btn.ghost { background:transparent; color:var(--tv-glacia); border:1px solid var(--tv-accent); }
+  .ui-btn.primary { background:var(--tv-cta); color:var(--tv-text-dark); }
+  .ui-btn.win { background:var(--tv-win); color:#0c2110; }
+
+  .ui-body { background:var(--tv-canvas); padding:24px 28px; min-height:600px; }
+
+  .filter-bar { display:flex; gap:10px; align-items:center; margin-bottom:18px; }
+  .filter-pill { padding:6px 14px; border-radius:999px; border:1px solid var(--tv-accent); color:var(--tv-glacia); font-size:12px; cursor:pointer; background:transparent; }
+  .filter-pill.active { background:var(--tv-cta); color:var(--tv-text-dark); border-color:var(--tv-cta); font-weight:600; }
+  .filter-pill .count { opacity:.7; margin-left:4px; }
+
+  .exp-list { display:flex; flex-direction:column; gap:10px; }
+  .exp-card {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:10px;
+    padding:16px 20px;
+    display:grid; grid-template-columns: 90px 1fr 220px 180px 80px;
+    gap:18px; align-items:center;
+  }
+  .exp-status {
+    display:inline-block; padding:3px 10px; border-radius:999px;
+    font-size:10px; letter-spacing:.1em; text-transform:uppercase; font-weight:700;
+  }
+  .exp-status.live { background:var(--tv-win); color:#0c2110; }
+  .exp-status.draft { background:transparent; color:var(--tv-secondary); border:1px solid var(--tv-accent); }
+  .exp-status.paused { background:var(--tv-cta-bright); color:var(--tv-text-dark); }
+  .exp-status.concluded { background:transparent; color:var(--tv-cta); border:1px solid var(--tv-cta); }
+
+  .exp-info .name { color:var(--tv-stone); font-weight:600; font-size:14px; margin-bottom:2px; }
+  .exp-info .sub { color:var(--tv-secondary); font-size:11px; font-family:"JetBrains Mono",monospace; }
+
+  .exp-kpi .label { color:var(--tv-secondary); font-size:10px; text-transform:uppercase; letter-spacing:.1em; margin-bottom:2px; }
+  .exp-kpi .value { color:var(--tv-stone); font-weight:600; font-size:15px; }
+  .exp-kpi .delta { font-size:12px; font-weight:600; margin-left:6px; }
+  .exp-kpi .delta.up { color:var(--tv-win); }
+  .exp-kpi .delta.down { color:var(--tv-loss); }
+
+  .exp-meta { color:var(--tv-glacia); font-size:11px; }
+  .exp-meta .row { display:flex; justify-content:space-between; padding:2px 0; }
+  .exp-meta .row .label { color:var(--tv-secondary); }
+
+  /* detail page */
+  .detail-grid { display:grid; grid-template-columns: 1fr 320px; gap:24px; margin-top:18px; }
+  .detail-main h3 { margin-top:0; }
+  .variant-card {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:10px;
+    padding:16px 20px; margin-bottom:12px;
+  }
+  .variant-card.winner { border-color:var(--tv-win); box-shadow:0 0 0 2px rgba(95,168,96,.18); }
+  .variant-head { display:flex; align-items:baseline; gap:12px; margin-bottom:10px; }
+  .variant-head .label {
+    background:var(--tv-accent); color:var(--tv-stone); padding:2px 10px;
+    border-radius:999px; font-size:10px; letter-spacing:.1em; text-transform:uppercase; font-weight:700;
+  }
+  .variant-card.winner .variant-head .label { background:var(--tv-win); color:#0c2110; }
+  .variant-head .name { color:var(--tv-stone); font-weight:600; font-size:15px; }
+  .variant-head .tpl { color:var(--tv-secondary); font-family:monospace; font-size:11px; }
+  .variant-head .alloc { margin-left:auto; color:var(--tv-glacia); font-family:monospace; font-size:13px; }
+  .variant-kpis { display:grid; grid-template-columns: repeat(4, 1fr); gap:14px; }
+  .kpi-stat .label { color:var(--tv-secondary); font-size:10px; text-transform:uppercase; letter-spacing:.1em; margin-bottom:4px; }
+  .kpi-stat .value { color:var(--tv-stone); font-weight:600; font-size:18px; }
+  .kpi-stat .lift { font-size:11px; margin-top:2px; }
+  .kpi-stat .lift.up { color:var(--tv-win); }
+  .kpi-stat .lift.down { color:var(--tv-loss); }
+
+  .sig-bar { height:6px; background:var(--tv-element-mid); border-radius:3px; margin-top:18px; position:relative; overflow:hidden; }
+  .sig-bar .fill { background:var(--tv-win); height:100%; }
+  .sig-label { display:flex; justify-content:space-between; color:var(--tv-secondary); font-size:11px; margin-top:6px; }
+
+  .side-panel { background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:10px; padding:18px 20px; }
+  .side-panel h5 { font-family:"Jost",sans-serif; font-weight:700; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--tv-stone); margin:0 0 10px; }
+  .side-row { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--tv-element-mid); font-size:12px; }
+  .side-row:last-child { border:none; }
+  .side-row .label { color:var(--tv-secondary); }
+  .side-row .value { color:var(--tv-stone); font-family:monospace; }
+  .side-panel .danger { color:#ff8a8a; }
+
+  /* wizard */
+  .wizard { background:var(--tv-rail); border:1px solid var(--tv-cta); border-radius:12px; margin:24px 0; }
+  .wizard-head { padding:16px 22px; border-bottom:1px solid var(--tv-element-mid); display:flex; align-items:center; gap:16px; }
+  .wizard-head .t { font-family:"Jost",sans-serif; color:var(--tv-stone); font-size:15px; font-weight:600; }
+  .step-pip { width:24px; height:24px; border-radius:50%; background:var(--tv-card); border:1px solid var(--tv-accent); display:inline-flex; align-items:center; justify-content:center; font-family:monospace; font-size:11px; color:var(--tv-secondary); }
+  .step-pip.active { background:var(--tv-cta); color:var(--tv-text-dark); border-color:var(--tv-cta); font-weight:700; }
+  .step-pip.done { background:var(--tv-win); color:#0c2110; border-color:var(--tv-win); }
+  .step-line { width:32px; height:1px; background:var(--tv-element-mid); }
+  .wizard-body { padding:22px; }
+  .wizard-row { display:flex; gap:12px; align-items:center; margin-bottom:14px; }
+  .wizard-row .label { color:var(--tv-secondary); font-size:12px; min-width:130px; }
+  .field { background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:5px; padding:7px 10px; font-family:inherit; font-size:12px; color:var(--tv-glacia); flex:1; }
+  .wizard-foot { padding:14px 22px; border-top:1px solid var(--tv-element-mid); display:flex; justify-content:space-between; }
+
+  .annot { display:flex; gap:14px; background:var(--tv-card); border-left:3px solid var(--tv-glow); padding:12px 16px; margin:18px 0; border-radius:0 6px 6px 0; font-size:13px; }
+  .annot .num { background:var(--tv-glow); color:var(--tv-stone); width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; flex-shrink:0; }
+  .annot strong { color:var(--tv-stone); display:block; margin-bottom:2px; }
+
+  table { width:100%; border-collapse:collapse; margin:16px 0; font-size:13px; }
+  th { text-align:left; padding:9px 12px; background:var(--tv-rail); color:var(--tv-stone); font-weight:600; border-bottom:1px solid var(--tv-accent); }
+  td { padding:9px 12px; border-bottom:1px solid var(--tv-element-mid); color:var(--tv-glacia); vertical-align:top; }
+
+  hr { border:none; border-top:1px solid var(--tv-element-mid); margin:40px 0; }
+  .navlinks { display:flex; justify-content:space-between; margin-top:32px; font-size:12px; color:var(--tv-secondary); }
+  .navlinks a { color:var(--tv-cta-bright); text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="docpage">
+
+<p class="crumb"><a href="../index.html">← Index</a> · M2 · Management Console</p>
+
+<div class="docmeta">
+  Document M2.3 · Experiments · v0.1 · 2026-05-11 ·
+  Owner: Brian (COO) · Audience: TrueVi engineering team
+</div>
+
+<div class="wordmark">TrueVi</div>
+<div class="tagline">Console Wireframe · M2.3</div>
+
+<h1>Experiments</h1>
+<p class="lede">
+  Author, run, monitor, and conclude A/B experiments. Each experiment pits
+  two or more templates of the same page type against each other. Stable
+  cohort assignment, four locked primary KPIs, automatic guardrail
+  monitoring, statistical-significance readout, one-click promote-winner.
+</p>
+
+<div class="callout principle">
+  <h4>One sentence</h4>
+  <p style="margin:0">
+    Experiments are how the team learns what actually works. They
+    <strong>override</strong> selector rules for assigned users and report
+    every event with their <code>experimentId</code> + <code>variantId</code>
+    so the inference engine can learn per-variant (M1.1 §11).
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2>Experiment list</h2>
+
+<div class="ui-wrap">
+  <div class="ui-browser-chrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="url">my.truevi.tv/console/experiments</span>
+  </div>
+
+  <div class="ui-topbar">
+    <div class="breadcrumb">Console &nbsp;›&nbsp; <span class="current">Experiments</span></div>
+    <div class="spacer"></div>
+    <button class="ui-btn primary">+ New experiment</button>
+  </div>
+
+  <div class="ui-body">
+    <div class="filter-bar">
+      <button class="filter-pill active">All <span class="count">12</span></button>
+      <button class="filter-pill">Live <span class="count">3</span></button>
+      <button class="filter-pill">Draft <span class="count">2</span></button>
+      <button class="filter-pill">Paused <span class="count">1</span></button>
+      <button class="filter-pill">Concluded <span class="count">6</span></button>
+    </div>
+
+    <div class="exp-list">
+
+      <div class="exp-card">
+        <span class="exp-status live">Live</span>
+        <div class="exp-info">
+          <div class="name">Home Hero · Carousel vs Static</div>
+          <div class="sub">pageType: home · started 2026-05-04 · 7 days running</div>
+        </div>
+        <div class="exp-kpi">
+          <div class="label">Watch completion · primary</div>
+          <div class="value">0.64 <span class="delta up">+8.2%</span></div>
+        </div>
+        <div class="exp-meta">
+          <div class="row"><span class="label">Sample</span><span>4,128 / 4,000</span></div>
+          <div class="row"><span class="label">Significance</span><span style="color:var(--tv-win)">96%</span></div>
+          <div class="row"><span class="label">Variants</span><span>2 (50/50)</span></div>
+        </div>
+        <button class="ui-btn win">Promote</button>
+      </div>
+
+      <div class="exp-card">
+        <span class="exp-status live">Live</span>
+        <div class="exp-info">
+          <div class="name">AskAnything · Hero card vs sticky bottom</div>
+          <div class="sub">pageType: home · started 2026-05-08 · 3 days running</div>
+        </div>
+        <div class="exp-kpi">
+          <div class="label">Ask Anything engagement</div>
+          <div class="value">0.21 <span class="delta down">−2.1%</span></div>
+        </div>
+        <div class="exp-meta">
+          <div class="row"><span class="label">Sample</span><span>1,802 / 4,000</span></div>
+          <div class="row"><span class="label">Significance</span><span style="color:var(--tv-secondary)">61%</span></div>
+          <div class="row"><span class="label">Variants</span><span>2 (50/50)</span></div>
+        </div>
+        <button class="ui-btn ghost">View</button>
+      </div>
+
+      <div class="exp-card">
+        <span class="exp-status live">Live</span>
+        <div class="exp-info">
+          <div class="name">Ministry hero · pastor-first vs ministry-first</div>
+          <div class="sub">pageType: ministry · started 2026-04-29 · 12 days running</div>
+        </div>
+        <div class="exp-kpi">
+          <div class="label">Watch completion · primary</div>
+          <div class="value">0.58 <span class="delta up">+3.4%</span></div>
+        </div>
+        <div class="exp-meta">
+          <div class="row"><span class="label">Sample</span><span>6,201 / 4,000</span></div>
+          <div class="row"><span class="label">Significance</span><span style="color:var(--tv-cta-bright)">82%</span></div>
+          <div class="row"><span class="label">Variants</span><span>2 (50/50)</span></div>
+        </div>
+        <button class="ui-btn ghost">View</button>
+      </div>
+
+      <div class="exp-card">
+        <span class="exp-status paused">Paused</span>
+        <div class="exp-info">
+          <div class="name">Search Response · empathic vs scriptural</div>
+          <div class="sub">pageType: search-response · paused 2026-05-09 · guardrail tripped</div>
+        </div>
+        <div class="exp-kpi">
+          <div class="label">Return visit · primary</div>
+          <div class="value">0.14 <span class="delta down">−12%</span></div>
+        </div>
+        <div class="exp-meta">
+          <div class="row"><span class="label">Sample</span><span>892 / 4,000</span></div>
+          <div class="row"><span class="label">Significance</span><span style="color:var(--tv-loss)">guardrail</span></div>
+          <div class="row"><span class="label">Variants</span><span>2 (50/50)</span></div>
+        </div>
+        <button class="ui-btn ghost">View</button>
+      </div>
+
+      <div class="exp-card">
+        <span class="exp-status draft">Draft</span>
+        <div class="exp-info">
+          <div class="name">Home · UpgradeTeaser placement test</div>
+          <div class="sub">pageType: home · not started</div>
+        </div>
+        <div class="exp-kpi">
+          <div class="label">Signup conversion · primary</div>
+          <div class="value" style="color:var(--tv-secondary)">—</div>
+        </div>
+        <div class="exp-meta">
+          <div class="row"><span class="label">Sample</span><span>—</span></div>
+          <div class="row"><span class="label">Variants</span><span>3 (33/33/34)</span></div>
+          <div class="row"><span class="label">Owner</span><span>brian</span></div>
+        </div>
+        <button class="ui-btn ghost">Edit</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Experiment detail</h2>
+
+<p>Clicking an experiment opens its detail view — variants side-by-side with stat-sig and per-KPI lift.</p>
+
+<div class="ui-wrap">
+  <div class="ui-browser-chrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="url">my.truevi.tv/console/experiments/home-hero-carousel-vs-static</span>
+  </div>
+
+  <div class="ui-topbar">
+    <div class="breadcrumb">Console &nbsp;›&nbsp; Experiments &nbsp;›&nbsp; <span class="current">Home Hero · Carousel vs Static</span></div>
+    <span class="exp-status live" style="margin-left:8px;">Live · day 7 of 30</span>
+    <div class="spacer"></div>
+    <button class="ui-btn ghost">Pause</button>
+    <button class="ui-btn ghost">Extend</button>
+    <button class="ui-btn win">Promote variant-B</button>
+  </div>
+
+  <div class="ui-body">
+    <div class="detail-grid">
+
+      <div class="detail-main">
+
+        <div class="variant-card">
+          <div class="variant-head">
+            <span class="label">Control</span>
+            <span class="name">Static Hero</span>
+            <span class="tpl">home-v3</span>
+            <span class="alloc">50% · 2,063 users</span>
+          </div>
+          <div class="variant-kpis">
+            <div class="kpi-stat">
+              <div class="label">Watch completion ★</div>
+              <div class="value">0.591</div>
+              <div class="lift">baseline</div>
+            </div>
+            <div class="kpi-stat">
+              <div class="label">Return visit 7d</div>
+              <div class="value">0.412</div>
+              <div class="lift">baseline</div>
+            </div>
+            <div class="kpi-stat">
+              <div class="label">Signup conversion</div>
+              <div class="value">0.038</div>
+              <div class="lift">baseline</div>
+            </div>
+            <div class="kpi-stat">
+              <div class="label">Ask Anything engagement</div>
+              <div class="value">0.184</div>
+              <div class="lift">baseline</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="variant-card winner">
+          <div class="variant-head">
+            <span class="label">Winner</span>
+            <span class="name">Carousel Hero</span>
+            <span class="tpl">home-v3-carousel</span>
+            <span class="alloc">50% · 2,065 users</span>
+          </div>
+          <div class="variant-kpis">
+            <div class="kpi-stat">
+              <div class="label">Watch completion ★</div>
+              <div class="value">0.640</div>
+              <div class="lift up">+8.2% (p=0.04)</div>
+            </div>
+            <div class="kpi-stat">
+              <div class="label">Return visit 7d</div>
+              <div class="value">0.428</div>
+              <div class="lift up">+3.9%</div>
+            </div>
+            <div class="kpi-stat">
+              <div class="label">Signup conversion</div>
+              <div class="value">0.041</div>
+              <div class="lift up">+7.9%</div>
+            </div>
+            <div class="kpi-stat">
+              <div class="label">Ask Anything engagement</div>
+              <div class="value">0.182</div>
+              <div class="lift down">−1.0%</div>
+            </div>
+          </div>
+
+          <div class="sig-bar"><div class="fill" style="width:96%;"></div></div>
+          <div class="sig-label">
+            <span>Statistical significance (primary KPI)</span>
+            <span style="color:var(--tv-win)">96% · threshold 95%</span>
+          </div>
+        </div>
+
+        <h3>Guardrail KPIs</h3>
+        <table>
+          <thead><tr><th>Guardrail</th><th>Control</th><th>Variant B</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Theological complaint rate</td><td>0.000</td><td>0.000</td><td style="color:var(--tv-win)">OK</td></tr>
+            <tr><td>Crash rate</td><td>0.001</td><td>0.001</td><td style="color:var(--tv-win)">OK</td></tr>
+            <tr><td>Page load p95 (ms)</td><td>1,840</td><td>1,902</td><td style="color:var(--tv-win)">OK</td></tr>
+            <tr><td>Bounce rate</td><td>0.31</td><td>0.30</td><td style="color:var(--tv-win)">OK</td></tr>
+          </tbody>
+        </table>
+
+      </div>
+
+      <div class="side-panel">
+        <h5>Experiment</h5>
+        <div class="side-row"><span class="label">id</span><span class="value">home-hero-carousel</span></div>
+        <div class="side-row"><span class="label">page type</span><span class="value">home</span></div>
+        <div class="side-row"><span class="label">assignment key</span><span class="value">userId</span></div>
+        <div class="side-row"><span class="label">started</span><span class="value">2026-05-04</span></div>
+        <div class="side-row"><span class="label">duration</span><span class="value">7 / 30 d</span></div>
+        <div class="side-row"><span class="label">primary KPI</span><span class="value">watch_completion</span></div>
+        <div class="side-row"><span class="label">sig threshold</span><span class="value">0.95</span></div>
+        <div class="side-row"><span class="label">min sample</span><span class="value">2,000 / var</span></div>
+        <div class="side-row"><span class="label">owner</span><span class="value">brian</span></div>
+
+        <h5 style="margin-top:24px;">Cohort</h5>
+        <div class="side-row"><span class="label">included</span><span class="value">all users</span></div>
+        <div class="side-row"><span class="label">excluded</span><span class="value">tier=plus</span></div>
+
+        <h5 style="margin-top:24px;">Actions</h5>
+        <button class="ui-btn ghost" style="width:100%; margin-top:6px;">Export results CSV</button>
+        <button class="ui-btn ghost" style="width:100%; margin-top:6px;">View activity events</button>
+        <button class="ui-btn ghost" style="width:100%; margin-top:6px;" class="danger">Conclude without winner</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>New experiment wizard</h2>
+
+<p>Step-by-step creation flow. Each step validates before the user can proceed.</p>
+
+<div class="wizard">
+  <div class="wizard-head">
+    <span class="t">New experiment</span>
+    <span style="color:var(--tv-secondary); font-size:11px;">Step 2 of 5</span>
+    <span style="margin-left:auto;"></span>
+    <span class="step-pip done">1</span><span class="step-line"></span>
+    <span class="step-pip active">2</span><span class="step-line"></span>
+    <span class="step-pip">3</span><span class="step-line"></span>
+    <span class="step-pip">4</span><span class="step-line"></span>
+    <span class="step-pip">5</span>
+  </div>
+  <div class="wizard-body">
+    <h3 style="margin-top:0">Choose variants</h3>
+    <p style="font-size:13px; color:var(--tv-secondary); margin-top:0;">Pick the templates to compare. All variants must share the page type selected in step 1 (Home).</p>
+
+    <div class="wizard-row">
+      <span class="label">Control (A)</span>
+      <select class="field"><option>home-v3 (current default · published)</option><option>home-discovery-v1</option></select>
+      <input class="field" value="50" style="max-width:80px;"/>
+      <span style="color:var(--tv-secondary); font-size:11px;">% allocation</span>
+    </div>
+    <div class="wizard-row">
+      <span class="label">Variant B</span>
+      <select class="field"><option>home-v3-carousel (published)</option><option>home-v3-minimal</option></select>
+      <input class="field" value="50" style="max-width:80px;"/>
+      <span style="color:var(--tv-secondary); font-size:11px;">% allocation</span>
+    </div>
+
+    <button class="ui-btn ghost" style="margin-top:6px;">+ Add variant</button>
+
+    <div style="margin-top:18px; background:var(--tv-card); padding:10px 14px; border-radius:6px; border-left:3px solid var(--tv-cta); font-size:12px; color:var(--tv-glacia);">
+      <strong style="color:var(--tv-stone);">Allocation total: 100%</strong>
+      · Same user always sees the same variant for the life of the experiment (assignment key: <code>userId</code>).
+    </div>
+  </div>
+  <div class="wizard-foot">
+    <button class="ui-btn ghost">← Back</button>
+    <button class="ui-btn primary">Next: KPIs →</button>
+  </div>
+</div>
+
+<h3>Wizard steps</h3>
+<table>
+  <thead><tr><th style="width:8%">Step</th><th style="width:24%">Title</th><th>Captures</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Identity</td><td>Name, page type, assignment key (<code>userId</code> / <code>sessionId</code> / <code>deviceId</code>), owner</td></tr>
+    <tr><td>2</td><td>Variants</td><td>2-4 template variants with traffic allocation summing to 100%</td></tr>
+    <tr><td>3</td><td>KPIs</td><td>Pick primary KPI from locked four (watch completion · return visit · signup conversion · Ask Anything engagement); secondary KPIs; guardrails</td></tr>
+    <tr><td>4</td><td>Cohort</td><td>Include / exclude rules (tier, visitorType, locale, etc.)</td></tr>
+    <tr><td>5</td><td>Limits &amp; review</td><td>Min sample size per variant, max duration days, significance threshold, summary screen</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Annotated walkthrough</h2>
+
+<div class="annot">
+  <span class="num">1</span>
+  <div>
+    <strong>Status filters</strong>
+    Five mutually exclusive states: live, draft, paused, concluded, archived (not shown).
+    Concluded experiments retain their data for historical review.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">2</span>
+  <div>
+    <strong>Primary KPI column</strong>
+    Always the single KPI that determines the winner. Locked to the four
+    metrics from M1.1 §11: watch completion · return visit (7d) · signup
+    conversion · Ask Anything engagement. Other KPIs are tracked but not
+    decisive.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">3</span>
+  <div>
+    <strong>Promote button</strong>
+    Visible only when significance ≥ threshold AND sample ≥ minimum AND
+    no guardrail tripped. One click moves the winning variant's template
+    into the default-template slot for that page type, archives the
+    experiment, and reroutes all traffic.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">4</span>
+  <div>
+    <strong>Paused with guardrail tripped</strong>
+    When a guardrail KPI (theological complaint rate, crash rate, p95
+    latency, bounce rate) regresses past its threshold, the system
+    auto-pauses and emails the owner. Resume requires explicit
+    acknowledgment.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">5</span>
+  <div>
+    <strong>Significance bar</strong>
+    Visualizes p-value for the primary KPI against the experiment's
+    threshold. The bar turns green when the experiment is ready to call.
+    Hover for full statistical detail (confidence interval, effect size,
+    sample power).
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">6</span>
+  <div>
+    <strong>Conclude without winner</strong>
+    For experiments that ran their max duration without significance.
+    Archives the experiment, traffic reverts to selector rules + default
+    template. Available even mid-run for kills.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Data contract</h2>
+
+<h3>Stored shape</h3>
+<pre><code><span class="c">// experiments row — see M1.3 §10</span>
+{
+  <span class="k">"id"</span>:           <span class="s">"home-hero-carousel"</span>,
+  <span class="k">"name"</span>:         <span class="s">"Home Hero · Carousel vs Static"</span>,
+  <span class="k">"page_type"</span>:    <span class="s">"home"</span>,
+  <span class="k">"status"</span>:       <span class="s">"live"</span>,
+  <span class="k">"variants"</span>: [
+    { <span class="k">"id"</span>: <span class="s">"control"</span>,   <span class="k">"template_id"</span>: <span class="s">"home-v3"</span>,          <span class="k">"allocation"</span>: <span class="n">0.50</span> },
+    { <span class="k">"id"</span>: <span class="s">"variant-B"</span>, <span class="k">"template_id"</span>: <span class="s">"home-v3-carousel"</span>, <span class="k">"allocation"</span>: <span class="n">0.50</span> }
+  ],
+  <span class="k">"assignment_key"</span>:  <span class="s">"userId"</span>,
+  <span class="k">"primary_kpi"</span>:     <span class="s">"watch_completion_rate"</span>,
+  <span class="k">"secondary_kpis"</span>:  [<span class="s">"return_visit_7d"</span>, <span class="s">"signup_conversion"</span>],
+  <span class="k">"guardrail_kpis"</span>:  [<span class="s">"theological_complaint_rate"</span>, <span class="s">"crash_rate"</span>, <span class="s">"p95_latency_ms"</span>],
+  <span class="k">"min_sample_size"</span>: <span class="n">2000</span>,
+  <span class="k">"significance_threshold"</span>: <span class="n">0.95</span>,
+  <span class="k">"max_duration_days"</span>: <span class="n">30</span>,
+  <span class="k">"cohort"</span>: {
+    <span class="k">"include"</span>: { <span class="k">"all"</span>: [] },
+    <span class="k">"exclude"</span>: { <span class="k">"any"</span>: [{ <span class="k">"field"</span>: <span class="s">"tier"</span>, <span class="k">"op"</span>: <span class="s">"=="</span>, <span class="k">"value"</span>: <span class="s">"plus"</span> }] }
+  }
+}</code></pre>
+
+<h3>Endpoints</h3>
+<table>
+  <thead><tr><th>Endpoint</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>GET /console/experiments?status=live</code></td><td>List experiments with optional status filter</td></tr>
+    <tr><td><code>GET /console/experiments/:id</code></td><td>Detail + computed KPI snapshots</td></tr>
+    <tr><td><code>POST /console/experiments</code></td><td>Create draft</td></tr>
+    <tr><td><code>POST /console/experiments/:id/start</code></td><td>Promote draft → live; allocates baseline assignments</td></tr>
+    <tr><td><code>POST /console/experiments/:id/pause</code></td><td>Stop assigning new users; keep existing assignments active</td></tr>
+    <tr><td><code>POST /console/experiments/:id/resume</code></td><td>Reverse a pause; requires guardrail ack if auto-paused</td></tr>
+    <tr><td><code>POST /console/experiments/:id/promote</code></td><td>Promote a variant → default template; conclude experiment</td></tr>
+    <tr><td><code>POST /console/experiments/:id/conclude</code></td><td>Conclude without winner; revert to selector rules</td></tr>
+    <tr><td><code>GET /console/experiments/:id/results.csv</code></td><td>Per-user per-event export for offline analysis</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Assignment guarantees</h2>
+
+<table>
+  <thead><tr><th>Guarantee</th><th>How it's enforced</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Stable</strong> — same user, same variant</td><td><code>experiment_assignments</code> table (M1.3 §11) with unique <code>(experiment_id, identity_id)</code></td></tr>
+    <tr><td><strong>Deterministic</strong> for new users</td><td>Hash of <code>(assignmentKey, experimentId)</code> mod 100 against the allocation table</td></tr>
+    <tr><td><strong>Sticky across sessions</strong></td><td>Assignment persists in the table; sessionId rotation does not affect it</td></tr>
+    <tr><td><strong>Mergeable on signup</strong></td><td>Anonymous-id assignments are rewritten to user-id at signup with <code>migrated_from_anonymous=true</code></td></tr>
+    <tr><td><strong>Reported on every event</strong></td><td>Renderer includes active assignments in the <code>experimentAssignments</code> array on every POST /events (M1.2 §16)</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Edge cases</h2>
+
+<h3>Two live experiments on the same page type</h3>
+<p>
+  Both run, both assign. If a user is in both, both variants' template
+  IDs would conflict. The system resolves this with an
+  <strong>experiment priority</strong> — older experiments win until
+  concluded. The newer experiment skips users already in the older one.
+  Surfaced in the UI as <em>"will not enroll users already in: …"</em>
+</p>
+
+<h3>Template archived mid-experiment</h3>
+<p>
+  Blocked at the template archive action. Archive UI shows: <em>"Template
+  is referenced by live experiment X. Conclude or remove from experiment
+  first."</em>
+</p>
+
+<h3>Allocation change mid-experiment</h3>
+<p>
+  Not allowed once <code>status=live</code>. Pause first, edit, resume.
+  Existing assignments are not redistributed when allocation changes —
+  only future unassigned users see the new ratio.
+</p>
+
+<h3>Guardrail auto-pause</h3>
+<p>
+  Checked every 15 minutes. If a guardrail KPI is statistically worse
+  than control with sig &gt; 0.90, the experiment moves to
+  <code>paused</code> automatically. Email to owner. Resume requires
+  explicit "I acknowledge the regression" checkbox.
+</p>
+
+<hr/>
+<div class="navlinks">
+  <a href="04-console-selector-rules.html">← M2.2 · Template Selector Rules</a>
+  <a href="06-console-global-settings.html">M2.4 · Global Settings →</a>
+</div>
+
+</div>
+</body>
+</html>

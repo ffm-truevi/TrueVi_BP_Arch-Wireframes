@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TrueVi — Console: Template Builder (M2.1)</title>
+<style>
+  :root {
+    --tv-canvas:        #030C0F;
+    --tv-rail:          #051318;
+    --tv-card:          #0A2830;
+    --tv-card-hover:    #112F38;
+    --tv-element-mid:   #1A4E5C;
+    --tv-accent:        #245F70;
+    --tv-glow:          #2E7A8A;
+    --tv-cta:           #C9902A;
+    --tv-cta-bright:    #E8A832;
+    --tv-glacia:        #C8E4E8;
+    --tv-secondary:     #8FB8BE;
+    --tv-stone:         #E8E8E2;
+    --tv-text-dark:     #1A1A1A;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--tv-canvas); color: var(--tv-glacia); }
+  body { font-family: "Jost", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-weight: 300; line-height: 1.6; font-size: 15px; }
+  .docpage { max-width: 1320px; margin: 0 auto; padding: 48px 32px 96px; }
+  .docmeta { color: var(--tv-secondary); font-size: 12px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--tv-element-mid); }
+  .wordmark { font-family: "Jost", sans-serif; font-weight: 800; color: var(--tv-stone); font-size: 22px; letter-spacing: -0.01em; margin-bottom: 4px; }
+  .tagline { font-family: "Cormorant Garamond", Georgia, serif; font-style: italic; color: var(--tv-secondary); font-size: 14px; margin-bottom: 24px; }
+  h1 { font-family: "Jost", sans-serif; font-weight: 800; color: var(--tv-stone); font-size: 36px; line-height: 1.15; margin: 0 0 8px; }
+  h2 { font-family: "Jost", sans-serif; font-weight: 700; color: var(--tv-stone); font-size: 22px; margin: 56px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--tv-element-mid); }
+  h3 { font-family: "Jost", sans-serif; font-weight: 600; color: var(--tv-stone); font-size: 16px; margin: 28px 0 8px; }
+  h4 { font-family: "Jost", sans-serif; font-weight: 600; color: var(--tv-glacia); font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; margin: 20px 0 6px; }
+  p, li { color: var(--tv-glacia); }
+  strong { color: var(--tv-stone); font-weight: 600; }
+  em { color: var(--tv-secondary); font-style: italic; }
+  .lede { font-size: 17px; color: var(--tv-glacia); margin-bottom: 24px; }
+  .crumb { color: var(--tv-secondary); font-size: 13px; margin-bottom: 8px; }
+  .crumb a { color: var(--tv-cta-bright); text-decoration: none; }
+
+  code { font-family: "JetBrains Mono", "Consolas", monospace; background: var(--tv-card); color: var(--tv-glacia); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+  pre { font-family: "JetBrains Mono", monospace; background: var(--tv-rail); border: 1px solid var(--tv-element-mid); border-radius: 8px; padding: 16px 20px; overflow-x: auto; font-size: 12px; line-height: 1.5; }
+  pre code { background: transparent; padding: 0; }
+  pre .k { color: var(--tv-cta-bright); }
+  pre .s { color: var(--tv-glacia); }
+  pre .c { color: var(--tv-secondary); font-style: italic; }
+  pre .n { color: var(--tv-glow); }
+
+  .callout { background: var(--tv-card); border-left: 3px solid var(--tv-cta); padding: 16px 20px; margin: 18px 0; border-radius: 0 8px 8px 0; }
+  .callout.principle { border-left-color: var(--tv-glow); }
+  .callout h4 { margin-top: 0; color: var(--tv-stone); }
+
+  /* ============== WIREFRAME UI ============== */
+  .ui-wrap {
+    background: var(--tv-rail);
+    border: 1px solid var(--tv-element-mid);
+    border-radius: 14px;
+    overflow: hidden;
+    margin: 28px 0 32px;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.4);
+  }
+  .ui-browser-chrome {
+    background: var(--tv-canvas);
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--tv-element-mid);
+    display: flex; align-items: center; gap: 8px;
+    font-family: "JetBrains Mono", monospace; font-size: 11px;
+    color: var(--tv-secondary);
+  }
+  .ui-browser-chrome .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--tv-accent); }
+  .ui-browser-chrome .url { margin-left: 12px; }
+
+  .ui-topbar {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 22px;
+    background: var(--tv-rail);
+    border-bottom: 1px solid var(--tv-element-mid);
+    font-size: 13px;
+  }
+  .ui-topbar .breadcrumb { color: var(--tv-secondary); }
+  .ui-topbar .breadcrumb .current { color: var(--tv-stone); font-weight: 600; }
+  .ui-topbar .spacer { flex: 1; }
+  .ui-status {
+    display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 10px;
+    letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600;
+  }
+  .ui-status.draft     { background: transparent; color: var(--tv-secondary); border: 1px solid var(--tv-accent); }
+  .ui-status.published { background: var(--tv-cta); color: var(--tv-text-dark); }
+  .ui-btn {
+    padding: 7px 16px; border-radius: 6px; font-family: inherit; font-size: 13px;
+    font-weight: 600; border: none; cursor: pointer;
+  }
+  .ui-btn.ghost   { background: transparent; color: var(--tv-glacia); border: 1px solid var(--tv-accent); }
+  .ui-btn.primary { background: var(--tv-cta); color: var(--tv-text-dark); }
+  .ui-btn.danger  { background: transparent; color: #ff8a8a; border: 1px solid #6e2828; }
+
+  .ui-three-pane {
+    display: grid;
+    grid-template-columns: 240px 1fr 320px;
+    min-height: 720px;
+  }
+
+  /* LEFT PALETTE */
+  .ui-palette {
+    background: var(--tv-rail); border-right: 1px solid var(--tv-element-mid);
+    padding: 18px 14px; font-size: 12px;
+  }
+  .ui-palette h5 {
+    margin: 14px 0 8px; font-family: "Jost", sans-serif; font-weight: 600;
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--tv-secondary);
+  }
+  .ui-palette h5:first-of-type { margin-top: 0; }
+  .palette-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px;
+    background: var(--tv-card);
+    border: 1px solid var(--tv-accent);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    color: var(--tv-glacia);
+    cursor: grab;
+  }
+  .palette-item:hover { background: var(--tv-card-hover); border-color: var(--tv-glow); }
+  .palette-item .grip { color: var(--tv-secondary); font-size: 10px; font-family: monospace; }
+
+  /* CENTER CANVAS */
+  .ui-canvas {
+    background: var(--tv-canvas);
+    padding: 22px 28px;
+    overflow-y: auto;
+  }
+  .canvas-header {
+    display: flex; align-items: baseline; gap: 12px;
+    margin-bottom: 18px;
+    color: var(--tv-secondary); font-size: 12px;
+  }
+  .canvas-header .title { font-family: "Jost", sans-serif; color: var(--tv-stone); font-size: 18px; font-weight: 600; }
+
+  .slot-card {
+    border: 1px solid var(--tv-accent);
+    border-radius: 10px;
+    margin-bottom: 14px;
+    background: var(--tv-card);
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .slot-card.selected { border-color: var(--tv-cta); box-shadow: 0 0 0 2px rgba(201,144,42,0.18); }
+  .slot-card-head {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px;
+    background: var(--tv-rail);
+    border-bottom: 1px solid var(--tv-element-mid);
+    font-size: 12px;
+  }
+  .slot-card-head .slot-id { font-family: "JetBrains Mono", monospace; color: var(--tv-stone); font-weight: 600; }
+  .slot-card-head .kind {
+    display: inline-block; padding: 2px 8px; border-radius: 999px;
+    font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700;
+  }
+  .kind.fixed   { background: var(--tv-accent); color: var(--tv-stone); }
+  .kind.dynamic { background: var(--tv-cta); color: var(--tv-text-dark); }
+  .slot-card-head .controls { margin-left: auto; display: flex; gap: 8px; color: var(--tv-secondary); font-size: 11px; }
+  .slot-card-body { padding: 14px 16px; font-size: 12px; }
+
+  .slot-body-row { display: flex; justify-content: space-between; padding: 4px 0; color: var(--tv-glacia); }
+  .slot-body-row .label { color: var(--tv-secondary); }
+  .slot-body-row .value { font-family: "JetBrains Mono", monospace; color: var(--tv-stone); font-size: 11px; }
+
+  .add-slot-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; padding: 16px;
+    border: 1px dashed var(--tv-accent);
+    border-radius: 10px;
+    color: var(--tv-secondary);
+    font-family: inherit; font-size: 13px; font-weight: 500;
+    background: transparent; cursor: pointer;
+  }
+  .add-slot-btn:hover { border-color: var(--tv-cta); color: var(--tv-cta-bright); }
+
+  /* RIGHT PROPERTIES */
+  .ui-properties {
+    background: var(--tv-rail); border-left: 1px solid var(--tv-element-mid);
+    padding: 18px 18px; font-size: 12px; overflow-y: auto;
+  }
+  .ui-properties h5 {
+    margin: 0 0 4px; font-family: "Jost", sans-serif; font-weight: 700;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--tv-stone);
+  }
+  .ui-properties .props-sub {
+    color: var(--tv-secondary); font-size: 11px; margin-bottom: 16px;
+  }
+  .prop-section { margin: 18px 0 10px; }
+  .prop-section h6 {
+    margin: 0 0 6px; font-family: "Jost", sans-serif; font-weight: 600;
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--tv-secondary);
+  }
+  .prop-row { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; gap: 8px; }
+  .prop-row .label { color: var(--tv-secondary); font-size: 11px; min-width: 80px; }
+  .prop-input {
+    background: var(--tv-card); border: 1px solid var(--tv-accent);
+    border-radius: 4px; padding: 5px 8px; font-family: inherit; font-size: 11px;
+    color: var(--tv-glacia); flex: 1;
+  }
+  .prop-input.readonly { background: transparent; border-color: var(--tv-element-mid); color: var(--tv-stone); }
+  .prop-pill {
+    background: var(--tv-card); color: var(--tv-glacia); padding: 3px 8px;
+    border-radius: 999px; font-size: 10px; font-family: "JetBrains Mono", monospace;
+    border: 1px solid var(--tv-accent);
+  }
+  .prop-checkbox { display: inline-flex; align-items: center; gap: 6px; color: var(--tv-glacia); font-size: 11px; margin-right: 10px; }
+  .prop-checkbox input { accent-color: var(--tv-cta); }
+  .prop-tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+
+  /* annotations */
+  .annot {
+    display: flex; gap: 14px;
+    background: var(--tv-card); border-left: 3px solid var(--tv-glow);
+    padding: 12px 16px; margin: 18px 0; border-radius: 0 6px 6px 0;
+    font-size: 13px;
+  }
+  .annot .num {
+    background: var(--tv-glow); color: var(--tv-stone);
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 11px; flex-shrink: 0;
+  }
+  .annot strong { color: var(--tv-stone); display: block; margin-bottom: 2px; }
+
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+  th { text-align: left; padding: 9px 12px; background: var(--tv-rail); color: var(--tv-stone); font-weight: 600; border-bottom: 1px solid var(--tv-accent); }
+  td { padding: 9px 12px; border-bottom: 1px solid var(--tv-element-mid); color: var(--tv-glacia); vertical-align: top; }
+
+  hr { border: none; border-top: 1px solid var(--tv-element-mid); margin: 40px 0; }
+  .navlinks { display: flex; justify-content: space-between; margin-top: 32px; font-size: 12px; color: var(--tv-secondary); }
+  .navlinks a { color: var(--tv-cta-bright); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="docpage">
+
+<p class="crumb"><a href="../index.html">← Index</a> · M2 · Management Console</p>
+
+<div class="docmeta">
+  Document M2.1 · Template Builder · v0.1 · 2026-05-11 ·
+  Owner: Brian (COO) · Audience: TrueVi engineering team
+</div>
+
+<div class="wordmark">TrueVi</div>
+<div class="tagline">Console Wireframe · M2.1</div>
+
+<h1>Template Builder</h1>
+<p class="lede">
+  The drag-and-drop authoring surface where admins compose page templates
+  from generic components. Three panels: palette of components, canvas of
+  slots, properties of the selected slot. This is the hero screen of the
+  entire system.
+</p>
+
+<div class="callout principle">
+  <h4>One sentence</h4>
+  <p style="margin:0">
+    The admin assembles a <strong>shape</strong> (slots + constraints) and
+    publishes it. The Library decides what fills the shape at runtime
+    (M1.1 §3).
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2>The screen</h2>
+
+<div class="ui-wrap">
+  <div class="ui-browser-chrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="url">my.truevi.tv/console/templates/home-v3/edit</span>
+  </div>
+
+  <!-- TOP BAR -->
+  <div class="ui-topbar">
+    <div class="breadcrumb">
+      Templates &nbsp;›&nbsp;
+      <span class="current">HomeTemplate v3</span>
+    </div>
+    <span class="ui-status draft">Draft</span>
+    <span style="color:var(--tv-secondary); font-size:11px">Last saved 2 min ago</span>
+
+    <div class="spacer"></div>
+
+    <select class="ui-btn ghost" style="font-size:11px; padding:6px 12px;">
+      <option>View as · First-visit user</option>
+      <option>View as · Returning user</option>
+      <option>View as · Power user</option>
+      <option>View as · TrueVi+ subscriber</option>
+      <option>View as · Specific user…</option>
+    </select>
+    <button class="ui-btn ghost">Preview</button>
+    <button class="ui-btn ghost">Clone</button>
+    <button class="ui-btn primary">Publish</button>
+  </div>
+
+  <!-- THREE-PANE -->
+  <div class="ui-three-pane">
+
+    <!-- LEFT: PALETTE -->
+    <div class="ui-palette">
+      <input class="prop-input" placeholder="Search components…" style="width:100%; margin-bottom:14px;"/>
+
+      <h5>Heroes</h5>
+      <div class="palette-item"><span class="grip">⋮⋮</span> Hero-Carousel</div>
+      <div class="palette-item"><span class="grip">⋮⋮</span> Hero-Video</div>
+      <div class="palette-item"><span class="grip">⋮⋮</span> Hero-Image</div>
+      <div class="palette-item"><span class="grip">⋮⋮</span> Hero-Search</div>
+      <div class="palette-item"><span class="grip">⋮⋮</span> Hero-AskAnything</div>
+      <div class="palette-item"><span class="grip">⋮⋮</span> Hero-Ministry</div>
+      <div class="palette-item"><span class="grip">⋮⋮</span> Hero-Subject</div>
+      <div class="palette-item"><span class="grip">⋮⋮</span> Hero-Series</div>
+
+      <h5>Content</h5>
+      <div class="palette-item"><span class="grip">⋮⋮</span> ContentRail</div>
+      <div class="palette-item"><span class="grip">⋮⋮</span> ContentGrid</div>
+      <div class="palette-item"><span class="grip">⋮⋮</span> EpisodeList</div>
+
+      <h5>Discovery</h5>
+      <div class="palette-item"><span class="grip">⋮⋮</span> FilterChips</div>
+      <div class="palette-item"><span class="grip">⋮⋮</span> MinistryRail</div>
+      <div class="palette-item"><span class="grip">⋮⋮</span> SeriesRail</div>
+      <div class="palette-item"><span class="grip">⋮⋮</span> ContextBanner</div>
+      <div class="palette-item"><span class="grip">⋮⋮</span> Breadcrumbs</div>
+
+      <h5>Guidance</h5>
+      <div class="palette-item"><span class="grip">⋮⋮</span> AskAnythingBlock</div>
+      <div class="palette-item"><span class="grip">⋮⋮</span> ScriptureBlock</div>
+      <div class="palette-item"><span class="grip">⋮⋮</span> AIResponseBlock</div>
+
+      <h5>People</h5>
+      <div class="palette-item"><span class="grip">⋮⋮</span> PastorCard</div>
+      <div class="palette-item"><span class="grip">⋮⋮</span> MinistryCard</div>
+      <div class="palette-item"><span class="grip">⋮⋮</span> SeriesCard</div>
+
+      <h5>Editorial</h5>
+      <div class="palette-item"><span class="grip">⋮⋮</span> TextBlock</div>
+      <div class="palette-item"><span class="grip">⋮⋮</span> CTABlock</div>
+
+      <h5>Monetization</h5>
+      <div class="palette-item"><span class="grip">⋮⋮</span> UpgradeTeaser</div>
+    </div>
+
+    <!-- CENTER: CANVAS -->
+    <div class="ui-canvas">
+      <div class="canvas-header">
+        <span class="title">HomeTemplate v3</span>
+        <span>· pageType: <code>home</code> · 4 slots · inputs: none</span>
+      </div>
+
+      <!-- Slot 1: Hero (FIXED, selected) -->
+      <div class="slot-card selected">
+        <div class="slot-card-head">
+          <span class="kind fixed">Fixed</span>
+          <span class="slot-id">hero</span>
+          <span style="color:var(--tv-secondary); font-size:11px;">Hero-Carousel v2.1</span>
+          <div class="controls">↑ ↓ ⋯</div>
+        </div>
+        <div class="slot-card-body">
+          <div class="slot-body-row"><span class="label">title</span><span class="value">"Find what speaks to you"</span></div>
+          <div class="slot-body-row"><span class="label">maxSlides</span><span class="value">5</span></div>
+          <div class="slot-body-row"><span class="label">autoplay</span><span class="value">true</span></div>
+          <div class="slot-body-row"><span class="label">tiers</span><span class="value">[new, vine, plus]</span></div>
+        </div>
+      </div>
+
+      <!-- Slot 2: dynamic-rails -->
+      <div class="slot-card">
+        <div class="slot-card-head">
+          <span class="kind dynamic">Dynamic</span>
+          <span class="slot-id">dynamic-rails</span>
+          <span style="color:var(--tv-secondary); font-size:11px;">Library picks 3-10 rails</span>
+          <div class="controls">↑ ↓ ⋯</div>
+        </div>
+        <div class="slot-card-body">
+          <div class="slot-body-row"><span class="label">allows</span><span class="value">[ContentRail, MinistryRail, SeriesRail]</span></div>
+          <div class="slot-body-row"><span class="label">minCount</span><span class="value">3</span></div>
+          <div class="slot-body-row"><span class="label">maxCount</span><span class="value">10</span></div>
+          <div class="slot-body-row"><span class="label">tiers</span><span class="value">[new, vine, plus]</span></div>
+        </div>
+      </div>
+
+      <!-- Slot 3: ask-anything -->
+      <div class="slot-card">
+        <div class="slot-card-head">
+          <span class="kind fixed">Fixed</span>
+          <span class="slot-id">ask-anything</span>
+          <span style="color:var(--tv-secondary); font-size:11px;">AskAnythingBlock v1.3</span>
+          <div class="controls">↑ ↓ ⋯</div>
+        </div>
+        <div class="slot-card-body">
+          <div class="slot-body-row"><span class="label">variant</span><span class="value">"hero-card"</span></div>
+          <div class="slot-body-row"><span class="label">placeholder</span><span class="value">"What's on your heart today?"</span></div>
+          <div class="slot-body-row"><span class="label">tiers</span><span class="value">[new, vine, plus]</span></div>
+        </div>
+      </div>
+
+      <!-- Slot 4: upgrade-teaser (tier-gated) -->
+      <div class="slot-card">
+        <div class="slot-card-head">
+          <span class="kind fixed">Fixed</span>
+          <span class="slot-id">upgrade-teaser</span>
+          <span style="color:var(--tv-secondary); font-size:11px;">UpgradeTeaser v1.0 · <span style="color:var(--tv-cta-bright);">tier-gated</span></span>
+          <div class="controls">↑ ↓ ⋯</div>
+        </div>
+        <div class="slot-card-body">
+          <div class="slot-body-row"><span class="label">targetTier</span><span class="value">"vine"</span></div>
+          <div class="slot-body-row"><span class="label">trigger</span><span class="value">"placement"</span></div>
+          <div class="slot-body-row"><span class="label">tiers (audience)</span><span class="value">[new]</span></div>
+        </div>
+      </div>
+
+      <button class="add-slot-btn">+ Add slot</button>
+    </div>
+
+    <!-- RIGHT: PROPERTIES PANEL -->
+    <div class="ui-properties">
+      <h5>Hero Slot</h5>
+      <div class="props-sub">Selected: <code>hero</code></div>
+
+      <div class="prop-section">
+        <h6>Slot</h6>
+        <div class="prop-row"><span class="label">slotId</span><input class="prop-input readonly" value="hero" readonly/></div>
+        <div class="prop-row"><span class="label">kind</span>
+          <select class="prop-input"><option>FIXED</option><option>DYNAMIC</option></select>
+        </div>
+      </div>
+
+      <div class="prop-section">
+        <h6>Component</h6>
+        <div class="prop-row"><span class="label">type</span>
+          <select class="prop-input"><option>Hero-Carousel</option><option>Hero-Video</option><option>Hero-Image</option></select>
+        </div>
+        <div class="prop-row"><span class="label">version</span><input class="prop-input" value="2.1.0"/></div>
+      </div>
+
+      <div class="prop-section">
+        <h6>Config</h6>
+        <div class="prop-row"><span class="label">maxSlides</span><input class="prop-input" value="5"/></div>
+        <div class="prop-row"><span class="label">autoplay</span>
+          <select class="prop-input"><option>true</option><option>false</option></select>
+        </div>
+        <div class="prop-row"><span class="label">dwellSec</span><input class="prop-input" value="7"/></div>
+      </div>
+
+      <div class="prop-section">
+        <h6>Query</h6>
+        <div class="prop-row"><span class="label">mode</span>
+          <select class="prop-input"><option>auto</option><option>curated</option></select>
+        </div>
+        <div class="prop-row"><span class="label">sort</span>
+          <select class="prop-input"><option>recommended</option><option>recent</option><option>trending</option></select>
+        </div>
+        <div class="prop-row"><span class="label">limit</span><input class="prop-input" value="5"/></div>
+      </div>
+
+      <div class="prop-section">
+        <h6>Personalization</h6>
+        <div class="prop-row"><span class="label">enabled</span>
+          <label class="prop-checkbox"><input type="checkbox" checked/></label>
+        </div>
+        <div class="prop-row">
+          <span class="label">signals</span>
+          <div class="prop-tag-row">
+            <span class="prop-pill">inferredFaithStage</span>
+            <span class="prop-pill">watchHistory</span>
+          </div>
+        </div>
+        <div class="prop-row"><span class="label">fallback</span>
+          <select class="prop-input"><option>trending</option><option>editorial</option><option>hide</option></select>
+        </div>
+      </div>
+
+      <div class="prop-section">
+        <h6>Visibility</h6>
+        <div class="prop-row"><span class="label">tiers</span>
+          <div>
+            <label class="prop-checkbox"><input type="checkbox" checked/> new</label>
+            <label class="prop-checkbox"><input type="checkbox" checked/> vine</label>
+            <label class="prop-checkbox"><input type="checkbox" checked/> plus</label>
+          </div>
+        </div>
+        <div class="prop-row"><span class="label">devices</span>
+          <div>
+            <label class="prop-checkbox"><input type="checkbox" checked/> desktop</label>
+            <label class="prop-checkbox"><input type="checkbox" checked/> mobile</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="prop-section">
+        <h6>Copy (locale-keyed)</h6>
+        <div class="prop-row"><span class="label">en · title</span><input class="prop-input" value="Find what speaks to you"/></div>
+        <div class="prop-row"><span class="label">en · cta</span><input class="prop-input" value="See all"/></div>
+        <div class="prop-row"><span class="label">es · title</span><input class="prop-input" value="" placeholder="(falls back to en)"/></div>
+      </div>
+
+      <div class="prop-section">
+        <h6>Danger zone</h6>
+        <button class="ui-btn danger" style="width:100%;">Delete slot</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Annotated walkthrough</h2>
+
+<div class="annot">
+  <span class="num">1</span>
+  <div>
+    <strong>Breadcrumb &amp; status</strong>
+    The user navigated from <code>/console/templates</code> to this template.
+    Status is <code>Draft</code> — changes are autosaved every ~10 seconds.
+    Only the <code>Published</code> version is served to users; drafts are
+    invisible until promoted.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">2</span>
+  <div>
+    <strong>View as · cohort selector</strong>
+    Critical preview affordance. Renders the canvas as if the selected cohort
+    were viewing it — selector rules and inferences are evaluated against the
+    simulated user. Without this, you can't QA the personalization layer.
+    Backed by <code>POST /library/compose-page</code> with the
+    <code>overrides.viewAsCohort</code> field (M1.2 §14).
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">3</span>
+  <div>
+    <strong>Component palette</strong>
+    Grouped by purpose. Drag any component into the canvas to create a new
+    slot pre-filled with that component as a FIXED choice. Each palette item
+    pulls its allowed config schema from the <code>components</code> table
+    (M1.3 §6).
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">4</span>
+  <div>
+    <strong>Canvas — vertical slot stack</strong>
+    Top to bottom = render order. Each card represents one slot in the
+    template. Shows slot kind (FIXED / DYNAMIC), slotId, component type +
+    version, and a config preview. Drag to reorder. Click to select.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">5</span>
+  <div>
+    <strong>FIXED vs DYNAMIC slots</strong>
+    <code>hero</code>, <code>ask-anything</code>, <code>upgrade-teaser</code>
+    are FIXED — admin picked the component, Library only chooses the
+    content. <code>dynamic-rails</code> is DYNAMIC — admin defines what
+    components are allowed and how many; Library picks both the components
+    and the content. See M1.1 §3 for the model.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">6</span>
+  <div>
+    <strong>Properties panel — the Component Contract live</strong>
+    Every field maps to a key in the ComponentInstance shape (M1.2 §8):
+    <code>config</code>, <code>query</code>, <code>personalization</code>,
+    <code>visibility</code>, <code>copy</code>. Edits autosave to the draft
+    template. Field validation comes from the component's
+    <code>config_schema</code> + <code>query_schema</code> in
+    <code>components</code> (M1.3 §6).
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">7</span>
+  <div>
+    <strong>Tier visibility</strong>
+    When the global <code>monetizationMode</code> is set to <em>open-all</em>
+    (M2.4), this control still saves but does not enforce. When flipped to
+    <em>tier-gated</em>, slots marked tier-restricted are hidden from users
+    outside the allowed tiers. Tier visibility on the
+    <code>upgrade-teaser</code> slot is inverted — it shows <em>only</em>
+    for the listed tiers (i.e., free users).
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Interactions &amp; states</h2>
+
+<h3>Adding a slot</h3>
+<ol>
+  <li>Drag a component from the palette into the canvas at the target position. A drop indicator highlights the insertion point.</li>
+  <li>On drop, a new FIXED slot is created with the component pre-selected. <code>slotId</code> auto-generates from component type + counter (<code>hero</code>, <code>rail-2</code>, etc.) and is editable in the Properties panel.</li>
+  <li>Default config values come from the component's schema. Defaults are sensible — the slot renders without further input.</li>
+</ol>
+
+<h3>Converting FIXED → DYNAMIC</h3>
+<p>
+  In the Properties panel, changing <code>kind</code> from <code>FIXED</code> to
+  <code>DYNAMIC</code> converts the slot. The single component selection
+  becomes the first entry in the <code>allows</code> list; admin adds more
+  allowed components, sets <code>minCount</code>/<code>maxCount</code>.
+</p>
+
+<h3>Cloning a template</h3>
+<p>
+  The <strong>Clone</strong> button copies the entire template into a new
+  draft with version <code>{original}+1-draft</code>. Cloning preserves all
+  slot configurations and copy. No inheritance — see M1.1 §19 locked
+  decision #28. The cloned template is a fully independent record.
+</p>
+
+<h3>Publishing</h3>
+<ol>
+  <li>Validation runs across the full template:
+    <ul>
+      <li>All FIXED slot components must exist in <code>components</code> with status <code>active</code></li>
+      <li>All DYNAMIC slot <code>allows</code> arrays must contain at least one valid component</li>
+      <li>Every locale-keyed string must have at least <code>en</code></li>
+      <li>No empty required copy fields</li>
+    </ul>
+  </li>
+  <li>If valid, the draft is promoted to <code>published</code> status. Any previously published version of the same template is archived (kept for rollback).</li>
+  <li>Existing experiments referencing the template are notified; an admin must explicitly opt the experiment into the new version.</li>
+</ol>
+
+<h3>Preview mode</h3>
+<p>
+  <strong>Preview</strong> opens the canvas as a rendered page in a side
+  drawer, using the selected "View as" cohort. The render uses Library's
+  <code>compose-page</code> endpoint against the draft template, marked
+  <code>X-Preview-Mode: true</code> so it bypasses cache and includes the
+  full <code>why</code> payload for every slot. Hover any slot in preview
+  to reveal its <code>why</code> reasoning.
+</p>
+
+<!-- ============================================================ -->
+<h2>Data contract</h2>
+
+<p>The Template Builder is a single-page React app at <code>/console/templates/[id]/edit</code> that hits five endpoints:</p>
+
+<table>
+  <thead><tr><th>Endpoint</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>GET /console/templates/:id</code></td><td>Load the template record + linked component metadata</td></tr>
+    <tr><td><code>PATCH /console/templates/:id</code></td><td>Autosave a draft (debounced ~10s)</td></tr>
+    <tr><td><code>POST /console/templates/:id/publish</code></td><td>Promote draft → published</td></tr>
+    <tr><td><code>POST /console/templates/:id/clone</code></td><td>Clone into new draft</td></tr>
+    <tr><td><code>POST /library/compose-page</code></td><td>Power the live preview with <code>overrides.viewAsCohort</code></td></tr>
+  </tbody>
+</table>
+
+<h3>Save payload shape</h3>
+<pre><code><span class="c">// PATCH /console/templates/:id — partial update</span>
+{
+  <span class="k">"name"</span>:    <span class="s">"HomeTemplate v3"</span>,
+  <span class="k">"slots"</span>:   [ SlotSpec, SlotSpec, ... ],     <span class="c">// M1.2 §10</span>
+  <span class="k">"inputs"</span>:  [],
+  <span class="k">"tierVisibility"</span>: [<span class="s">"new"</span>, <span class="s">"vine"</span>, <span class="s">"plus"</span>]
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2>Validation rules</h2>
+
+<table>
+  <thead><tr><th>Rule</th><th>Severity</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>FIXED slot must reference an active component</td><td>error</td><td>publish</td></tr>
+    <tr><td>DYNAMIC slot <code>allows</code> must be non-empty</td><td>error</td><td>publish</td></tr>
+    <tr><td>DYNAMIC slot <code>minCount</code> ≤ <code>maxCount</code></td><td>error</td><td>autosave</td></tr>
+    <tr><td>Every required copy field has <code>en</code></td><td>error</td><td>publish</td></tr>
+    <tr><td>Component config validates against its <code>config_schema</code></td><td>error</td><td>autosave (per-field) + publish</td></tr>
+    <tr><td>Personalization <code>signals</code> are in the component's <code>allowed_signals</code></td><td>error</td><td>autosave</td></tr>
+    <tr><td>Locale-keyed string has no untranslated locale that's also missing from <code>en</code></td><td>warn</td><td>publish</td></tr>
+    <tr><td>Deprecated component version in use</td><td>warn</td><td>load + publish</td></tr>
+    <tr><td>No tier overlap with template-level <code>tierVisibility</code></td><td>warn</td><td>publish</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Empty states</h2>
+
+<h3>New template, no slots</h3>
+<p>Canvas shows a centered message: <em>"Drag a component from the palette to begin."</em> The "Add slot" button is replaced by a larger drop target.</p>
+
+<h3>No component selected</h3>
+<p>Properties panel shows a placeholder: <em>"Select a slot to edit its properties."</em></p>
+
+<h3>Preview with no Library result</h3>
+<p>Preview panel shows the page rendered with editorial defaults and a banner: <em>"Library returned no personalized content for this cohort — showing trending fallback."</em> This is normal for new cohorts.</p>
+
+<hr/>
+<div class="navlinks">
+  <a href="../index.html">← Index</a>
+  <a href="04-console-selector-rules.html">M2.2 · Template Selector Rules →</a>
+</div>
+
+</div>
+</body>
+</html>
