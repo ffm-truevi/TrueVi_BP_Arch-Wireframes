@@ -1,0 +1,1063 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TrueVi — Page Builder Architecture (M1.1)</title>
+<style>
+  :root {
+    --tv-canvas:        #030C0F;
+    --tv-rail:          #051318;
+    --tv-card:          #0A2830;
+    --tv-card-hover:    #112F38;
+    --tv-element-mid:   #1A4E5C;
+    --tv-accent:        #245F70;
+    --tv-glow:          #2E7A8A;
+    --tv-cta:           #C9902A;
+    --tv-cta-bright:    #E8A832;
+    --tv-glacia:        #C8E4E8;
+    --tv-secondary:     #8FB8BE;
+    --tv-stone:         #E8E8E2;
+    --tv-text-dark:     #1A1A1A;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--tv-canvas); color: var(--tv-glacia); }
+  body {
+    font-family: "Jost", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    font-size: 15px;
+  }
+
+  .layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+  nav.toc {
+    background: var(--tv-rail);
+    border-right: 1px solid var(--tv-element-mid);
+    padding: 32px 24px;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  nav.toc h2 { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--tv-secondary); margin: 24px 0 8px; font-weight: 500; }
+  nav.toc h2:first-of-type { margin-top: 0; }
+  nav.toc a { display: block; color: var(--tv-glacia); text-decoration: none; padding: 6px 0; font-size: 13px; border-left: 2px solid transparent; padding-left: 12px; margin-left: -12px; }
+  nav.toc a:hover { color: var(--tv-stone); border-left-color: var(--tv-accent); }
+
+  main { padding: 48px 64px 96px; max-width: 1080px; }
+
+  .wordmark { font-family: "Jost", sans-serif; font-weight: 800; color: var(--tv-stone); font-size: 22px; letter-spacing: -0.01em; margin-bottom: 4px; }
+  .tagline { font-family: "Cormorant Garamond", Georgia, serif; font-style: italic; color: var(--tv-secondary); font-size: 14px; margin-bottom: 32px; }
+
+  h1 { font-family: "Jost", sans-serif; font-weight: 800; color: var(--tv-stone); font-size: 36px; line-height: 1.15; margin: 0 0 8px; }
+  h2 { font-family: "Jost", sans-serif; font-weight: 700; color: var(--tv-stone); font-size: 24px; margin: 56px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--tv-element-mid); }
+  h3 { font-family: "Jost", sans-serif; font-weight: 600; color: var(--tv-stone); font-size: 18px; margin: 32px 0 8px; }
+  h4 { font-family: "Jost", sans-serif; font-weight: 600; color: var(--tv-glacia); font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; margin: 24px 0 6px; }
+
+  p, li { color: var(--tv-glacia); }
+  strong { color: var(--tv-stone); font-weight: 600; }
+  em { color: var(--tv-secondary); font-style: italic; }
+
+  .lede { font-size: 17px; color: var(--tv-glacia); margin-bottom: 32px; }
+
+  .callout {
+    background: var(--tv-card);
+    border-left: 3px solid var(--tv-cta);
+    padding: 18px 22px;
+    margin: 20px 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .callout.principle { border-left-color: var(--tv-glow); }
+  .callout.decision  { border-left-color: var(--tv-cta); }
+  .callout.warning   { border-left-color: var(--tv-cta-bright); }
+  .callout h4 { margin-top: 0; color: var(--tv-stone); }
+
+  code, pre { font-family: "JetBrains Mono", "Consolas", monospace; }
+  code { background: var(--tv-card); color: var(--tv-glacia); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+  pre {
+    background: var(--tv-rail);
+    border: 1px solid var(--tv-element-mid);
+    border-radius: 8px;
+    padding: 18px 22px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--tv-glacia);
+  }
+  pre code { background: transparent; padding: 0; color: inherit; }
+  pre .k { color: var(--tv-cta-bright); }
+  pre .s { color: var(--tv-glacia); }
+  pre .c { color: var(--tv-secondary); font-style: italic; }
+  pre .n { color: var(--tv-glow); }
+
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
+  th { text-align: left; padding: 10px 14px; background: var(--tv-rail); color: var(--tv-stone); font-weight: 600; border-bottom: 1px solid var(--tv-accent); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--tv-element-mid); color: var(--tv-glacia); vertical-align: top; }
+  tr:hover td { background: var(--tv-card-hover); }
+
+  .diagram { background: var(--tv-rail); border: 1px solid var(--tv-element-mid); border-radius: 12px; padding: 28px; margin: 24px 0; text-align: center; }
+  .diagram svg { max-width: 100%; height: auto; }
+  .diagram-caption { color: var(--tv-secondary); font-size: 12px; font-style: italic; margin-top: 12px; }
+
+  .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; }
+  .pill.fixed { background: var(--tv-accent); color: var(--tv-stone); }
+  .pill.dynamic { background: var(--tv-cta); color: var(--tv-text-dark); }
+  .pill.gold { background: var(--tv-cta); color: var(--tv-text-dark); }
+  .pill.note { background: var(--tv-card); color: var(--tv-glacia); border: 1px solid var(--tv-accent); }
+
+  .docmeta { color: var(--tv-secondary); font-size: 12px; margin-bottom: 40px; padding-bottom: 16px; border-bottom: 1px solid var(--tv-element-mid); }
+
+  hr { border: none; border-top: 1px solid var(--tv-element-mid); margin: 48px 0; }
+
+  .toc-pill { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 4px; background: var(--tv-accent); color: var(--tv-stone); margin-left: 6px; vertical-align: middle; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="toc">
+  <div class="wordmark">TrueVi</div>
+  <div class="tagline">Architecture · M1.1</div>
+
+  <h2>Foundations</h2>
+  <a href="#mental-model">1 · Mental Model</a>
+  <a href="#three-layers">2 · The Three Layers</a>
+  <a href="#slots">3 · Slot-Based Composition</a>
+  <a href="#contract">4 · The Component Contract</a>
+  <a href="#sequence">5 · Page Render Sequence</a>
+
+  <h2>The Library</h2>
+  <a href="#personalization">6 · Passive Personalization</a>
+  <a href="#inference">7 · Tiered Inference</a>
+  <a href="#selection">8 · AI Template Selection</a>
+  <a href="#guardrails">9 · Theological Guardrails</a>
+  <a href="#cold-start">10 · Cold-Start Strategy</a>
+
+  <h2>Operations</h2>
+  <a href="#experiments">11 · A/B Experimentation</a>
+  <a href="#identity">12 · Identity &amp; Merge</a>
+  <a href="#editorial">13 · Editorial Overrides</a>
+  <a href="#caching">14 · Caching</a>
+  <a href="#search-response">15 · Search Response</a>
+  <a href="#tiers">16 · Tier-Aware Components</a>
+  <a href="#i18n">17 · Localization</a>
+
+  <h2>Reference</h2>
+  <a href="#glossary">18 · Glossary</a>
+  <a href="#decisions">19 · Locked Decisions</a>
+</nav>
+
+<main>
+
+<div class="docmeta">
+  Document M1.1 · Foundations · v0.1 · 2026-05-11 ·
+  Owner: Brian (COO) · Sign-off: Bunker (CEO) ·
+  Audience: TrueVi engineering team
+</div>
+
+<h1>TrueVi Page Builder — Architecture</h1>
+<p class="lede">
+  A specification for the page composition system that powers truevi.tv.
+  Templates are slot-shaped holding tanks. The TrueVi Library fills the slots
+  using AI, behavioral inference, and editorial controls.
+  Pages are rendered per user, per session, per experiment.
+</p>
+
+<div class="callout principle">
+  <h4>The one sentence</h4>
+  <p style="margin:0">
+    <strong>Admins define the shape of pages. The TrueVi Library decides what
+    goes inside them.</strong> The front-end is a holding tank. Personalization,
+    template selection, content choice, copy, and ordering all happen inside the
+    Library. The renderer is intentionally dumb.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="mental-model">1 · Mental Model</h2>
+
+<p>
+  TrueVi.tv is not a CMS in the traditional sense. Traditional CMS systems
+  bind pages to specific content at edit time. TrueVi binds pages to content
+  at <strong>render time</strong>, per user, per session, based on an evolving
+  behavioral model. Admins do not pick the content; they pick the
+  <em>conditions under which the Library is allowed to pick the content</em>.
+</p>
+
+<p>This produces four moving parts:</p>
+
+<table>
+  <thead><tr><th style="width:18%">Layer</th><th style="width:42%">Responsibility</th><th>Operated by</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Management Console</strong></td>
+      <td>Design templates, define slot constraints, run experiments,
+          publish editorial overrides, manage routes</td>
+      <td>TrueVi internal admins</td>
+    </tr>
+    <tr>
+      <td><strong>Page Renderer</strong></td>
+      <td>Read template spec, call Library with envelope, hydrate components,
+          ship HTML/JS to the browser, capture activity events</td>
+      <td>Next.js application</td>
+    </tr>
+    <tr>
+      <td><strong>TrueVi Library</strong></td>
+      <td>Select templates, fill slots, infer user state, enforce theological
+          guardrails, allocate experiment variants, cache responses</td>
+      <td>Internal AI &amp; content service</td>
+    </tr>
+    <tr>
+      <td><strong>Activity Stream</strong></td>
+      <td>Every impression, click, dwell, completion, save, share, replay is
+          captured and fed back into the inference engine</td>
+      <td>Event pipeline</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <h4>Why this matters</h4>
+  <p style="margin:0">
+    The renderer never knows whether it is showing crude oil, gasoline, or
+    diesel. It is given a composition spec and renders it. This makes the
+    front-end stable across years of personalization-engine evolution.
+    Replacing the keyword search with a vector DB does not require front-end
+    changes. Replacing the inference model does not require front-end changes.
+    The Library is the brain; the renderer is the body.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="three-layers">2 · The Three Layers</h2>
+
+<div class="diagram">
+<svg viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowDown" viewBox="0 0 10 10" refX="5" refY="9" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,0 L5,10 z" fill="#8FB8BE"/>
+    </marker>
+    <marker id="arrowUp" viewBox="0 0 10 10" refX="5" refY="1" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,10 L10,10 L5,0 z" fill="#C9902A"/>
+    </marker>
+  </defs>
+
+  <!-- Console -->
+  <rect x="60" y="20" width="780" height="100" rx="12" fill="#0A2830" stroke="#245F70" stroke-width="1.5"/>
+  <text x="80" y="50" fill="#E8E8E2" font-family="Jost" font-weight="700" font-size="18">Layer 1 · Management Console</text>
+  <text x="80" y="78" fill="#C8E4E8" font-family="Jost" font-size="13">Template Builder · Selector Rules · Experiments · Editorial Pins · Routes · Settings</text>
+  <text x="80" y="100" fill="#8FB8BE" font-family="Jost" font-size="12" font-style="italic">Authoring time — admins shape the system</text>
+
+  <!-- arrows: Console publishes specs -->
+  <line x1="450" y1="120" x2="450" y2="160" stroke="#8FB8BE" stroke-width="2" marker-end="url(#arrowDown)"/>
+  <text x="465" y="145" fill="#8FB8BE" font-family="Jost" font-size="11">publishes template + experiment specs</text>
+
+  <!-- Renderer -->
+  <rect x="60" y="170" width="780" height="100" rx="12" fill="#051318" stroke="#245F70" stroke-width="1.5"/>
+  <text x="80" y="200" fill="#E8E8E2" font-family="Jost" font-weight="700" font-size="18">Layer 2 · Page Renderer</text>
+  <text x="80" y="228" fill="#C8E4E8" font-family="Jost" font-size="13">Read spec → call Library → hydrate components → render to browser → emit events</text>
+  <text x="80" y="250" fill="#8FB8BE" font-family="Jost" font-size="12" font-style="italic">Runtime — per request, per user, per session</text>
+
+  <!-- arrows down: render request -->
+  <line x1="380" y1="270" x2="380" y2="320" stroke="#8FB8BE" stroke-width="2" marker-end="url(#arrowDown)"/>
+  <text x="200" y="295" fill="#8FB8BE" font-family="Jost" font-size="11">compose-page(pageType, route, userId, session)</text>
+
+  <!-- arrow up: composed page spec -->
+  <line x1="520" y1="320" x2="520" y2="270" stroke="#C9902A" stroke-width="2" marker-end="url(#arrowUp)"/>
+  <text x="535" y="295" fill="#C9902A" font-family="Jost" font-size="11">composition + content + copy</text>
+
+  <!-- Library -->
+  <rect x="60" y="330" width="780" height="110" rx="12" fill="#0A2830" stroke="#C9902A" stroke-width="1.5"/>
+  <text x="80" y="360" fill="#E8E8E2" font-family="Jost" font-weight="700" font-size="18">Layer 3 · TrueVi Library</text>
+  <text x="80" y="388" fill="#C8E4E8" font-family="Jost" font-size="13">Selects template · fills slots · infers user state · enforces guardrails · allocates experiments</text>
+  <text x="80" y="410" fill="#8FB8BE" font-family="Jost" font-size="12" font-style="italic">The brain — AI + content + behavioral model + editorial overrides</text>
+  <text x="80" y="430" fill="#C9902A" font-family="Jost" font-size="11">Activity events from Layer 2 feed continuously back into the inference engine</text>
+</svg>
+<div class="diagram-caption">Figure 2.1 — The three layers and the direction of data flow</div>
+</div>
+
+<h3>Boundaries you must not cross</h3>
+<ul>
+  <li>The renderer <strong>never</strong> implements personalization logic. If you find yourself filtering content by faith stage in a React component, stop and move it into the Library.</li>
+  <li>The Console <strong>never</strong> binds specific content IDs to templates (except via the explicit editorial override system — see §13).</li>
+  <li>The Library <strong>never</strong> returns raw model output. Every payload it returns conforms to the Component Contract (§4).</li>
+  <li>The Activity Stream <strong>never</strong> writes to the rendered DOM. It is a one-way feed: browser → events → Library.</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="slots">3 · Slot-Based Composition</h2>
+
+<p>
+  A <strong>template</strong> is a typed list of <strong>slots</strong>. Each
+  slot has constraints. The Library is responsible for filling each slot with
+  a concrete <strong>component instance</strong> at render time, subject to
+  those constraints.
+</p>
+
+<h3>Two slot kinds</h3>
+
+<table>
+  <thead><tr><th>Kind</th><th>Meaning</th><th>Library role</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><span class="pill fixed">FIXED</span></td>
+      <td>The admin pinned a specific component type. The slot must always
+          render that component. Only the component's <em>content</em> is
+          personalized — not its identity.</td>
+      <td>Fills the slot's query, respecting any admin overrides</td>
+    </tr>
+    <tr>
+      <td><span class="pill dynamic">DYNAMIC</span></td>
+      <td>The admin defined constraints only: a list of allowed component
+          types, a min/max count, and zone-level rules. The Library picks
+          <em>which</em> components to render and how many, within those bounds.</td>
+      <td>Decides component identity, count, ordering, and content</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Example: HomeTemplate v3</h3>
+
+<pre><code><span class="c">// Stored in the Templates table — see data model M1.3</span>
+{
+  <span class="k">"templateId"</span>: <span class="s">"home-v3"</span>,
+  <span class="k">"pageType"</span>: <span class="s">"home"</span>,
+  <span class="k">"inputs"</span>: [],             <span class="c">// home takes no slot variables</span>
+  <span class="k">"slots"</span>: [
+    {
+      <span class="k">"slotId"</span>: <span class="s">"hero"</span>,
+      <span class="k">"kind"</span>: <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"Hero-Carousel"</span>,
+      <span class="k">"config"</span>: { <span class="k">"maxSlides"</span>: <span class="n">5</span>, <span class="k">"autoplay"</span>: <span class="n">true</span> }
+    },
+    {
+      <span class="k">"slotId"</span>: <span class="s">"dynamic-rails"</span>,
+      <span class="k">"kind"</span>: <span class="s">"DYNAMIC"</span>,
+      <span class="k">"allows"</span>: [<span class="s">"ContentRail"</span>, <span class="s">"MinistryRail"</span>, <span class="s">"SeriesRail"</span>],
+      <span class="k">"minCount"</span>: <span class="n">3</span>,
+      <span class="k">"maxCount"</span>: <span class="n">10</span>,
+      <span class="k">"tierVisibility"</span>: [<span class="s">"new"</span>, <span class="s">"vine"</span>, <span class="s">"plus"</span>]
+    },
+    {
+      <span class="k">"slotId"</span>: <span class="s">"ask-anything"</span>,
+      <span class="k">"kind"</span>: <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"AskAnythingBlock"</span>,
+      <span class="k">"config"</span>: { <span class="k">"variant"</span>: <span class="s">"hero-card"</span> }
+    },
+    {
+      <span class="k">"slotId"</span>: <span class="s">"upgrade-teaser"</span>,
+      <span class="k">"kind"</span>: <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"UpgradeTeaser"</span>,
+      <span class="k">"tierVisibility"</span>: [<span class="s">"new"</span>]   <span class="c">// only free-tier users see this</span>
+    }
+  ]
+}</code></pre>
+
+<div class="callout decision">
+  <h4>Decision · No nesting in v1</h4>
+  <p style="margin:0">
+    Templates are a flat vertical stack of slots. Multi-column layouts
+    (e.g., two rails side by side) ship in Phase 2 via a <code>ColumnRow</code>
+    component that holds child slots. The schema reserves this — see §4 — but
+    the v1 builder does not expose it.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="contract">4 · The Component Contract</h2>
+
+<p>
+  Every renderable component in the system, regardless of where it appears,
+  speaks the same shape. Components are <strong>generic</strong> — a
+  <code>ContentRail</code> is the same component on Home, Ministry, Subject,
+  and Series pages. Only its parameters differ.
+</p>
+
+<h3>The contract</h3>
+
+<pre><code>ComponentInstance {
+  <span class="c">// identity</span>
+  type:           <span class="s">"ContentRail" | "Hero" | "Grid" | ... </span>
+  instanceId:     <span class="s">"rail-recommended-001"</span>
+  version:        <span class="s">"1.4.2"</span>   <span class="c">// templates pin component versions</span>
+
+  <span class="c">// admin-authored, stored on the template</span>
+  config:         {
+    title:         <span class="s">"Continue Watching"</span>,
+    subtitle:      <span class="s">null</span>,
+    layout:        <span class="s">"horizontal-scroll"</span>,
+    cardSize:      <span class="s">"medium"</span>,
+    maxItems:      <span class="n">12</span>,
+    showAllLink:   <span class="n">true</span>
+  }
+
+  <span class="c">// what the component asks Library for</span>
+  query:          {
+    contentType:   <span class="s">"video"</span>,
+    filters:       { faithStage?, lifeStage?, ministry?, tags?, denomination? },
+    sort:          <span class="s">"recommended" | "recent" | "trending" | "curated"</span>,
+    mode:          <span class="s">"auto" | "curated"</span>,
+    curatedIds?:   [<span class="s">"abc123"</span>, <span class="s">"def456"</span>],   <span class="c">// only when mode=curated</span>
+    limit:         <span class="n">12</span>
+  }
+
+  <span class="c">// passive signals this component is allowed to consume</span>
+  personalization: {
+    enabled:       <span class="n">true</span>,
+    signals:       [<span class="s">"inferredFaithStage"</span>, <span class="s">"watchHistory"</span>, <span class="s">"exploredSubjects"</span>],
+    fallback:      <span class="s">"trending"</span>      <span class="c">// what to do on low confidence</span>
+  }
+
+  <span class="c">// gating</span>
+  visibility:     {
+    tiers:         [<span class="s">"new"</span>, <span class="s">"vine"</span>, <span class="s">"plus"</span>],
+    deviceClasses: [<span class="s">"desktop"</span>, <span class="s">"tablet"</span>, <span class="s">"mobile"</span>],
+    minSessions:   <span class="n">0</span>,
+    maxSessions:   <span class="s">null</span>
+  }
+
+  <span class="c">// localization</span>
+  copy:           {
+    en: { title: <span class="s">"Continue Watching"</span>, cta: <span class="s">"See all"</span> },
+    es: { ... }                                       <span class="c">// reserved, EN-only at launch</span>
+  }
+}</code></pre>
+
+<h3>What the Library returns for each instance</h3>
+
+<pre><code>FilledInstance {
+  instanceId:    <span class="s">"rail-recommended-001"</span>,
+  componentType: <span class="s">"ContentRail"</span>,
+  resolvedConfig: { ... },        <span class="c">// admin config merged with Library overrides</span>
+  content:       [ ContentItem, ContentItem, ... ],
+  copy:          { title, subtitle, cta },
+  why:           {
+    reason:      <span class="s">"high_engagement_with_forgiveness_subjects"</span>,
+    confidence:  <span class="n">0.82</span>,
+    signalsUsed: [<span class="s">"watchHistory"</span>, <span class="s">"exploredSubjects"</span>]
+  },
+  experimentVariant: <span class="s">"home-v3-variant-B"</span>,
+  ttl:           <span class="n">900</span>                  <span class="c">// seconds — see §14</span>
+}</code></pre>
+
+<div class="callout">
+  <h4>The <code>why</code> field</h4>
+  <p style="margin:0">
+    Every Library response includes an explainability payload. It is not
+    surfaced to end users. It powers (a) the "View as User" debugger in the
+    Console, (b) the QA workflow for new experiments, and (c) the analytics
+    pipeline. <em>Optional in v1 production, mandatory in Console preview.</em>
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="sequence">5 · Page Render Sequence</h2>
+
+<p>The end-to-end path from a browser request to a fully rendered page:</p>
+
+<div class="diagram">
+<svg viewBox="0 0 900 540" xmlns="http://www.w3.org/2000/svg">
+  <!-- swimlane headers -->
+  <text x="90"  y="24" fill="#E8E8E2" font-family="Jost" font-weight="600" font-size="13">Browser</text>
+  <text x="280" y="24" fill="#E8E8E2" font-family="Jost" font-weight="600" font-size="13">Renderer</text>
+  <text x="490" y="24" fill="#E8E8E2" font-family="Jost" font-weight="600" font-size="13">TrueVi Library</text>
+  <text x="720" y="24" fill="#E8E8E2" font-family="Jost" font-weight="600" font-size="13">Activity Stream</text>
+
+  <!-- lifelines -->
+  <line x1="120" y1="40" x2="120" y2="520" stroke="#245F70" stroke-dasharray="3,4"/>
+  <line x1="320" y1="40" x2="320" y2="520" stroke="#245F70" stroke-dasharray="3,4"/>
+  <line x1="540" y1="40" x2="540" y2="520" stroke="#245F70" stroke-dasharray="3,4"/>
+  <line x1="760" y1="40" x2="760" y2="520" stroke="#245F70" stroke-dasharray="3,4"/>
+
+  <!-- step 1 -->
+  <line x1="120" y1="65" x2="320" y2="65" stroke="#C8E4E8" stroke-width="1.5" marker-end="url(#arrowDown)"/>
+  <text x="125" y="58" fill="#C8E4E8" font-family="Jost" font-size="11">1. GET /home (cookie: sid=...)</text>
+
+  <!-- step 2 -->
+  <rect x="280" y="80" width="80" height="22" rx="4" fill="#0A2830" stroke="#245F70"/>
+  <text x="285" y="95" fill="#C8E4E8" font-family="Jost" font-size="11">resolve route</text>
+
+  <!-- step 3 -->
+  <line x1="320" y1="125" x2="540" y2="125" stroke="#C8E4E8" stroke-width="1.5" marker-end="url(#arrowDown)"/>
+  <text x="325" y="118" fill="#C8E4E8" font-family="Jost" font-size="11">2. compose-page(pageType=home, userId, session, route)</text>
+
+  <!-- step 4 (Library work) -->
+  <rect x="500" y="140" width="100" height="22" rx="4" fill="#0A2830" stroke="#C9902A"/>
+  <text x="505" y="155" fill="#C9902A" font-family="Jost" font-size="11">select template</text>
+
+  <rect x="500" y="170" width="100" height="22" rx="4" fill="#0A2830" stroke="#C9902A"/>
+  <text x="505" y="185" fill="#C9902A" font-family="Jost" font-size="11">load inferences</text>
+
+  <rect x="500" y="200" width="100" height="22" rx="4" fill="#0A2830" stroke="#C9902A"/>
+  <text x="505" y="215" fill="#C9902A" font-family="Jost" font-size="11">fill DYNAMIC slots</text>
+
+  <rect x="500" y="230" width="100" height="22" rx="4" fill="#0A2830" stroke="#C9902A"/>
+  <text x="505" y="245" fill="#C9902A" font-family="Jost" font-size="11">apply guardrails</text>
+
+  <rect x="500" y="260" width="100" height="22" rx="4" fill="#0A2830" stroke="#C9902A"/>
+  <text x="505" y="275" fill="#C9902A" font-family="Jost" font-size="11">dedupe + tag why</text>
+
+  <!-- response -->
+  <line x1="540" y1="295" x2="320" y2="295" stroke="#C9902A" stroke-width="1.5" marker-end="url(#arrowUp)"/>
+  <text x="335" y="288" fill="#C9902A" font-family="Jost" font-size="11">3. composition spec + experimentId + ttl</text>
+
+  <!-- render -->
+  <rect x="280" y="310" width="80" height="22" rx="4" fill="#0A2830" stroke="#245F70"/>
+  <text x="285" y="325" fill="#C8E4E8" font-family="Jost" font-size="11">hydrate</text>
+
+  <!-- to browser -->
+  <line x1="320" y1="350" x2="120" y2="350" stroke="#C8E4E8" stroke-width="1.5" marker-end="url(#arrowUp)"/>
+  <text x="135" y="343" fill="#C8E4E8" font-family="Jost" font-size="11">4. HTML + JSON spec for client-side hydration</text>
+
+  <!-- events firing -->
+  <line x1="120" y1="395" x2="760" y2="395" stroke="#2E7A8A" stroke-width="1.5" marker-end="url(#arrowDown)"/>
+  <text x="135" y="388" fill="#2E7A8A" font-family="Jost" font-size="11">5. impression events fire (every slot)</text>
+
+  <line x1="120" y1="440" x2="760" y2="440" stroke="#2E7A8A" stroke-width="1.5" marker-end="url(#arrowDown)"/>
+  <text x="135" y="433" fill="#2E7A8A" font-family="Jost" font-size="11">6. user clicks / dwells / completes</text>
+
+  <line x1="760" y1="485" x2="540" y2="485" stroke="#C9902A" stroke-width="1.5" marker-end="url(#arrowUp)"/>
+  <text x="555" y="478" fill="#C9902A" font-family="Jost" font-size="11">7. event stream feeds inference (warm tier)</text>
+</svg>
+<div class="diagram-caption">Figure 5.1 — Sequence diagram, one page render with activity feedback</div>
+</div>
+
+<h3>Notes on the sequence</h3>
+<ul>
+  <li><strong>One Library call per page.</strong> Not one per component. Library returns the entire composition. This eliminates N-fetch waterfall problems.</li>
+  <li><strong>Activity events are fire-and-forget.</strong> The browser does not wait for ingestion. Lost events are acceptable; this is not a financial system.</li>
+  <li><strong>Inference is asynchronous.</strong> The warm tier processes the event stream out-of-band. The user's <em>next</em> page reflects the previous page's behavior.</li>
+  <li><strong>TTL governs re-fetch.</strong> Same user, same page, within TTL — same composition. See §14.</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="personalization">6 · Passive Personalization</h2>
+
+<p>
+  TrueVi does not ask users questions to personalize. There is no
+  onboarding form, no profile wizard, no "tell us about yourself."
+  Every personalization signal is <strong>inferred from behavior</strong>.
+</p>
+
+<h3>Why this matters</h3>
+<p>
+  Users lie on profile forms. Users abandon profile forms. Users do not know
+  their own faith stage. Users do not want to declare it even when they do.
+  Behavior tells the truth. Watch what they watch.
+</p>
+
+<h3>The derived signals catalog</h3>
+
+<pre><code>DerivedSignals {
+  <span class="c">// inferred classifications — produced by the warm-tier model</span>
+  inferredFaithStage:    { value: <span class="s">"Seeking"</span>,        confidence: <span class="n">0.61</span> }
+  inferredLifeStage:     { value: <span class="s">"YoungAdult"</span>,     confidence: <span class="n">0.78</span> }
+  inferredLifeEvents:    [
+                           { tag: <span class="s">"career-crisis"</span>,   confidence: <span class="n">0.45</span> },
+                           { tag: <span class="s">"spiritual-doubt"</span>, confidence: <span class="n">0.72</span> }
+                         ]
+
+  <span class="c">// behavioral patterns — counters and ratios, updated in hot tier</span>
+  watchPatterns:         {
+    completionRate:      <span class="n">0.42</span>,
+    avgDwellSec:         <span class="n">680</span>,
+    formatAffinity:      { sermon: <span class="n">0.61</span>, devotional: <span class="n">0.22</span>, teaching: <span class="n">0.17</span> },
+    preferredSessionMin: <span class="n">28</span>
+  }
+  exploredSubjects:      [{ subject: <span class="s">"forgiveness"</span>, weight: <span class="n">0.81</span> },
+                          { subject: <span class="s">"anxiety"</span>,     weight: <span class="n">0.54</span> }]
+  visitedMinistries:     [{ slug: <span class="s">"mercy-hill"</span>,     recencyScore: <span class="n">0.92</span> }]
+  searchHistory:         [{ query: <span class="s">"how to forgive"</span>, intent: <span class="s">"emotional-pain"</span> }]
+  askAnythingHistory:    [{ topic: <span class="s">"forgiving-father"</span>, weight: <span class="n">0.88</span> }]
+  scriptureEngagement:   [{ ref: <span class="s">"Matthew 18:21"</span>,    weight: <span class="n">0.45</span> }]
+
+  <span class="c">// session context — computed at request time, not stored</span>
+  visitorType:           <span class="s">"first-visit" | "returning" | "regular" | "power"</span>
+  sessionContext:        {
+    timeOfDay:           <span class="s">"evening"</span>,
+    dayOfWeek:           <span class="s">"sunday"</span>,
+    deviceClass:         <span class="s">"desktop"</span>,
+    referrer:            <span class="s">"google"</span>,
+    sessionNumber:       <span class="n">7</span>
+  }
+}</code></pre>
+
+<div class="callout principle">
+  <h4>The confidence rule</h4>
+  <p style="margin:0">
+    Every inferred classification carries a confidence score in [0, 1]. The
+    Library uses confidence to decide whether to (a) personalize, (b) fall
+    back to trending, or (c) blend personalization with discovery.
+    Default thresholds: <code>&lt;0.3</code> = ignore signal,
+    <code>0.3-0.6</code> = blend, <code>&gt;0.6</code> = trust.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="inference">7 · Tiered Inference</h2>
+
+<p>
+  The user's behavioral profile updates at three different cadences. This
+  preserves both real-time personalization feel and overnight batch guarantees.
+</p>
+
+<table>
+  <thead>
+    <tr><th style="width:14%">Tier</th><th style="width:30%">Computes</th><th style="width:24%">When</th><th>Cost profile</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Hot</strong> <span class="pill note">sync</span></td>
+      <td>Recency scores, last-visited-ministry, current-session subjects,
+          watch progress, save/share state, view counters</td>
+      <td>Inline, on every event, before the event is acknowledged</td>
+      <td>Trivial — counter updates and cache writes</td>
+    </tr>
+    <tr>
+      <td><strong>Warm</strong> <span class="pill note">JITP</span></td>
+      <td>Inferred faith stage, life stage, life-event tags, format affinity,
+          intent classification on search queries</td>
+      <td>Triggered when a threshold is crossed: <code>+10 new events</code>
+          OR <code>+24h stale</code> OR <code>+1 completed video</code></td>
+      <td>Pay-per-update — only runs when meaningful new signal exists</td>
+    </tr>
+    <tr>
+      <td><strong>Cold</strong> <span class="pill note">batch</span></td>
+      <td>Confidence decay sweeps, cohort recomputation, drift detection,
+          model retraining triggers — <em>no per-user inference</em></td>
+      <td>Nightly at 02:00 UTC</td>
+      <td>Fixed, scheduled, predictable</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout decision">
+  <h4>Decision · Tiered, not "real-time vs nightly"</h4>
+  <p style="margin:0">
+    Bunker's "fresh every morning" guarantee is satisfied by the Cold tier
+    (decay + cohort recomputation). Brian's "real-time feel" is satisfied by
+    the Hot tier. The Warm tier (the expensive ML inference) only runs when
+    the user has actually done something worth re-classifying. This is
+    measurably cheaper than recomputing every user nightly.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="selection">8 · AI Template Selection</h2>
+
+<p>
+  Multiple templates can exist for the same page type. The Library decides
+  which template a given user sees on a given request. This is a distinct
+  step from filling the template's slots.
+</p>
+
+<h3>Selection inputs</h3>
+<ul>
+  <li><strong>Page type</strong> — what kind of page is being rendered (home, ministry, subject, series, search, search-response)</li>
+  <li><strong>User context</strong> — derived signals (§6), visitor type, tier</li>
+  <li><strong>Eligible templates</strong> — the published templates for this page type</li>
+  <li><strong>Selector rules</strong> — admin-authored rules ("first-visit users always see HomeTemplate-Discovery") — see §13</li>
+  <li><strong>Experiment assignments</strong> — if this user is in an A/B cohort, the variant template</li>
+</ul>
+
+<h3>Selection precedence</h3>
+<ol>
+  <li>If the user is enrolled in a live experiment for this page type, the variant assigned by the experiment wins. <em>Always.</em></li>
+  <li>Otherwise, evaluate selector rules in priority order. First matching rule wins.</li>
+  <li>If no rule matches, the default template for the page type is used.</li>
+</ol>
+
+<pre><code><span class="c">// Example selector rule, stored in TemplateSelectorRules table</span>
+{
+  <span class="k">"pageType"</span>: <span class="s">"home"</span>,
+  <span class="k">"priority"</span>: <span class="n">10</span>,
+  <span class="k">"name"</span>: <span class="s">"first-visit-discovery"</span>,
+  <span class="k">"condition"</span>: { <span class="k">"visitorType"</span>: <span class="s">"first-visit"</span> },
+  <span class="k">"templateId"</span>: <span class="s">"home-discovery-v1"</span>
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2 id="guardrails">9 · Theological Guardrails</h2>
+
+<p>
+  TrueVi has a hard editorial position: no prosperity gospel, no
+  personality-cult content, no theology that compromises the Nicene Creed.
+  These rules are enforced by the Library, not the renderer.
+</p>
+
+<h3>Three layers of enforcement</h3>
+
+<table>
+  <thead><tr><th>Layer</th><th>Where</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Ingestion-time</strong></td>
+      <td>Content Library Management System</td>
+      <td>Every piece of content is tagged at ingestion with theological
+          alignment scores, denomination, content warnings, and a
+          pastoral-review status. Prosperity-gospel content is rejected
+          before it ever enters the catalog.</td>
+    </tr>
+    <tr>
+      <td><strong>Query-time</strong></td>
+      <td>TrueVi Library</td>
+      <td>Every Library response runs through a guardrail filter that strips
+          any content failing the theological bar — even if an experiment or
+          editorial pin would have surfaced it. Guardrails are always on.</td>
+    </tr>
+    <tr>
+      <td><strong>Audit-time</strong></td>
+      <td>Pastoral Board review queue</td>
+      <td>The Pastoral Board reviews flagged edge cases, content scoring
+          changes, and tagging disputes. Their decisions update the
+          ingestion-time and query-time rules.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout warning">
+  <h4>Console role</h4>
+  <p style="margin:0">
+    The Management Console has a <strong>read-only</strong> view of active
+    guardrails at <code>/console/guardrails</code>. Edits require Pastoral
+    Board sign-off and are made through a separate workflow. Admins
+    <em>cannot</em> disable guardrails for an experiment.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="cold-start">10 · Cold-Start Strategy</h2>
+
+<p>
+  On session #1, the user has zero behavioral history. The Library still
+  needs to produce a useful page. Cold-start uses the <strong>request
+  envelope</strong> — information available from the HTTP request itself.
+</p>
+
+<h3>Available cold-start signals</h3>
+<ul>
+  <li><strong>Referrer</strong> — Google query, social link, direct, ministry partner site</li>
+  <li><strong>UTM tags</strong> — campaign, source, medium, content, term</li>
+  <li><strong>Landing path</strong> — did they hit <code>/</code> or <code>/ministry/mercy-hill</code>?</li>
+  <li><strong>IP geo</strong> — country-level only, never street-level</li>
+  <li><strong>Device class</strong> — desktop / tablet / mobile</li>
+  <li><strong>Time of day, day of week</strong></li>
+  <li><strong>Browser language</strong></li>
+</ul>
+
+<p>
+  These feed a lightweight cold-start model that produces low-confidence
+  inferences. The Library blends those with editorial defaults and trending
+  content. As the user accumulates 5-10 events, the warm tier kicks in and
+  the inferences sharpen.
+</p>
+
+<!-- ============================================================ -->
+<h2 id="experiments">11 · A/B Experimentation</h2>
+
+<p>
+  Experimentation is a first-class capability, not an add-on. Every template,
+  every slot, and every component can be A/B tested.
+</p>
+
+<h3>Experiment model</h3>
+
+<pre><code>Experiment {
+  experimentId:    <span class="s">"home-hero-carousel-vs-static"</span>
+  pageType:        <span class="s">"home"</span>
+  status:          <span class="s">"draft" | "live" | "paused" | "concluded"</span>
+
+  variants: [
+    { id: <span class="s">"control"</span>, templateId: <span class="s">"home-v3"</span>,          allocation: <span class="n">0.50</span> },
+    { id: <span class="s">"variant-B"</span>, templateId: <span class="s">"home-v3-carousel"</span>, allocation: <span class="n">0.50</span> }
+  ]
+
+  <span class="c">// stable assignment — same user always gets same variant for life of experiment</span>
+  assignmentKey:   <span class="s">"userId"</span> | <span class="s">"sessionId"</span> | <span class="s">"deviceId"</span>
+
+  primaryKPI:      <span class="s">"watch_completion_rate"</span>
+  secondaryKPIs:   [<span class="s">"return_visit_7d"</span>, <span class="s">"signup_conversion"</span>, <span class="s">"ask_anything_engagement"</span>]
+
+  guardrailKPIs:   [<span class="s">"theological_complaint_rate"</span>, <span class="s">"crash_rate"</span>]
+
+  minSampleSize:   <span class="n">2000</span>
+  maxDurationDays: <span class="n">30</span>
+  significanceThreshold: <span class="n">0.95</span>
+}</code></pre>
+
+<h3>Locked KPIs (from §10 of the Q&amp;A)</h3>
+<ol>
+  <li><strong>Watch completion rate</strong> — % of started videos completed past the 80% mark</li>
+  <li><strong>Return visit</strong> — % of users who return within 7 days</li>
+  <li><strong>Signup conversion</strong> — anonymous → registered, attributed to template</li>
+  <li><strong>Ask Anything engagement</strong> — % of sessions that submit at least one query</li>
+</ol>
+
+<h3>Assignment guarantees</h3>
+<ul>
+  <li><strong>Stable</strong> — same user, same variant, for the life of the experiment</li>
+  <li><strong>Sticky across sessions</strong> — assignment is persisted, not recomputed</li>
+  <li><strong>Mergeable</strong> — when an anonymous user signs up, their pre-signup assignment migrates to the user ID (see §12)</li>
+  <li><strong>Reported on every event</strong> — every activity event carries its experiment + variant tags</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="identity">12 · Identity &amp; Anonymous → Authenticated Merge</h2>
+
+<p>
+  Free browsing requires no signup (YouTube TOS compliance — see CLAUDE.md).
+  This means most users start anonymous. Many never sign up. Those who do
+  sign up should not lose their accumulated behavioral history.
+</p>
+
+<h3>Identity hierarchy</h3>
+
+<table>
+  <thead><tr><th>Identity</th><th>Lifetime</th><th>Used for</th></tr></thead>
+  <tbody>
+    <tr><td><code>deviceId</code></td><td>localStorage, ~years</td><td>Cold-start defaults, device-level analytics</td></tr>
+    <tr><td><code>anonymousId</code></td><td>cookie, ~1 year</td><td>Pre-signup behavioral history accumulator</td></tr>
+    <tr><td><code>sessionId</code></td><td>session cookie, ~hours</td><td>Per-session caching, session-level analytics</td></tr>
+    <tr><td><code>userId</code></td><td>permanent</td><td>Authenticated user, primary key for all inferences</td></tr>
+  </tbody>
+</table>
+
+<h3>Merge protocol</h3>
+<ol>
+  <li>Anonymous user accumulates <code>activity_events</code> tagged with their <code>anonymousId</code>.</li>
+  <li>User signs up. Signup UI displays a consent line: <em>"Carry over your activity from this device so we can keep personalizing for you."</em> (default: checked, can opt out)</li>
+  <li>On consent, a merge job rewrites <code>anonymous_id → user_id</code> for all events from that <code>anonymousId</code>.</li>
+  <li>The Warm tier is triggered to recompute inferences from the merged event history.</li>
+  <li>Experiment assignments tied to the <code>anonymousId</code> are migrated to the <code>userId</code>, preserving cohort integrity.</li>
+</ol>
+
+<!-- ============================================================ -->
+<h2 id="editorial">13 · Editorial Overrides</h2>
+
+<p>
+  The Library makes most decisions. Sometimes a human must override it.
+  Three mechanisms exist:
+</p>
+
+<table>
+  <thead><tr><th>Tool</th><th>What it does</th><th>Console location</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Pin</strong></td>
+      <td>Force a specific component instance or content item into a specific
+          slot, for a date range, optionally segment-scoped</td>
+      <td><code>/console/editorial/pins</code></td>
+    </tr>
+    <tr>
+      <td><strong>Block</strong></td>
+      <td>Prevent specific content from surfacing globally, regardless of
+          inference scores. Used for hot-take pulls, takedown requests,
+          PR-sensitive moments</td>
+      <td><code>/console/editorial/blocks</code></td>
+    </tr>
+    <tr>
+      <td><strong>Boost</strong></td>
+      <td>Temporarily weight specific ministries, series, or content tags
+          higher in selection scoring. Used for seasonal campaigns (Easter,
+          Christmas), partner pushes, new-content highlights</td>
+      <td><code>/console/editorial/boosts</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <h4>Time-windowed and segmentable</h4>
+  <p style="margin:0">
+    All three editorial tools accept a start/end date and an optional
+    audience segment (e.g., visitorType=returning, lifeStage=YoungAdult).
+    Pins and Boosts auto-expire. Blocks persist until explicitly removed.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="caching">14 · Caching</h2>
+
+<p>
+  Personalization is expensive. Caching is mandatory. But session-level
+  content shifts can disorient users, so caching must be tunable.
+</p>
+
+<h3>Cache hierarchy</h3>
+
+<table>
+  <thead><tr><th>Layer</th><th>Scope</th><th>Default TTL</th><th>Invalidation</th></tr></thead>
+  <tbody>
+    <tr><td>Browser memory</td><td>per page view</td><td>view lifetime</td><td>navigation</td></tr>
+    <tr><td>Edge / CDN</td><td>per template, anonymous only</td><td>5 minutes</td><td>template publish</td></tr>
+    <tr><td>Library composition cache</td><td>per (user, pageType, route)</td><td>15 minutes</td><td>activity event, manual flush</td></tr>
+    <tr><td>Library content cache</td><td>per (query signature)</td><td>1 hour</td><td>content publish</td></tr>
+    <tr><td>Inference cache</td><td>per user</td><td>warm-tier output, updated on threshold</td><td>warm-tier run</td></tr>
+  </tbody>
+</table>
+
+<div class="callout warning">
+  <h4>Open question — Brian flagged</h4>
+  <p style="margin:0">
+    Constant content shifts within a session can disorient users.
+    The composition cache TTL of 15 minutes is a default; the
+    <em>actual</em> right value should be A/B tested. The Library API
+    accepts per-instance TTL overrides for components where stability
+    matters more (e.g., Hero, Continue Watching).
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="search-response">15 · Search Response (Ask Anything)</h2>
+
+<p>
+  When a user submits an Ask Anything query, the Library produces a
+  composed response: a curated summary, scripture references, and
+  recommended content. Every response gets a shareable URL.
+</p>
+
+<h3>Storage strategy</h3>
+
+<p>
+  Storing raw HTML responses at scale is expensive. Storing
+  <em>composition specs</em> is not. The pattern:
+</p>
+
+<ol>
+  <li>Normalize the query (lowercase, strip filler words, lemmatize).</li>
+  <li>Compute a <strong>semantic hash</strong> — an embedding-based hash that
+      groups queries with equivalent meaning. "How do I forgive my father?"
+      and "I can't forgive my dad" map to the same hash.</li>
+  <li>Cache lookup by hash. On hit, return the cached composition spec.</li>
+  <li>On miss, generate the response, store the spec (~3-5 KB), return.</li>
+  <li>Every shared response gets a permanent URL: <code>/answer/[hash]</code>.</li>
+</ol>
+
+<h3>Storage cost projection</h3>
+
+<table>
+  <thead><tr><th>Scale</th><th>Spec storage</th><th>Backing store</th><th>Cost</th></tr></thead>
+  <tbody>
+    <tr><td>1M unique responses</td><td>~5 GB</td><td>SQLite or Postgres</td><td>trivial</td></tr>
+    <tr><td>100M unique responses</td><td>~500 GB</td><td>Cloud SQL</td><td>~$100/month</td></tr>
+    <tr><td>1B unique responses</td><td>~5 TB</td><td>sharded</td><td>~$1K/month</td></tr>
+  </tbody>
+</table>
+
+<h3>Eviction policy</h3>
+<ul>
+  <li><strong>Hot</strong> — last 30 days OR &gt;5 shares: in-memory + persistent</li>
+  <li><strong>Warm</strong> — shared at least once, ever: persistent only</li>
+  <li><strong>Cold</strong> — never shared, last accessed &gt;30 days ago: evict; regenerate on demand (same query is the same hash, so regeneration is deterministic and cheap)</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="tiers">16 · Tier-Aware Components</h2>
+
+<p>
+  Components can declare which subscription tiers see them. A global setting
+  controls whether tier gating is enforced or bypassed.
+</p>
+
+<pre><code><span class="c">// Component declares tier visibility</span>
+visibility: { tiers: [<span class="s">"vine"</span>, <span class="s">"plus"</span>] }   <span class="c">// hidden from free tier</span>
+
+<span class="c">// Console global setting overrides</span>
+ConsoleSettings.monetizationMode = <span class="s">"open-all"</span>     <span class="c">// pre-launch: all features visible</span>
+                                 | <span class="s">"tier-gated"</span>    <span class="c">// post-launch: tiers enforced</span></code></pre>
+
+<p>
+  The <code>UpgradeTeaser</code> component is the inverse: it appears
+  <em>only</em> for tiers <em>below</em> a target. Its placement and trigger
+  rules are deferred to a later spec — for v1, the Console exposes
+  configurable slots where teasers <em>can</em> appear, and the Library
+  decides whether to fill them based on user signals and experiment state.
+</p>
+
+<!-- ============================================================ -->
+<h2 id="i18n">17 · Localization</h2>
+
+<p>
+  Every user-visible string is locale-keyed from day one. English-only ships
+  at launch. The schema reserves additional locales.
+</p>
+
+<pre><code>copy: {
+  en: { title: <span class="s">"Continue Watching"</span>, cta: <span class="s">"See all"</span> },
+  es: { title: <span class="s">"Continuar viendo"</span>,  cta: <span class="s">"Ver todo"</span> },     <span class="c">// reserved</span>
+  pt: { ... }                                                <span class="c">// reserved</span>
+}</code></pre>
+
+<p>
+  The Library returns copy keyed by the user's resolved locale, falling
+  back to <code>en</code> when a translation is missing.
+</p>
+
+<!-- ============================================================ -->
+<h2 id="glossary">18 · Glossary</h2>
+
+<table>
+  <thead><tr><th style="width:24%">Term</th><th>Definition</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Page Type</strong></td><td>A logical kind of page: home, ministry, subject, series, search, search-response. Each route binds to a page type.</td></tr>
+    <tr><td><strong>Template</strong></td><td>A typed list of slots representing the shape of a page. Multiple templates can exist per page type.</td></tr>
+    <tr><td><strong>Slot</strong></td><td>A position in a template that holds a component. Can be FIXED (admin-pinned) or DYNAMIC (Library-filled).</td></tr>
+    <tr><td><strong>Component</strong></td><td>A generic, reusable UI block (Hero, ContentRail, Grid, etc.). Speaks the Component Contract.</td></tr>
+    <tr><td><strong>Component Instance</strong></td><td>A concrete use of a component in a slot, with config, query, personalization, visibility, and copy.</td></tr>
+    <tr><td><strong>Filled Instance</strong></td><td>What the Library returns: a Component Instance with resolved content and copy.</td></tr>
+    <tr><td><strong>Composition</strong></td><td>The full set of Filled Instances the Library returns for a page render.</td></tr>
+    <tr><td><strong>Derived Signal</strong></td><td>A behavioral metric or classification inferred from activity events.</td></tr>
+    <tr><td><strong>Tier (inference)</strong></td><td>Hot, Warm, Cold — the three cadences at which derived signals update.</td></tr>
+    <tr><td><strong>Tier (subscription)</strong></td><td>New, Vine, Plus — the three subscription levels.</td></tr>
+    <tr><td><strong>Selector Rule</strong></td><td>An admin-authored rule that maps a user context to a specific template.</td></tr>
+    <tr><td><strong>Experiment</strong></td><td>An A/B test that overrides selector rules for assigned users.</td></tr>
+    <tr><td><strong>Editorial Override</strong></td><td>Pin, Block, or Boost — human intervention on Library decisions.</td></tr>
+    <tr><td><strong>Guardrail</strong></td><td>A theological filter applied at query time. Always on.</td></tr>
+    <tr><td><strong>Cold-Start</strong></td><td>The first session for a user, where no behavioral history exists.</td></tr>
+    <tr><td><strong>Semantic Hash</strong></td><td>An embedding-based hash that groups semantically equivalent Ask Anything queries.</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2 id="decisions">19 · Locked Decisions (from this thread)</h2>
+
+<ol>
+  <li>Pages are slot-based holding tanks. Library fills slots.</li>
+  <li>Component palette includes: Hero (Video/Image/Search/AskAnything/Ministry/Subject/Series/Carousel), ContentRail, ContentGrid, FilterChips, MinistryRail, MinistryCard, SeriesRail, SeriesCard, EpisodeList, AskAnythingBlock, ScriptureBlock, AIResponseBlock, PastorCard, ContextBanner, Breadcrumbs, TextBlock, CTABlock, UpgradeTeaser. Phase 2: ColumnRow for nesting.</li>
+  <li>Personalization is fully passive. No onboarding questions. All signals inferred from behavior.</li>
+  <li>Multiple templates per page type. Library selects which template to use per request.</li>
+  <li>Nesting deferred to Phase 2 via ColumnRow.</li>
+  <li>Tier-aware components, with a Console-global "open-all vs tier-gated" mode toggle.</li>
+  <li>Live preview in Console with "View as User" selector.</li>
+  <li>A/B testing is Phase 1, not deferred. Primary KPIs: watch completion, return visit, signup conversion, Ask Anything engagement.</li>
+  <li>TrueVi Library is one logical service. Vector DB / mock JSON / SQLite are implementation details.</li>
+  <li>Rails support both <code>auto</code> and <code>curated</code> modes.</li>
+  <li>Page-level content de-duplication, top-priority slot wins.</li>
+  <li>Empty/low-confidence fallback is the Library's decision, not the template's.</li>
+  <li>Tiered inference: Hot (sync), Warm (JITP), Cold (nightly batch).</li>
+  <li>Templates take typed input parameters (slot variables) — same template serves many URLs.</li>
+  <li>Per-page-type route map at <code>/console/routes</code>.</li>
+  <li>Component versioning: templates pin component version; explicit upgrade.</li>
+  <li>UpgradeTeaser trigger logic deferred — architecture supports configurable placement.</li>
+  <li>Search Response = a distinct page type from Search results list.</li>
+  <li>Every Search Response gets a shareable URL via semantic hash.</li>
+  <li>Same template renders desktop, tablet, mobile via component-level responsive rules.</li>
+  <li>Anonymous → authenticated history merge with consent at signup.</li>
+  <li>Cold-start uses request envelope (referrer, UTM, geo, device, time).</li>
+  <li>Editorial: Pin, Block, Boost. Time-windowed and segmentable.</li>
+  <li>Inference: tiered (Hot + Warm-JITP + Cold-nightly).</li>
+  <li>Theological guardrails enforced in the Library, read-only in Console.</li>
+  <li>Card-level state (saved, in-progress, completed) is universal, not template-controlled.</li>
+  <li>Locale-keyed copy from day one, English-only at launch.</li>
+  <li>Templates can be cloned but cannot inherit.</li>
+</ol>
+
+<hr/>
+
+<p style="color:var(--tv-secondary); font-size: 12px; text-align: center;">
+  Next: <a href="09-api-contract.md" style="color:var(--tv-cta-bright)">09 · API Contract</a> ·
+  Then: <a href="10-data-model.html" style="color:var(--tv-cta-bright)">10 · Data Model</a> ·
+  After M1 review: M2 (Console wireframes), M3 (Template wireframes)
+</p>
+
+</main>
+</div>
+</body>
+</html>
