@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TrueVi — Series Template (M3.7)</title>
+<style>
+  :root {
+    --tv-canvas:#030C0F; --tv-rail:#051318; --tv-card:#0A2830; --tv-card-hover:#112F38;
+    --tv-element-mid:#1A4E5C; --tv-accent:#245F70; --tv-glow:#2E7A8A;
+    --tv-cta:#C9902A; --tv-cta-bright:#E8A832; --tv-glacia:#C8E4E8;
+    --tv-secondary:#8FB8BE; --tv-stone:#E8E8E2; --tv-text-dark:#1A1A1A;
+  }
+  * { box-sizing:border-box; }
+  html, body { margin:0; padding:0; background:var(--tv-canvas); color:var(--tv-glacia); }
+  body { font-family:"Jost","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-weight:300; line-height:1.6; font-size:15px; }
+  .docpage { max-width:1280px; margin:0 auto; padding:48px 32px 96px; }
+  .docmeta { color:var(--tv-secondary); font-size:12px; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--tv-element-mid); }
+  .wordmark { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:22px; margin-bottom:4px; }
+  .tagline { font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; color:var(--tv-secondary); font-size:14px; margin-bottom:24px; }
+  h1 { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:36px; margin:0 0 8px; }
+  h2 { font-family:"Jost",sans-serif; font-weight:700; color:var(--tv-stone); font-size:22px; margin:56px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--tv-element-mid); }
+  h3 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-stone); font-size:16px; margin:28px 0 8px; }
+  h4 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-glacia); font-size:13px; text-transform:uppercase; letter-spacing:.1em; margin:18px 0 6px; }
+  p, li { color:var(--tv-glacia); }
+  strong { color:var(--tv-stone); font-weight:600; }
+  em { color:var(--tv-secondary); font-style:italic; }
+  .lede { font-size:17px; color:var(--tv-glacia); margin-bottom:24px; }
+  .crumb { color:var(--tv-secondary); font-size:13px; margin-bottom:8px; }
+  .crumb a { color:var(--tv-cta-bright); text-decoration:none; }
+  code { font-family:"JetBrains Mono","Consolas",monospace; background:var(--tv-card); color:var(--tv-glacia); padding:2px 6px; border-radius:4px; font-size:13px; }
+  pre { font-family:"JetBrains Mono",monospace; background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:8px; padding:16px 20px; overflow-x:auto; font-size:12px; line-height:1.5; }
+  pre code { background:transparent; padding:0; }
+  pre .k { color: var(--tv-cta-bright); } pre .s { color: var(--tv-glacia); } pre .c { color: var(--tv-secondary); font-style:italic; } pre .n { color: var(--tv-glow); }
+  .callout { background:var(--tv-card); border-left:3px solid var(--tv-cta); padding:14px 18px; margin:18px 0; border-radius:0 6px 6px 0; }
+  .callout.principle { border-left-color: var(--tv-glow); }
+  .callout h4 { margin-top:0; color: var(--tv-stone); }
+  table { width:100%; border-collapse:collapse; margin:14px 0; font-size:13px; }
+  th { text-align:left; padding:9px 12px; background:var(--tv-rail); color:var(--tv-stone); font-weight:600; border-bottom:1px solid var(--tv-accent); }
+  td { padding:9px 12px; border-bottom:1px solid var(--tv-element-mid); color:var(--tv-glacia); vertical-align:top; }
+
+  .browser { background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:14px; overflow:hidden; margin:24px 0; box-shadow:0 12px 48px rgba(0,0,0,.4); }
+  .chrome { background:var(--tv-canvas); padding:10px 16px; border-bottom:1px solid var(--tv-element-mid); display:flex; align-items:center; gap:8px; font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--tv-secondary); }
+  .chrome .dot { width:9px; height:9px; border-radius:50%; background:var(--tv-accent); }
+  .chrome .url { margin-left:12px; }
+  .page-mock { padding:0; background:var(--tv-canvas); }
+  .slot-mark { position:absolute; left:-32px; width:24px; height:24px; background:var(--tv-cta); color:var(--tv-text-dark); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:"JetBrains Mono",monospace; font-weight:700; font-size:12px; }
+  .slot { position:relative; border-left:3px solid var(--tv-cta); padding:18px 22px 18px 28px; border-bottom:1px solid var(--tv-element-mid); }
+  .slot.dynamic { border-left-color:var(--tv-cta-bright); border-left-style:dashed; }
+  .slot-meta { color:var(--tv-secondary); font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.08em; margin-bottom:8px; }
+  .slot-meta .kind { display:inline-block; padding:2px 8px; border-radius:999px; font-weight:700; font-size:9px; letter-spacing:.12em; text-transform:uppercase; margin-right:8px; }
+  .slot-meta .kind.fixed { background:var(--tv-accent); color:var(--tv-stone); }
+  .slot-meta .kind.dynamic { background:var(--tv-cta); color:var(--tv-text-dark); }
+
+  .m-bread { color:var(--tv-secondary); font-size:12px; }
+  .m-bread a { color:var(--tv-cta-bright); }
+
+  .m-hero-series {
+    background:linear-gradient(135deg, #082832, #1c4e5d);
+    border-radius:10px; padding:36px;
+    display:grid; grid-template-columns: 280px 1fr; gap:32px; align-items:center;
+    color:var(--tv-stone);
+  }
+  .m-hero-series .art {
+    height:180px; border-radius:10px;
+    background:linear-gradient(135deg, var(--tv-accent), var(--tv-glow));
+    display:flex; align-items:center; justify-content:center;
+    color:var(--tv-stone); font-family:"Cormorant Garamond",Georgia,serif;
+    font-style:italic; font-size:26px;
+  }
+  .m-hero-series .info .eyebrow { color:var(--tv-cta-bright); font-size:11px; letter-spacing:.14em; text-transform:uppercase; }
+  .m-hero-series .info h1 { font-family:"Jost",sans-serif; font-weight:800; font-size:32px; line-height:1.1; margin:6px 0; }
+  .m-hero-series .info .ministry { color:var(--tv-glacia); font-size:14px; }
+  .m-hero-series .info .desc { color:var(--tv-glacia); font-size:14px; margin-top:12px; line-height:1.6; max-width:600px; }
+  .m-hero-series .info .stats { color:var(--tv-secondary); font-size:12px; margin-top:14px; }
+  .m-hero-series .info .stats .dot { color:var(--tv-element-mid); margin:0 6px; }
+  .m-hero-series .info .stats .complete { color:var(--tv-cta-bright); font-weight:600; }
+  .m-hero-series .info .actions { display:flex; gap:10px; margin-top:18px; }
+  .m-hero-series .info .btn-primary { background:var(--tv-cta); color:var(--tv-text-dark); padding:10px 22px; border-radius:6px; font-weight:600; font-size:13px; }
+  .m-hero-series .info .btn-ghost { background:transparent; border:1px solid var(--tv-secondary); color:var(--tv-stone); padding:10px 22px; border-radius:6px; font-weight:500; font-size:13px; }
+
+  .m-progress {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:10px;
+    padding:16px 22px;
+    display:flex; align-items:center; gap:20px;
+  }
+  .m-progress .label { color:var(--tv-secondary); font-size:11px; letter-spacing:.1em; text-transform:uppercase; min-width:80px; }
+  .m-progress .bar { flex:1; height:6px; background:var(--tv-element-mid); border-radius:3px; overflow:hidden; }
+  .m-progress .fill { background:var(--tv-cta); height:100%; }
+  .m-progress .ratio { color:var(--tv-stone); font-family:"JetBrains Mono",monospace; font-size:13px; font-weight:600; }
+
+  .m-episodes { display:flex; flex-direction:column; gap:8px; }
+  .m-episode {
+    display:flex; gap:14px; align-items:center; padding:12px 16px;
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:8px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .m-episode:hover { background:var(--tv-card-hover); border-color:var(--tv-glow); }
+  .m-episode.current { border-color:var(--tv-cta); box-shadow:0 0 0 2px rgba(201,144,42,.18); }
+  .m-episode.completed { opacity:.7; }
+  .m-episode .num { font-family:"JetBrains Mono",monospace; color:var(--tv-cta); font-weight:700; font-size:14px; min-width:30px; }
+  .m-episode .ethumb { width:120px; height:70px; background:linear-gradient(135deg, var(--tv-element-mid), var(--tv-card)); border-radius:5px; flex-shrink:0; position:relative; }
+  .m-episode .ethumb .play { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:var(--tv-stone); font-size:20px; opacity:.7; }
+  .m-episode .einfo { flex:1; }
+  .m-episode .ename { color:var(--tv-stone); font-size:14px; font-weight:600; line-height:1.2; }
+  .m-episode .edesc { color:var(--tv-secondary); font-size:12px; margin-top:4px; line-height:1.4; }
+  .m-episode .estate { font-size:10px; color:var(--tv-cta-bright); font-weight:600; margin-top:6px; letter-spacing:.08em; text-transform:uppercase; }
+  .m-episode .edur { color:var(--tv-glacia); font-family:"JetBrains Mono",monospace; font-size:13px; min-width:60px; text-align:right; }
+  .m-episode .progress-mini { width:60px; height:3px; background:var(--tv-element-mid); border-radius:2px; overflow:hidden; margin-top:4px; }
+  .m-episode .progress-mini .fill { background:var(--tv-cta); height:100%; }
+
+  .m-rail .title { color:var(--tv-stone); font-family:"Jost",sans-serif; font-weight:600; font-size:18px; margin-bottom:10px; }
+  .m-cards-row { display:flex; gap:12px; overflow:hidden; }
+  .m-series-card {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:8px;
+    width:220px; flex-shrink:0; overflow:hidden;
+  }
+  .m-series-card .sthumb { background:linear-gradient(135deg, var(--tv-accent), var(--tv-glow)); height:110px; }
+  .m-series-card .sbody { padding:12px; }
+  .m-series-card .sname { color:var(--tv-stone); font-weight:600; font-size:14px; }
+  .m-series-card .sep { color:var(--tv-secondary); font-size:11px; margin-top:4px; }
+
+  .m-min-context {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:8px;
+    padding:14px 18px; display:flex; align-items:center; gap:14px;
+  }
+  .m-min-context .logo { width:48px; height:48px; border-radius:8px; background:var(--tv-element-mid); flex-shrink:0; }
+  .m-min-context .mname { color:var(--tv-stone); font-weight:600; font-size:13px; }
+  .m-min-context .mpastor { color:var(--tv-secondary); font-size:11px; }
+  .m-min-context .more { margin-left:auto; color:var(--tv-cta-bright); font-size:12px; }
+
+  .annot { display:flex; gap:14px; background:var(--tv-card); border-left:3px solid var(--tv-glow); padding:12px 16px; margin-bottom:10px; border-radius:0 6px 6px 0; font-size:13px; }
+  .annot .num { background:var(--tv-cta); color:var(--tv-text-dark); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0; font-family:"JetBrains Mono",monospace; }
+  .annot strong { color:var(--tv-stone); display:block; margin-bottom:2px; }
+
+  hr { border:none; border-top:1px solid var(--tv-element-mid); margin:36px 0; }
+  .navlinks { display:flex; justify-content:space-between; margin-top:32px; font-size:12px; color:var(--tv-secondary); }
+  .navlinks a { color:var(--tv-cta-bright); text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="docpage">
+
+<p class="crumb"><a href="../index.html">← Index</a> · M3 · Page Templates</p>
+<div class="docmeta">Document M3.7 · Series Template · v0.1 · 2026-05-11 · Owner: Brian (COO) · Audience: TrueVi engineering team + design contractors</div>
+
+<div class="wordmark">TrueVi</div>
+<div class="tagline">Page Template Wireframe · M3.7</div>
+
+<h1>Series Template</h1>
+<p class="lede">
+  The page for a multi-episode teaching arc. Bound to
+  <code>/ministry/[slug]/series/[seriesSlug]</code>. The user's path
+  through a series is tracked — episodes show watch state, the next
+  unwatched episode is highlighted, and completed series are marked.
+</p>
+
+<div class="callout principle">
+  <h4>One sentence</h4>
+  <p style="margin:0">
+    Series pages are <strong>ordered, sequential, stateful</strong>. Unlike
+    most templates where the Library reorders content per user, the
+    episode list is fixed by sequence. Personalization shows up only in
+    "Continue watching" prominence and related-series recommendations.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2>Rendered page · annotated</h2>
+
+<div class="browser">
+  <div class="chrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="url">truevi.tv/ministry/mercy-hill/series/forgiveness-series</span>
+  </div>
+
+  <div class="page-mock">
+
+    <!-- Slot 1: breadcrumbs -->
+    <div class="slot">
+      <span class="slot-mark">1</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>breadcrumbs</code> · Breadcrumbs · 3 levels deep
+      </div>
+      <div class="m-bread">
+        <a>Home</a> &nbsp;›&nbsp; <a>Ministries</a> &nbsp;›&nbsp; <a>Mercy Hill Church</a> &nbsp;›&nbsp; <span style="color:var(--tv-stone);">Forgiveness Series</span>
+      </div>
+    </div>
+
+    <!-- Slot 2: Hero-Series -->
+    <div class="slot">
+      <span class="slot-mark">2</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>hero</code> · Hero (variant: <code>Hero-Series</code>) · query.seriesSlug=forgiveness-series
+      </div>
+      <div class="m-hero-series">
+        <div class="art">Forgiveness</div>
+        <div class="info">
+          <div class="eyebrow">Series · Mercy Hill Church</div>
+          <h1>The Forgiveness Series</h1>
+          <div class="ministry">Pastor Jane Doe · 7 episodes · Complete</div>
+          <div class="desc">A 7-part teaching on the hardest, holiest work of the Christian life — forgiving when we cannot forget, when reconciliation is not possible, and when the wound is still fresh.</div>
+          <div class="stats">
+            Total runtime 3h 12min <span class="dot">·</span> Published 2026-02 <span class="dot">·</span> <span class="complete">Complete</span>
+          </div>
+          <div class="actions">
+            <span class="btn-primary">▶ Continue from episode 3</span>
+            <span class="btn-ghost">★ Save series</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot 3: Progress bar -->
+    <div class="slot">
+      <span class="slot-mark">3</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>progress</code> · CTABlock (variant: <code>progressTracker</code>) · from content_state aggregation
+      </div>
+      <div class="m-progress">
+        <span class="label">Your progress</span>
+        <div class="bar"><div class="fill" style="width:38%"></div></div>
+        <span class="ratio">2 of 7 watched · 42 min remaining in episode 3</span>
+      </div>
+    </div>
+
+    <!-- Slot 4: Episode list -->
+    <div class="slot">
+      <span class="slot-mark">4</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>episodes</code> · EpisodeList · order: episode-number
+      </div>
+
+      <div class="m-episodes">
+
+        <div class="m-episode completed">
+          <div class="num">01</div>
+          <div class="ethumb"><span class="play">✓</span></div>
+          <div class="einfo">
+            <div class="ename">The Beginning of Mercy</div>
+            <div class="edesc">Why forgiveness is at the center of the Christian story, and what it actually means.</div>
+            <div class="estate">Watched</div>
+          </div>
+          <div class="edur">28:14</div>
+        </div>
+
+        <div class="m-episode completed">
+          <div class="num">02</div>
+          <div class="ethumb"><span class="play">✓</span></div>
+          <div class="einfo">
+            <div class="ename">Recognizing the Hurt</div>
+            <div class="edesc">Before we forgive, we must see clearly what we are forgiving. Pastoral guidance on naming the wound.</div>
+            <div class="estate">Watched</div>
+          </div>
+          <div class="edur">24:02</div>
+        </div>
+
+        <div class="m-episode current">
+          <div class="num">03</div>
+          <div class="ethumb"><span class="play">▶</span></div>
+          <div class="einfo">
+            <div class="ename">The Choice to Forgive</div>
+            <div class="edesc">Forgiveness as a decision, not a feeling. What scripture commands, and what it does not.</div>
+            <div class="estate">In progress · 63%</div>
+            <div class="progress-mini"><div class="fill" style="width:63%"></div></div>
+          </div>
+          <div class="edur">31:48</div>
+        </div>
+
+        <div class="m-episode">
+          <div class="num">04</div>
+          <div class="ethumb"><span class="play">▶</span></div>
+          <div class="einfo">
+            <div class="ename">Forgiveness Without Reconciliation</div>
+            <div class="edesc">When the person who hurt you is gone, dangerous, or unrepentant. How to forgive anyway.</div>
+          </div>
+          <div class="edur">29:31</div>
+        </div>
+
+        <div class="m-episode">
+          <div class="num">05</div>
+          <div class="ethumb"><span class="play">▶</span></div>
+          <div class="einfo">
+            <div class="ename">Forgiving Yourself</div>
+            <div class="edesc">The hardest forgiveness of all. Why guilt persists and how grace reaches it.</div>
+          </div>
+          <div class="edur">26:45</div>
+        </div>
+
+        <div class="m-episode">
+          <div class="num">06</div>
+          <div class="ethumb"><span class="play">▶</span></div>
+          <div class="einfo">
+            <div class="ename">The Long Work</div>
+            <div class="edesc">Forgiveness as a process, not a moment. What to do when the wound reopens.</div>
+          </div>
+          <div class="edur">28:19</div>
+        </div>
+
+        <div class="m-episode">
+          <div class="num">07</div>
+          <div class="ethumb"><span class="play">▶</span></div>
+          <div class="einfo">
+            <div class="ename">Walking in Mercy</div>
+            <div class="edesc">Living as someone who has been forgiven. The freedom on the other side.</div>
+          </div>
+          <div class="edur">23:02</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Slot 5: Ministry context -->
+    <div class="slot">
+      <span class="slot-mark">5</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>ministry-context</code> · MinistryCard (row layout)
+      </div>
+      <div class="m-min-context">
+        <div class="logo"></div>
+        <div>
+          <div class="mname">Mercy Hill Church</div>
+          <div class="mpastor">Pastor Jane Doe · Nondenominational</div>
+        </div>
+        <a class="more">See all from Mercy Hill →</a>
+      </div>
+    </div>
+
+    <!-- Slot 6: Related series -->
+    <div class="slot dynamic">
+      <span class="slot-mark">6</span>
+      <div class="slot-meta">
+        <span class="kind dynamic">Dynamic</span>
+        <code>related-series</code> · allows: SeriesRail · ContentRail · Library returned 2 rails
+      </div>
+
+      <div class="m-rail" style="margin-bottom:22px;">
+        <div class="title">Related series</div>
+        <div class="m-cards-row">
+          <div class="m-series-card">
+            <div class="sthumb"></div>
+            <div class="sbody"><div class="sname">Healing Family Wounds</div><div class="sep">5 episodes · Redemption Hill</div></div>
+          </div>
+          <div class="m-series-card">
+            <div class="sthumb"></div>
+            <div class="sbody"><div class="sname">Praying Through Grief</div><div class="sep">4 episodes · Mercy Hill</div></div>
+          </div>
+          <div class="m-series-card">
+            <div class="sthumb"></div>
+            <div class="sbody"><div class="sname">When Faith is Hard</div><div class="sep">5 episodes · Redemption Hill</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="m-rail">
+        <div class="title">If forgiveness is heavy right now</div>
+        <p style="color:var(--tv-secondary); font-size:12px; margin:-4px 0 10px; font-style:italic;">Single teachings on related struggles</p>
+        <div class="m-cards-row">
+          <div class="m-series-card">
+            <div class="sthumb" style="background:linear-gradient(135deg, var(--tv-element-mid), var(--tv-card));"></div>
+            <div class="sbody"><div class="sname">When Anger Runs Deep</div><div class="sep">Mercy Hill · 17 min</div></div>
+          </div>
+          <div class="m-series-card">
+            <div class="sthumb" style="background:linear-gradient(135deg, var(--tv-element-mid), var(--tv-card));"></div>
+            <div class="sbody"><div class="sname">The Long Wait</div><div class="sep">Redemption Hill · 21 min</div></div>
+          </div>
+          <div class="m-series-card">
+            <div class="sthumb" style="background:linear-gradient(135deg, var(--tv-element-mid), var(--tv-card));"></div>
+            <div class="sbody"><div class="sname">When You Can't Pray</div><div class="sep">Gospel Coalition · 14 min</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Annotated walkthrough</h2>
+
+<div class="annot">
+  <span class="num">1</span>
+  <div>
+    <strong>Breadcrumbs · 3 levels</strong>
+    Series live under ministries. The breadcrumb walks Home → Ministries
+    → Ministry name → Series name. Each level navigates back to its
+    respective page.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">2</span>
+  <div>
+    <strong>Hero-Series · with primary CTA</strong>
+    Series art, name, ministry attribution, description, and stats.
+    Importantly, the primary CTA reads <em>"Continue from episode 3"</em>
+    for returning users — the renderer reads
+    <code>content_state</code> to know where the user left off and
+    surfaces the resume button. Cold-start visitors see
+    <em>"Start episode 1"</em>.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">3</span>
+  <div>
+    <strong>Progress tracker · personalized</strong>
+    Aggregated from <code>content_state</code> rows for each episode in
+    the series. Shows total completed / total episodes plus current
+    in-progress detail. Hidden for cold-start visitors and replaced
+    with: <em>"Series overview"</em>.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">4</span>
+  <div>
+    <strong>EpisodeList · ordered, stateful, not reordered</strong>
+    This is the only template where the Library does <strong>not</strong>
+    reorder content. Series have a sequence; the sequence is sacred. Each
+    row shows: number, thumbnail (with play/completed icon), title,
+    description, watch state, duration, and a thin progress bar if
+    in-progress. The current episode is highlighted with a gold border.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">5</span>
+  <div>
+    <strong>Ministry context · always present</strong>
+    A compact MinistryCard reminds the user whose teaching this is and
+    offers a path back to the ministry page (M3.5). Helps users discover
+    more from a pastor they're connecting with.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">6</span>
+  <div>
+    <strong>Related series · personalized DYNAMIC slot</strong>
+    The only personalized part of the page. Library decides what fits —
+    related series (SeriesRail) for users who like long-form, or single
+    related teachings (ContentRail) for users who prefer one-off content.
+    The framing copy on the second rail
+    (<em>"If forgiveness is heavy right now"</em>) is Library-authored
+    based on the user's recent emotional-pain signals.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Template definition</h2>
+
+<pre><code>{
+  <span class="k">"templateId"</span>: <span class="s">"series-v1"</span>,
+  <span class="k">"pageType"</span>:   <span class="s">"series"</span>,
+  <span class="k">"name"</span>:       <span class="s">"SeriesTemplate v1"</span>,
+  <span class="k">"inputs"</span>: [
+    { <span class="k">"name"</span>: <span class="s">"ministrySlug"</span>, <span class="k">"type"</span>: <span class="s">"slug"</span>, <span class="k">"required"</span>: <span class="n">true</span> },
+    { <span class="k">"name"</span>: <span class="s">"seriesSlug"</span>,   <span class="k">"type"</span>: <span class="s">"slug"</span>, <span class="k">"required"</span>: <span class="n">true</span> }
+  ],
+  <span class="k">"slots"</span>: [
+    { <span class="k">"slotId"</span>: <span class="s">"breadcrumbs"</span>, <span class="k">"kind"</span>: <span class="s">"FIXED"</span>, <span class="k">"component"</span>: <span class="s">"Breadcrumbs"</span> },
+
+    {
+      <span class="k">"slotId"</span>: <span class="s">"hero"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"Hero"</span>,
+      <span class="k">"instance"</span>: {
+        <span class="k">"config"</span>: { <span class="k">"variant"</span>: <span class="s">"Hero-Series"</span>, <span class="k">"showResumeCta"</span>: <span class="n">true</span> },
+        <span class="k">"query"</span>:  { <span class="k">"contentType"</span>: <span class="s">"series"</span>, <span class="k">"filters"</span>: { <span class="k">"ministry"</span>: <span class="s">"${input.ministrySlug}"</span>, <span class="k">"series"</span>: <span class="s">"${input.seriesSlug}"</span> } }
+      }
+    },
+
+    {
+      <span class="k">"slotId"</span>: <span class="s">"progress"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"CTABlock"</span>,
+      <span class="k">"instance"</span>: { <span class="k">"config"</span>: { <span class="k">"style"</span>: <span class="s">"progressTracker"</span> }, <span class="k">"conditionalRender"</span>: <span class="s">"identity.userId != null"</span> }
+    },
+
+    {
+      <span class="k">"slotId"</span>: <span class="s">"episodes"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"EpisodeList"</span>,
+      <span class="k">"instance"</span>: {
+        <span class="k">"config"</span>: {
+          <span class="k">"showThumbnails"</span>:   <span class="n">true</span>,
+          <span class="k">"showDescriptions"</span>: <span class="n">true</span>,
+          <span class="k">"showProgress"</span>:     <span class="n">true</span>,
+          <span class="k">"autoplayNext"</span>:     <span class="n">true</span>
+        },
+        <span class="k">"query"</span>: { <span class="k">"seriesSlug"</span>: <span class="s">"${input.seriesSlug}"</span>, <span class="k">"sort"</span>: <span class="s">"episode-number"</span> }
+      }
+    },
+
+    {
+      <span class="k">"slotId"</span>: <span class="s">"ministry-context"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"MinistryCard"</span>,
+      <span class="k">"instance"</span>: {
+        <span class="k">"config"</span>: { <span class="k">"layout"</span>: <span class="s">"row"</span>, <span class="k">"showAllLink"</span>: <span class="n">true</span> },
+        <span class="k">"query"</span>:  { <span class="k">"filters"</span>: { <span class="k">"ministry"</span>: <span class="s">"${input.ministrySlug}"</span> }, <span class="k">"limit"</span>: <span class="n">1</span> }
+      }
+    },
+
+    {
+      <span class="k">"slotId"</span>: <span class="s">"related-series"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"DYNAMIC"</span>,
+      <span class="k">"allows"</span>: [<span class="s">"SeriesRail"</span>, <span class="s">"ContentRail"</span>],
+      <span class="k">"minCount"</span>: <span class="n">1</span>,
+      <span class="k">"maxCount"</span>: <span class="n">3</span>,
+      <span class="k">"slotInput"</span>: { <span class="k">"relatedToSeries"</span>: <span class="s">"${input.seriesSlug}"</span> }
+    }
+  ]
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2>The "no reordering" rule</h2>
+
+<div class="callout">
+  <h4>Series episodes are sequential</h4>
+  <p style="margin:0">
+    Unlike every other content slot in the system, EpisodeList does not
+    re-rank by user signals. Episode 4 must always appear after Episode 3.
+    The Library will not return episodes in a different order based on
+    personalization. <em>However</em>, the resume CTA in the hero, the
+    progress tracker, and which episode is highlighted ARE personalized
+    from <code>content_state</code>.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2>State management</h2>
+
+<h3>Per-user state for the series</h3>
+<table>
+  <thead><tr><th>State</th><th>Source</th><th>Effect on render</th></tr></thead>
+  <tbody>
+    <tr><td>Not started</td><td>No content_state rows for any episode</td><td>Hero CTA: <em>"Start episode 1"</em> · No progress tracker</td></tr>
+    <tr><td>In progress</td><td>At least one episode with watch_progress &gt; 0 and &lt; 1</td><td>Hero CTA: <em>"Continue from episode N"</em> · Progress tracker shown · Current episode highlighted</td></tr>
+    <tr><td>Complete</td><td>All episodes with watch_progress ≥ 0.95</td><td>Hero CTA: <em>"Watch again from episode 1"</em> · "✓ Series complete" badge · Related series promoted</td></tr>
+    <tr><td>Saved</td><td>Series saved (separate from content_state)</td><td>Save button toggled · Series appears in My Journey saved list</td></tr>
+  </tbody>
+</table>
+
+<h3>Episode state</h3>
+<table>
+  <thead><tr><th>State</th><th>Visual</th></tr></thead>
+  <tbody>
+    <tr><td>Not watched</td><td>Play triangle on thumbnail · regular border</td></tr>
+    <tr><td>In progress</td><td>Play triangle · "In progress · 63%" label · thin progress bar · subdued border</td></tr>
+    <tr><td>Current (next to watch)</td><td>Gold border + glow · "Continue from here" subtle indicator</td></tr>
+    <tr><td>Completed</td><td>Checkmark instead of play · subdued (0.7 opacity) · "Watched" label</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Anonymous user behavior</h2>
+
+<p>
+  Free browsing requires no signup (YouTube TOS · CLAUDE.md). Anonymous
+  users get a degraded but functional Series page:
+</p>
+
+<ul>
+  <li><strong>Progress tracker hidden</strong> (no identity = no per-user state to render)</li>
+  <li><strong>Hero CTA reads "Start episode 1"</strong> regardless of session</li>
+  <li><strong>No completion / in-progress badges</strong></li>
+  <li><strong>Related series still personalized</strong> based on anonymousId behavioral signals (cookies)</li>
+</ul>
+
+<p>
+  When the user signs up, their pre-signup watch history (tagged with
+  <code>anonymousId</code>) merges into their <code>userId</code> via the
+  identity merge protocol (M1.1 §12). On their next visit, the Series
+  page reflects their accumulated state.
+</p>
+
+<!-- ============================================================ -->
+<h2>Auto-advance behavior</h2>
+
+<p>
+  When a user finishes an episode, the embedded YouTube player triggers a
+  <code>video_completed</code> event. The renderer (client-side) checks
+  the EpisodeList config:
+</p>
+
+<ul>
+  <li>If <code>autoplayNext = true</code> AND there is a next episode, a countdown overlay appears: <em>"Next: Episode 4 — Forgiveness Without Reconciliation · starting in 5s"</em></li>
+  <li>User can cancel ("Watch later") or accept (clicks play)</li>
+  <li>On accept, navigates to the next episode's video player route</li>
+  <li>If it's the final episode, the overlay shows: <em>"Series complete. See related series"</em> + scrolls related-series rail into view</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2>Empty &amp; edge states</h2>
+
+<h3>Series has 1 episode</h3>
+<p>Hero CTA reads <em>"Watch"</em> (not "Start episode 1"). EpisodeList still renders but feels heavy — admin guidance: single-episode series should be tagged as standalone content instead.</p>
+
+<h3>Series not yet complete (ongoing)</h3>
+<p>Stats line shows <em>"5 of 12 episodes · ongoing"</em>. The final placeholder episode rows show <em>"Coming soon"</em> with no thumbnail.</p>
+
+<h3>Episode is tier-gated</h3>
+<p>Episode renders with a lock icon on the thumbnail and an UpgradeTeaser inline below the row. Click → upgrade flow, not video player.</p>
+
+<h3>Series unavailable (ministry permission pulled)</h3>
+<p>404 with a fallback page suggesting similar series.</p>
+
+<!-- ============================================================ -->
+<h2>Template variants</h2>
+
+<table>
+  <thead><tr><th>Template ID</th><th>When selected</th><th>Differs from <code>series-v1</code></th></tr></thead>
+  <tbody>
+    <tr><td><code>series-v1</code></td><td>Default · all series</td><td>Baseline</td></tr>
+    <tr><td><code>series-v1-completed</code></td><td>User has completed all episodes</td><td>Adds a CTABlock celebrating completion · prominent related series</td></tr>
+    <tr><td><code>series-cold-start-v1</code></td><td>First-visit user · series referrer</td><td>Adds a "What is TrueVi?" CTABlock near top · explainer copy in hero</td></tr>
+  </tbody>
+</table>
+
+<hr/>
+<div class="navlinks">
+  <a href="12-template-collections.html">← M3.6 · Collections (Subject) Template</a>
+  <a href="../index.html">Index · M3 complete →</a>
+</div>
+
+</div>
+</body>
+</html>

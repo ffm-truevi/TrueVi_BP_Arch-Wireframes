@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TrueVi — Ministry Template (M3.5)</title>
+<style>
+  :root {
+    --tv-canvas:#030C0F; --tv-rail:#051318; --tv-card:#0A2830; --tv-card-hover:#112F38;
+    --tv-element-mid:#1A4E5C; --tv-accent:#245F70; --tv-glow:#2E7A8A;
+    --tv-cta:#C9902A; --tv-cta-bright:#E8A832; --tv-glacia:#C8E4E8;
+    --tv-secondary:#8FB8BE; --tv-stone:#E8E8E2; --tv-text-dark:#1A1A1A;
+  }
+  * { box-sizing:border-box; }
+  html, body { margin:0; padding:0; background:var(--tv-canvas); color:var(--tv-glacia); }
+  body { font-family:"Jost","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-weight:300; line-height:1.6; font-size:15px; }
+  .docpage { max-width:1280px; margin:0 auto; padding:48px 32px 96px; }
+  .docmeta { color:var(--tv-secondary); font-size:12px; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--tv-element-mid); }
+  .wordmark { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:22px; margin-bottom:4px; }
+  .tagline { font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; color:var(--tv-secondary); font-size:14px; margin-bottom:24px; }
+  h1 { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:36px; margin:0 0 8px; }
+  h2 { font-family:"Jost",sans-serif; font-weight:700; color:var(--tv-stone); font-size:22px; margin:56px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--tv-element-mid); }
+  h3 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-stone); font-size:16px; margin:28px 0 8px; }
+  h4 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-glacia); font-size:13px; text-transform:uppercase; letter-spacing:.1em; margin:18px 0 6px; }
+  p, li { color:var(--tv-glacia); }
+  strong { color:var(--tv-stone); font-weight:600; }
+  em { color:var(--tv-secondary); font-style:italic; }
+  .lede { font-size:17px; color:var(--tv-glacia); margin-bottom:24px; }
+  .crumb { color:var(--tv-secondary); font-size:13px; margin-bottom:8px; }
+  .crumb a { color:var(--tv-cta-bright); text-decoration:none; }
+  code { font-family:"JetBrains Mono","Consolas",monospace; background:var(--tv-card); color:var(--tv-glacia); padding:2px 6px; border-radius:4px; font-size:13px; }
+  pre { font-family:"JetBrains Mono",monospace; background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:8px; padding:16px 20px; overflow-x:auto; font-size:12px; line-height:1.5; }
+  pre code { background:transparent; padding:0; }
+  pre .k { color: var(--tv-cta-bright); } pre .s { color: var(--tv-glacia); } pre .c { color: var(--tv-secondary); font-style:italic; } pre .n { color: var(--tv-glow); }
+  .callout { background:var(--tv-card); border-left:3px solid var(--tv-cta); padding:14px 18px; margin:18px 0; border-radius:0 6px 6px 0; }
+  .callout.principle { border-left-color: var(--tv-glow); }
+  .callout.warning { border-left-color: var(--tv-cta-bright); }
+  .callout h4 { margin-top:0; color: var(--tv-stone); }
+  table { width:100%; border-collapse:collapse; margin:14px 0; font-size:13px; }
+  th { text-align:left; padding:9px 12px; background:var(--tv-rail); color:var(--tv-stone); font-weight:600; border-bottom:1px solid var(--tv-accent); }
+  td { padding:9px 12px; border-bottom:1px solid var(--tv-element-mid); color:var(--tv-glacia); vertical-align:top; }
+
+  .browser { background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:14px; overflow:hidden; margin:24px 0; box-shadow:0 12px 48px rgba(0,0,0,.4); }
+  .chrome { background:var(--tv-canvas); padding:10px 16px; border-bottom:1px solid var(--tv-element-mid); display:flex; align-items:center; gap:8px; font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--tv-secondary); }
+  .chrome .dot { width:9px; height:9px; border-radius:50%; background:var(--tv-accent); }
+  .chrome .url { margin-left:12px; }
+  .page-mock { padding:0; background:var(--tv-canvas); }
+  .slot-mark { position:absolute; left:-32px; width:24px; height:24px; background:var(--tv-cta); color:var(--tv-text-dark); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:"JetBrains Mono",monospace; font-weight:700; font-size:12px; }
+  .slot { position:relative; border-left:3px solid var(--tv-cta); padding:18px 22px 18px 28px; border-bottom:1px solid var(--tv-element-mid); }
+  .slot.dynamic { border-left-color:var(--tv-cta-bright); border-left-style:dashed; }
+  .slot-meta { color:var(--tv-secondary); font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.08em; margin-bottom:8px; }
+  .slot-meta .kind { display:inline-block; padding:2px 8px; border-radius:999px; font-weight:700; font-size:9px; letter-spacing:.12em; text-transform:uppercase; margin-right:8px; }
+  .slot-meta .kind.fixed { background:var(--tv-accent); color:var(--tv-stone); }
+  .slot-meta .kind.dynamic { background:var(--tv-cta); color:var(--tv-text-dark); }
+
+  .m-bread { color:var(--tv-secondary); font-size:12px; }
+  .m-bread a { color:var(--tv-cta-bright); }
+
+  /* hero-ministry */
+  .m-hero-ministry {
+    background:linear-gradient(135deg, #082832, #1e6175);
+    border-radius:10px; padding:32px;
+    display:flex; gap:32px; align-items:center;
+    color:var(--tv-stone); min-height:200px;
+  }
+  .m-hero-ministry .logo {
+    width:120px; height:120px; border-radius:14px;
+    background:linear-gradient(135deg, var(--tv-element-mid), var(--tv-stone));
+    flex-shrink:0;
+  }
+  .m-hero-ministry .info { flex:1; }
+  .m-hero-ministry .eyebrow { color:var(--tv-cta-bright); font-size:11px; letter-spacing:.14em; text-transform:uppercase; }
+  .m-hero-ministry h1 { font-family:"Jost",sans-serif; font-weight:800; font-size:32px; color:var(--tv-stone); line-height:1.1; margin:6px 0 4px; }
+  .m-hero-ministry .pastor { color:var(--tv-glacia); font-size:15px; }
+  .m-hero-ministry .tag { color:var(--tv-secondary); font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; font-size:15px; margin-top:10px; }
+  .m-hero-ministry .stats { color:var(--tv-glacia); font-size:12px; margin-top:14px; }
+  .m-hero-ministry .stats .dot { color:var(--tv-element-mid); margin:0 6px; }
+
+  .m-pastor {
+    display:flex; gap:18px; align-items:flex-start;
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:10px;
+    padding:18px 22px;
+  }
+  .m-pastor .avatar { width:80px; height:80px; border-radius:50%; background:var(--tv-element-mid); flex-shrink:0; }
+  .m-pastor .pname { color:var(--tv-stone); font-weight:700; font-size:16px; }
+  .m-pastor .pmin { color:var(--tv-secondary); font-size:12px; margin-top:2px; }
+  .m-pastor .pbio { color:var(--tv-glacia); font-size:13px; line-height:1.6; margin-top:10px; max-width:680px; }
+
+  .m-faith-chips { display:flex; gap:8px; flex-wrap:wrap; }
+  .m-faith-chip {
+    padding:5px 12px; border-radius:999px;
+    background:transparent; border:1px solid var(--tv-glow); color:var(--tv-glacia);
+    font-size:11px;
+  }
+  .m-faith-chip.on { background:var(--tv-glow); color:var(--tv-stone); border-color:var(--tv-glow); }
+
+  /* rail / cards */
+  .m-rail .title { color:var(--tv-stone); font-family:"Jost",sans-serif; font-weight:600; font-size:18px; margin-bottom:6px; }
+  .m-rail .subtitle { color:var(--tv-secondary); font-size:12px; margin-bottom:12px; font-style:italic; }
+  .m-rail .all-link { float:right; color:var(--tv-cta-bright); font-size:12px; }
+  .m-cards { display:flex; gap:12px; overflow:hidden; }
+  .m-card {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:8px;
+    width:200px; flex-shrink:0; overflow:hidden;
+  }
+  .m-card .thumb { background:linear-gradient(135deg, var(--tv-element-mid), var(--tv-card)); height:110px; }
+  .m-card .body { padding:10px 12px; }
+  .m-card .ttl { color:var(--tv-stone); font-weight:600; font-size:13px; line-height:1.2; }
+  .m-card .meta { color:var(--tv-secondary); font-size:11px; margin-top:4px; }
+  .m-card .badge { display:inline-block; background:var(--tv-cta); color:var(--tv-text-dark); padding:1px 6px; border-radius:3px; font-size:9px; font-weight:600; margin-top:6px; }
+
+  .m-series {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:8px;
+    width:220px; flex-shrink:0; overflow:hidden;
+  }
+  .m-series .sthumb { background:linear-gradient(135deg, var(--tv-accent), var(--tv-glow)); height:120px; }
+  .m-series .sbody { padding:12px; }
+  .m-series .sname { color:var(--tv-stone); font-weight:600; font-size:14px; }
+  .m-series .sep { color:var(--tv-secondary); font-size:11px; margin-top:4px; }
+  .m-series .scomplete { color:var(--tv-cta-bright); font-size:10px; font-weight:600; margin-top:4px; }
+
+  .m-ask {
+    background:linear-gradient(135deg, rgba(46,122,138,.18), rgba(201,144,42,.10));
+    border:1px solid var(--tv-glow); border-radius:10px; padding:22px 26px;
+    text-align:center;
+  }
+  .m-ask .eyebrow { color:var(--tv-cta-bright); font-size:11px; letter-spacing:.14em; text-transform:uppercase; }
+  .m-ask .q { font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; color:var(--tv-stone); font-size:20px; margin:8px 0; }
+  .m-ask .input { background:var(--tv-canvas); border:1px solid var(--tv-accent); border-radius:6px; padding:10px 14px; color:var(--tv-secondary); font-size:12px; max-width:540px; margin:0 auto; text-align:left; }
+
+  .m-cta {
+    background:var(--tv-cta); color:var(--tv-text-dark); padding:12px 28px; border-radius:6px;
+    font-weight:600; font-size:14px; display:inline-block;
+  }
+
+  .annot { display:flex; gap:14px; background:var(--tv-card); border-left:3px solid var(--tv-glow); padding:12px 16px; margin-bottom:10px; border-radius:0 6px 6px 0; font-size:13px; }
+  .annot .num { background:var(--tv-cta); color:var(--tv-text-dark); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0; font-family:"JetBrains Mono",monospace; }
+  .annot strong { color:var(--tv-stone); display:block; margin-bottom:2px; }
+
+  hr { border:none; border-top:1px solid var(--tv-element-mid); margin:36px 0; }
+  .navlinks { display:flex; justify-content:space-between; margin-top:32px; font-size:12px; color:var(--tv-secondary); }
+  .navlinks a { color:var(--tv-cta-bright); text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="docpage">
+
+<p class="crumb"><a href="../index.html">← Index</a> · M3 · Page Templates</p>
+<div class="docmeta">Document M3.5 · Ministry Template · v0.1 · 2026-05-11 · Owner: Brian (COO) · Audience: TrueVi engineering team + design contractors</div>
+
+<div class="wordmark">TrueVi</div>
+<div class="tagline">Page Template Wireframe · M3.5</div>
+
+<h1>Ministry Template</h1>
+<p class="lede">
+  The landing page for a partner ministry — pastor identity, content,
+  series, and a way for users to engage. Bound to URL pattern
+  <code>/ministry/[slug]</code>. One template serves all twenty-plus
+  ministry pages; the slug input parameter swaps the content per page.
+</p>
+
+<div class="callout principle">
+  <h4>One sentence</h4>
+  <p style="margin:0">
+    Ministry pages establish trust and identity for partner pastors —
+    but use <strong>TrueVi branding only</strong>. Never adopt the
+    ministry's colors, fonts, or visual brand. Ministry preference is a
+    search and recommendation <strong>boost</strong>, not a wall.
+  </p>
+</div>
+
+<div class="callout warning">
+  <h4>Branding rule (from CLAUDE.md)</h4>
+  <p style="margin:0">
+    Ministry pages use the Abyss Teal palette exclusively. The ministry's
+    logo appears in the Hero, but no other brand assets (colors, fonts,
+    chrome) cross over. TrueVi is the platform; ministries are partners.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2>Rendered page · annotated</h2>
+
+<div class="browser">
+  <div class="chrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="url">truevi.tv/ministry/mercy-hill</span>
+  </div>
+
+  <div class="page-mock">
+
+    <!-- Slot 1: breadcrumbs -->
+    <div class="slot">
+      <span class="slot-mark">1</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>breadcrumbs</code> · Breadcrumbs
+      </div>
+      <div class="m-bread">
+        <a>Home</a> &nbsp;›&nbsp; <a>Ministries</a> &nbsp;›&nbsp; <span style="color:var(--tv-stone);">Mercy Hill Church</span>
+      </div>
+    </div>
+
+    <!-- Slot 2: Hero-Ministry -->
+    <div class="slot">
+      <span class="slot-mark">2</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>hero</code> · Hero (variant: <code>Hero-Ministry</code>) · query.ministrySlug=mercy-hill
+      </div>
+      <div class="m-hero-ministry">
+        <div class="logo"></div>
+        <div class="info">
+          <div class="eyebrow">Partner Ministry</div>
+          <h1>Mercy Hill Church</h1>
+          <div class="pastor">Pastor Jane Doe · Nondenominational</div>
+          <div class="tag">"Rooted in grace. Faithful to the Word."</div>
+          <div class="stats">
+            82 teachings <span class="dot">·</span> 12 series <span class="dot">·</span> Latest upload 2 days ago
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot 3: Pastor Card -->
+    <div class="slot">
+      <span class="slot-mark">3</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>pastor</code> · PastorCard
+      </div>
+      <div class="m-pastor">
+        <div class="avatar"></div>
+        <div>
+          <div class="pname">Pastor Jane Doe</div>
+          <div class="pmin">Lead Pastor · Mercy Hill Church · Serving since 2012</div>
+          <div class="pbio">Pastor Jane has served Mercy Hill for over a decade, walking with her congregation through seasons of grief, growth, and grace. Her teaching focuses on forgiveness, the everyday work of discipleship, and the quiet power of mercy in the face of pain.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot 4: Faith Stage Chips -->
+    <div class="slot">
+      <span class="slot-mark">4</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>faith-stages</code> · FilterChips · filterType=faithStage · Library marks aligned stages
+      </div>
+      <p style="color:var(--tv-secondary); font-size:13px; margin-bottom:10px;">This ministry speaks especially to:</p>
+      <div class="m-faith-chips">
+        <span class="m-faith-chip">Pre-Awareness</span>
+        <span class="m-faith-chip">Awareness</span>
+        <span class="m-faith-chip on">Seeking</span>
+        <span class="m-faith-chip on">New Believer</span>
+        <span class="m-faith-chip on">Growing Believer</span>
+        <span class="m-faith-chip">Mature Believer</span>
+        <span class="m-faith-chip">Disciple-Maker</span>
+      </div>
+    </div>
+
+    <!-- Slot 5: Series Rail -->
+    <div class="slot">
+      <span class="slot-mark">5</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>series</code> · SeriesRail · query.ministrySlug=mercy-hill
+      </div>
+      <div class="m-rail">
+        <div class="title">Series from Mercy Hill <span class="all-link">See all 12 →</span></div>
+        <div class="m-cards">
+          <div class="m-series">
+            <div class="sthumb"></div>
+            <div class="sbody"><div class="sname">Forgiveness Series</div><div class="sep">7 episodes · 2026</div><div class="scomplete">Complete</div></div>
+          </div>
+          <div class="m-series">
+            <div class="sthumb"></div>
+            <div class="sbody"><div class="sname">When Faith is Hard</div><div class="sep">5 episodes · 2025</div><div class="scomplete">Complete</div></div>
+          </div>
+          <div class="m-series">
+            <div class="sthumb"></div>
+            <div class="sbody"><div class="sname">The Discipleship Course</div><div class="sep">12 episodes · ongoing</div></div>
+          </div>
+          <div class="m-series">
+            <div class="sthumb"></div>
+            <div class="sbody"><div class="sname">Praying Through Grief</div><div class="sep">4 episodes · 2024</div><div class="scomplete">Complete</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot 6: Dynamic content sections -->
+    <div class="slot dynamic">
+      <span class="slot-mark">6</span>
+      <div class="slot-meta">
+        <span class="kind dynamic">Dynamic</span>
+        <code>content-sections</code> · allows: ContentRail · min=2 max=6 · all rails ministry-filtered
+      </div>
+
+      <div class="m-rail" style="margin-bottom:22px;">
+        <div class="title">Most popular from Mercy Hill <span class="all-link">See all →</span></div>
+        <div class="m-cards">
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">How to Forgive</div><div class="meta">31 min</div></div></div>
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">When God Feels Distant</div><div class="meta">28 min</div></div></div>
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">The Hidden Cost of Bitterness</div><div class="meta">26 min</div></div></div>
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Grace for the Wounded</div><div class="meta">28 min</div></div></div>
+          <div class="m-card" style="opacity:.5;"><div class="thumb"></div><div class="body"><div class="ttl">…</div></div></div>
+        </div>
+      </div>
+
+      <div class="m-rail" style="margin-bottom:22px;">
+        <div class="title">Because you've been exploring forgiveness <span class="all-link">See all →</span></div>
+        <div class="subtitle">Mercy Hill teachings tuned to your recent activity</div>
+        <div class="m-cards">
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">The Hard Choice</div><div class="meta">24 min</div><span class="badge">New</span></div></div>
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Letting Go of Resentment</div><div class="meta">24 min</div></div></div>
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">When Words Fail</div><div class="meta">19 min</div></div></div>
+          <div class="m-card" style="opacity:.5;"><div class="thumb"></div><div class="body"><div class="ttl">…</div></div></div>
+        </div>
+      </div>
+
+      <div class="m-rail">
+        <div class="title">Latest from Pastor Jane <span class="all-link">See all →</span></div>
+        <div class="m-cards">
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">A Daily Mercy</div><div class="meta">8 min · 2 days ago</div><span class="badge">New</span></div></div>
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Prayer in Crisis</div><div class="meta">19 min · 5 days ago</div></div></div>
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Hope on Hard Days</div><div class="meta">22 min · 1 week ago</div></div></div>
+          <div class="m-card" style="opacity:.5;"><div class="thumb"></div><div class="body"><div class="ttl">…</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot 7: Ask Anything (ministry-scoped) -->
+    <div class="slot">
+      <span class="slot-mark">7</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>ask-anything</code> · AskAnythingBlock · scope=ministry · destination=/search?ministry=mercy-hill
+      </div>
+      <div class="m-ask">
+        <div class="eyebrow">Find what speaks to you</div>
+        <div class="q">"What do you want to learn from Mercy Hill?"</div>
+        <div class="input">Search within Mercy Hill — "Forgiveness," "Praying in grief"…</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Annotated walkthrough</h2>
+
+<div class="annot">
+  <span class="num">1</span>
+  <div>
+    <strong>Breadcrumbs</strong>
+    Standard nav aid — auto-generated from the route. Browse Ministries page
+    is reachable one click up.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">2</span>
+  <div>
+    <strong>Hero-Ministry · TrueVi-branded</strong>
+    Ministry logo + name + pastor + tagline + stats. Background gradient
+    is TrueVi's Abyss Teal — <em>not</em> Mercy Hill's brand. The eyebrow
+    "Partner Ministry" reinforces that this is a TrueVi page surfacing a
+    partner, not the ministry's own site. Stats are auto-computed from
+    <code>content_items</code>.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">3</span>
+  <div>
+    <strong>PastorCard · authored content</strong>
+    Avatar, name, role, and bio come from the <code>ministries</code> +
+    <code>pastors</code> tables. Editorial content, not Library-generated.
+    Updated through the CMS / ministry-onboarding workflow.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">4</span>
+  <div>
+    <strong>Faith Stage chips · ministry alignment</strong>
+    The seven Faith Journey stages (M1.1 §6) with this ministry's aligned
+    stages highlighted. Pulled from
+    <code>ministries.faith_stage_alignment</code>. Helps users
+    self-identify whether this ministry fits where they are. Clicking a
+    highlighted chip filters the rails below.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">5</span>
+  <div>
+    <strong>SeriesRail · ministry-scoped</strong>
+    All series from this ministry. Newest first, "Complete" badge on
+    finished arcs. Click navigates to <code>/ministry/[slug]/series/[seriesSlug]</code>
+    (Series Template, M3.7).
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">6</span>
+  <div>
+    <strong>Dynamic content sections · ministry-filtered</strong>
+    All rails here filter to <code>ministry == mercy-hill</code>. Library
+    decides which rails to surface based on the visiting user's signals.
+    Returning user with high engagement on Mercy Hill gets personalized
+    rails ("Because you've been exploring..."). Cold-start visitor gets
+    discovery rails ("Most popular," "Latest").
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">7</span>
+  <div>
+    <strong>Ministry-scoped Ask Anything</strong>
+    Same AskAnythingBlock component, but the submission destination is
+    <code>/search?ministry=mercy-hill&amp;q=...</code> — keeping the user
+    inside the ministry's content while still benefiting from the
+    list-style search. Notably, this CTA does NOT trigger a Search
+    Response (which is global); it routes to the scoped Search Template
+    (M3.3).
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Template definition</h2>
+
+<pre><code>{
+  <span class="k">"templateId"</span>: <span class="s">"ministry-v2"</span>,
+  <span class="k">"pageType"</span>:   <span class="s">"ministry"</span>,
+  <span class="k">"name"</span>:       <span class="s">"MinistryTemplate v2"</span>,
+  <span class="k">"inputs"</span>: [
+    { <span class="k">"name"</span>: <span class="s">"ministrySlug"</span>, <span class="k">"type"</span>: <span class="s">"slug"</span>, <span class="k">"required"</span>: <span class="n">true</span> }
+  ],
+  <span class="k">"slots"</span>: [
+    {
+      <span class="k">"slotId"</span>: <span class="s">"breadcrumbs"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"Breadcrumbs"</span>
+    },
+    {
+      <span class="k">"slotId"</span>: <span class="s">"hero"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"Hero"</span>,
+      <span class="k">"instance"</span>: {
+        <span class="k">"config"</span>: { <span class="k">"variant"</span>: <span class="s">"Hero-Ministry"</span> },
+        <span class="k">"query"</span>:  { <span class="k">"contentType"</span>: <span class="s">"ministry"</span>, <span class="k">"mode"</span>: <span class="s">"auto"</span>, <span class="k">"filters"</span>: { <span class="k">"ministry"</span>: <span class="s">"${input.ministrySlug}"</span> } }
+      }
+    },
+    {
+      <span class="k">"slotId"</span>: <span class="s">"pastor"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"PastorCard"</span>,
+      <span class="k">"instance"</span>: { <span class="k">"config"</span>: { <span class="k">"showBio"</span>: <span class="n">true</span>, <span class="k">"showAffiliation"</span>: <span class="n">true</span> } }
+    },
+    {
+      <span class="k">"slotId"</span>: <span class="s">"faith-stages"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"FilterChips"</span>,
+      <span class="k">"instance"</span>: { <span class="k">"config"</span>: { <span class="k">"filterType"</span>: <span class="s">"faithStage"</span>, <span class="k">"multi"</span>: <span class="n">false</span> } }
+    },
+    {
+      <span class="k">"slotId"</span>: <span class="s">"series"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"SeriesRail"</span>,
+      <span class="k">"instance"</span>: {
+        <span class="k">"config"</span>: { <span class="k">"layout"</span>: <span class="s">"horizontal-scroll"</span>, <span class="k">"showAllLink"</span>: <span class="n">true</span> },
+        <span class="k">"query"</span>:  { <span class="k">"mode"</span>: <span class="s">"auto"</span>, <span class="k">"sort"</span>: <span class="s">"recent"</span>, <span class="k">"filters"</span>: { <span class="k">"ministry"</span>: <span class="s">"${input.ministrySlug}"</span> } }
+      }
+    },
+    {
+      <span class="k">"slotId"</span>: <span class="s">"content-sections"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"DYNAMIC"</span>,
+      <span class="k">"allows"</span>: [<span class="s">"ContentRail"</span>],
+      <span class="k">"minCount"</span>: <span class="n">2</span>,
+      <span class="k">"maxCount"</span>: <span class="n">6</span>,
+      <span class="k">"slotInput"</span>: { <span class="k">"ministry"</span>: <span class="s">"${input.ministrySlug}"</span> }   <span class="c">// pre-applies ministry filter to every fill</span>
+    },
+    {
+      <span class="k">"slotId"</span>: <span class="s">"ask-anything"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"AskAnythingBlock"</span>,
+      <span class="k">"instance"</span>: {
+        <span class="k">"config"</span>: { <span class="k">"variant"</span>: <span class="s">"hero-card"</span>, <span class="k">"scopeTarget"</span>: <span class="s">"ministry"</span>, <span class="k">"submitDestination"</span>: <span class="s">"search"</span> }
+      }
+    }
+  ]
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2>Template input · slot variables</h2>
+
+<p>
+  <strong>One template, many pages.</strong> The
+  <code>ministry-v2</code> template takes a single typed input —
+  <code>ministrySlug</code> — and serves all twenty-plus ministry pages.
+  Slot configs use <code>${input.ministrySlug}</code> substitution to bind
+  the input into queries at render time.
+</p>
+
+<table>
+  <thead><tr><th>Input</th><th>Type</th><th>Used in</th></tr></thead>
+  <tbody>
+    <tr><td><code>ministrySlug</code></td><td>slug · required</td><td>Hero query, SeriesRail query, content-sections slot input, AskAnything scope</td></tr>
+  </tbody>
+</table>
+
+<p>
+  When the URL is <code>/ministry/mercy-hill</code>, the renderer resolves
+  <code>ministrySlug = "mercy-hill"</code> from the route, passes it as
+  <code>routeParams.ministrySlug</code> in the compose-page request, and
+  the Library applies it everywhere the template references
+  <code>${input.ministrySlug}</code>.
+</p>
+
+<!-- ============================================================ -->
+<h2>Ministry-preference boost · search semantics</h2>
+
+<div class="callout">
+  <h4>Ministries are a boost, not a wall</h4>
+  <p style="margin:0">
+    Visiting a ministry page increases the user's
+    <code>visitedMinistries[mercy-hill].recencyScore</code>. That score
+    feeds into Library content scoring system-wide — Mercy Hill teachings
+    rank higher in <em>global</em> recommendation contexts for this user
+    going forward. But the best content from any ministry always wins
+    when relevance dominates the score. Ministry preference is a
+    <em>10% boost</em> (see CLAUDE.md relevance scoring).
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2>Library compose-page · ministry routing</h2>
+
+<pre><code>POST /library/compose-page
+{
+  <span class="k">"pageType"</span>:    <span class="s">"ministry"</span>,
+  <span class="k">"route"</span>:       <span class="s">"/ministry/mercy-hill"</span>,
+  <span class="k">"routeParams"</span>: { <span class="k">"ministrySlug"</span>: <span class="s">"mercy-hill"</span> },
+  <span class="k">"identity"</span>:    { ... },
+  <span class="k">"request"</span>:     { ... }
+}
+
+<span class="c">// Library</span>
+1. Resolve route → pageType=ministry, input ministrySlug=mercy-hill
+2. Select template via TemplateSelector (likely ministry-v2 default)
+3. For each FIXED slot: substitute ${input.ministrySlug} into queries
+4. For DYNAMIC content-sections slot:
+   a) Library decides 3 rails fit best for this user + ministry
+   b) Each rail's query pre-filtered by ministry=mercy-hill via slotInput
+   c) Library picks rail themes ("Most popular," "Personalized," "Latest")
+5. Apply theological guardrails (always-on)
+6. Page-level dedupe across rails
+7. Return composition
+
+<span class="c">// Side effect: hot-tier inference</span>
+   identities.visitedMinistries[mercy-hill].recencyScore ← bumped
+   (informs future global recommendations)</code></pre>
+
+<!-- ============================================================ -->
+<h2>Cold-start vs. returning user</h2>
+
+<table>
+  <thead><tr><th>State</th><th>Hero</th><th>Content sections</th><th>Faith chips</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Cold-start</strong></td>
+      <td>Mercy Hill identity + intro tagline</td>
+      <td>Library returns: "Most popular," "Start here" (curated), "Latest"</td>
+      <td>Static — shows ministry's aligned stages</td>
+    </tr>
+    <tr>
+      <td><strong>Returning, no prior Mercy Hill engagement</strong></td>
+      <td>Same as cold-start</td>
+      <td>"Most popular," "Latest," "Topics you've explored" (cross-referenced with ministry)</td>
+      <td>Same</td>
+    </tr>
+    <tr>
+      <td><strong>Returning, high Mercy Hill engagement</strong></td>
+      <td>Continue Watching prominent</td>
+      <td>"Continue Watching," personalized rails, "Latest from Pastor Jane"</td>
+      <td>Same; the user's inferred stage subtly highlighted</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Template variants</h2>
+
+<table>
+  <thead><tr><th>Template ID</th><th>When selected</th><th>Differs from <code>ministry-v2</code></th></tr></thead>
+  <tbody>
+    <tr><td><code>ministry-v2</code></td><td>Default · all users + ministries</td><td>Baseline</td></tr>
+    <tr><td><code>ministry-v2-compact</code></td><td>Experiment variant</td><td>No PastorCard, condensed hero, larger content section</td></tr>
+    <tr><td><code>ministry-cold-start-v1</code></td><td>First-visit user</td><td>Adds a TextBlock explaining what this ministry is and how to engage; "Start here" series rail prominent</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Empty &amp; edge states</h2>
+
+<h3>Ministry not found</h3>
+<p>Renderer returns 404 with a fallback page: <em>"This ministry isn't on TrueVi yet"</em> + MinistryRail of similar ministries.</p>
+
+<h3>Ministry has &lt; 5 published items</h3>
+<p>Dynamic content-sections may return fewer than the minimum count. Template's <code>minCount=2</code> ensures we don't render a near-empty page; if even 2 rails can't be filled, an editorial fallback message renders: <em>"More teachings from Mercy Hill coming soon."</em></p>
+
+<h3>Pastor bio not authored</h3>
+<p>PastorCard renders with avatar and name only; bio block is hidden. Editorial team is notified to backfill via the CMS.</p>
+
+<h3>Ministry permission status = denied</h3>
+<p>Content from this ministry is hidden platform-wide (theological guardrail or pulled permission). Visiting the URL returns 404.</p>
+
+<hr/>
+<div class="navlinks">
+  <a href="10-template-search-response.html">← M3.4 · Search Response Template</a>
+  <a href="12-template-collections.html">M3.6 · Collections (Subject) Template →</a>
+</div>
+
+</div>
+</body>
+</html>

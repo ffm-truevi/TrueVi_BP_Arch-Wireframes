@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TrueVi — Collections (Subject) Template (M3.6)</title>
+<style>
+  :root {
+    --tv-canvas:#030C0F; --tv-rail:#051318; --tv-card:#0A2830; --tv-card-hover:#112F38;
+    --tv-element-mid:#1A4E5C; --tv-accent:#245F70; --tv-glow:#2E7A8A;
+    --tv-cta:#C9902A; --tv-cta-bright:#E8A832; --tv-glacia:#C8E4E8;
+    --tv-secondary:#8FB8BE; --tv-stone:#E8E8E2; --tv-text-dark:#1A1A1A;
+  }
+  * { box-sizing:border-box; }
+  html, body { margin:0; padding:0; background:var(--tv-canvas); color:var(--tv-glacia); }
+  body { font-family:"Jost","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-weight:300; line-height:1.6; font-size:15px; }
+  .docpage { max-width:1280px; margin:0 auto; padding:48px 32px 96px; }
+  .docmeta { color:var(--tv-secondary); font-size:12px; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--tv-element-mid); }
+  .wordmark { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:22px; margin-bottom:4px; }
+  .tagline { font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; color:var(--tv-secondary); font-size:14px; margin-bottom:24px; }
+  h1 { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:36px; margin:0 0 8px; }
+  h2 { font-family:"Jost",sans-serif; font-weight:700; color:var(--tv-stone); font-size:22px; margin:56px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--tv-element-mid); }
+  h3 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-stone); font-size:16px; margin:28px 0 8px; }
+  h4 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-glacia); font-size:13px; text-transform:uppercase; letter-spacing:.1em; margin:18px 0 6px; }
+  p, li { color:var(--tv-glacia); }
+  strong { color:var(--tv-stone); font-weight:600; }
+  em { color:var(--tv-secondary); font-style:italic; }
+  .lede { font-size:17px; color:var(--tv-glacia); margin-bottom:24px; }
+  .crumb { color:var(--tv-secondary); font-size:13px; margin-bottom:8px; }
+  .crumb a { color:var(--tv-cta-bright); text-decoration:none; }
+  code { font-family:"JetBrains Mono","Consolas",monospace; background:var(--tv-card); color:var(--tv-glacia); padding:2px 6px; border-radius:4px; font-size:13px; }
+  pre { font-family:"JetBrains Mono",monospace; background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:8px; padding:16px 20px; overflow-x:auto; font-size:12px; line-height:1.5; }
+  pre code { background:transparent; padding:0; }
+  pre .k { color: var(--tv-cta-bright); } pre .s { color: var(--tv-glacia); } pre .c { color: var(--tv-secondary); font-style:italic; } pre .n { color: var(--tv-glow); }
+  .callout { background:var(--tv-card); border-left:3px solid var(--tv-cta); padding:14px 18px; margin:18px 0; border-radius:0 6px 6px 0; }
+  .callout.principle { border-left-color: var(--tv-glow); }
+  .callout h4 { margin-top:0; color: var(--tv-stone); }
+  table { width:100%; border-collapse:collapse; margin:14px 0; font-size:13px; }
+  th { text-align:left; padding:9px 12px; background:var(--tv-rail); color:var(--tv-stone); font-weight:600; border-bottom:1px solid var(--tv-accent); }
+  td { padding:9px 12px; border-bottom:1px solid var(--tv-element-mid); color:var(--tv-glacia); vertical-align:top; }
+
+  .browser { background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:14px; overflow:hidden; margin:24px 0; box-shadow:0 12px 48px rgba(0,0,0,.4); }
+  .chrome { background:var(--tv-canvas); padding:10px 16px; border-bottom:1px solid var(--tv-element-mid); display:flex; align-items:center; gap:8px; font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--tv-secondary); }
+  .chrome .dot { width:9px; height:9px; border-radius:50%; background:var(--tv-accent); }
+  .chrome .url { margin-left:12px; }
+  .page-mock { padding:0; background:var(--tv-canvas); }
+  .slot-mark { position:absolute; left:-32px; width:24px; height:24px; background:var(--tv-cta); color:var(--tv-text-dark); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:"JetBrains Mono",monospace; font-weight:700; font-size:12px; }
+  .slot { position:relative; border-left:3px solid var(--tv-cta); padding:18px 22px 18px 28px; border-bottom:1px solid var(--tv-element-mid); }
+  .slot.dynamic { border-left-color:var(--tv-cta-bright); border-left-style:dashed; }
+  .slot-meta { color:var(--tv-secondary); font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.08em; margin-bottom:8px; }
+  .slot-meta .kind { display:inline-block; padding:2px 8px; border-radius:999px; font-weight:700; font-size:9px; letter-spacing:.12em; text-transform:uppercase; margin-right:8px; }
+  .slot-meta .kind.fixed { background:var(--tv-accent); color:var(--tv-stone); }
+  .slot-meta .kind.dynamic { background:var(--tv-cta); color:var(--tv-text-dark); }
+
+  .m-bread { color:var(--tv-secondary); font-size:12px; }
+  .m-bread a { color:var(--tv-cta-bright); }
+
+  .m-hero-subj {
+    background:linear-gradient(135deg, #082832, #28505e);
+    border-radius:10px; padding:42px 36px;
+    color:var(--tv-stone); position:relative; overflow:hidden;
+  }
+  .m-hero-subj .eyebrow { color:var(--tv-cta-bright); font-size:11px; letter-spacing:.14em; text-transform:uppercase; }
+  .m-hero-subj h1 { font-family:"Jost",sans-serif; font-weight:800; font-size:38px; color:var(--tv-stone); line-height:1.1; margin:8px 0; }
+  .m-hero-subj .tag { color:var(--tv-glacia); font-size:14px; margin-top:8px; max-width:600px; }
+  .m-hero-subj .stats { color:var(--tv-secondary); font-size:12px; margin-top:14px; }
+  .m-hero-subj .stats .dot { color:var(--tv-element-mid); margin:0 6px; }
+
+  .m-text {
+    color:var(--tv-glacia); font-size:14px; line-height:1.7;
+    max-width:760px;
+  }
+  .m-text em { color:var(--tv-cta-bright); font-style:normal; }
+
+  .m-scripture {
+    background:var(--tv-card); border-left:3px solid var(--tv-cta); border-radius:0 8px 8px 0;
+    padding:18px 24px; font-family:"Cormorant Garamond",Georgia,serif;
+    color:var(--tv-glacia); font-style:italic; font-size:16px; line-height:1.6;
+    max-width:760px;
+  }
+  .m-scripture .ref { color:var(--tv-cta-bright); font-size:11px; letter-spacing:.12em; text-transform:uppercase; font-style:normal; font-family:"Jost",sans-serif; margin-top:10px; display:block; }
+
+  .m-chips { display:flex; gap:8px; flex-wrap:wrap; }
+  .m-chip { padding:5px 12px; border-radius:999px; background:transparent; border:1px solid var(--tv-accent); color:var(--tv-glacia); font-size:11px; }
+  .m-chip.on { background:var(--tv-cta); color:var(--tv-text-dark); border-color:var(--tv-cta); }
+
+  .m-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; }
+  .m-card {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:8px; overflow:hidden;
+  }
+  .m-card .thumb { height:110px; background:linear-gradient(135deg, var(--tv-element-mid), var(--tv-card)); }
+  .m-card .body { padding:10px 12px; }
+  .m-card .ttl { color:var(--tv-stone); font-weight:600; font-size:13px; line-height:1.2; }
+  .m-card .meta { color:var(--tv-secondary); font-size:11px; margin-top:4px; }
+  .m-card .badge { display:inline-block; background:var(--tv-cta); color:var(--tv-text-dark); padding:1px 6px; border-radius:3px; font-size:9px; font-weight:600; margin-top:6px; }
+
+  .m-cards-row { display:flex; gap:12px; overflow:hidden; }
+  .m-rail .title { color:var(--tv-stone); font-family:"Jost",sans-serif; font-weight:600; font-size:18px; margin-bottom:10px; }
+
+  .m-min { background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:8px; padding:14px; width:220px; flex-shrink:0; }
+  .m-min .logo { width:64px; height:64px; border-radius:8px; background:var(--tv-element-mid); margin-bottom:10px; }
+  .m-min .mname { color:var(--tv-stone); font-weight:600; font-size:14px; }
+  .m-min .mpastor { color:var(--tv-secondary); font-size:11px; }
+  .m-min .mtag { color:var(--tv-glacia); font-style:italic; font-size:11px; margin-top:8px; }
+
+  .m-related { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+  .m-related-chip {
+    padding:8px 14px; border-radius:8px;
+    background:var(--tv-card); border:1px solid var(--tv-accent); color:var(--tv-glacia);
+    font-size:12px;
+  }
+  .m-related-chip:hover { border-color:var(--tv-cta-bright); color:var(--tv-cta-bright); }
+
+  .m-ask {
+    background:linear-gradient(135deg, rgba(46,122,138,.18), rgba(201,144,42,.10));
+    border:1px solid var(--tv-glow); border-radius:10px; padding:22px 26px;
+    text-align:center;
+  }
+  .m-ask .eyebrow { color:var(--tv-cta-bright); font-size:11px; letter-spacing:.14em; text-transform:uppercase; }
+  .m-ask .q { font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; color:var(--tv-stone); font-size:20px; margin:8px 0; }
+  .m-ask .input { background:var(--tv-canvas); border:1px solid var(--tv-accent); border-radius:6px; padding:10px 14px; color:var(--tv-secondary); font-size:12px; max-width:540px; margin:0 auto; text-align:left; }
+
+  .annot { display:flex; gap:14px; background:var(--tv-card); border-left:3px solid var(--tv-glow); padding:12px 16px; margin-bottom:10px; border-radius:0 6px 6px 0; font-size:13px; }
+  .annot .num { background:var(--tv-cta); color:var(--tv-text-dark); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0; font-family:"JetBrains Mono",monospace; }
+  .annot strong { color:var(--tv-stone); display:block; margin-bottom:2px; }
+
+  hr { border:none; border-top:1px solid var(--tv-element-mid); margin:36px 0; }
+  .navlinks { display:flex; justify-content:space-between; margin-top:32px; font-size:12px; color:var(--tv-secondary); }
+  .navlinks a { color:var(--tv-cta-bright); text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="docpage">
+
+<p class="crumb"><a href="../index.html">← Index</a> · M3 · Page Templates</p>
+<div class="docmeta">Document M3.6 · Collections (Subject) Template · v0.1 · 2026-05-11 · Owner: Brian (COO) · Audience: TrueVi engineering team + design contractors</div>
+
+<div class="wordmark">TrueVi</div>
+<div class="tagline">Page Template Wireframe · M3.6</div>
+
+<h1>Collections (Subject) Template</h1>
+<p class="lede">
+  The page for a subject collection — forgiveness, anxiety, marriage,
+  grief, doubt. Bound to <code>/subject/[slug]</code>. Subjects are the
+  topical entry point that crosses all ministries and content types.
+  Editorial framing + scripture anchor + filterable content grid +
+  related subjects.
+</p>
+
+<div class="callout principle">
+  <h4>One sentence</h4>
+  <p style="margin:0">
+    Subject pages aggregate <strong>everything we have on a topic</strong>
+    across ministries — anchored to scripture, framed editorially, and
+    personalized for the visiting user's stage and life context.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2>Rendered page · annotated</h2>
+
+<div class="browser">
+  <div class="chrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="url">truevi.tv/subject/forgiveness</span>
+  </div>
+
+  <div class="page-mock">
+
+    <!-- Slot 1: breadcrumbs -->
+    <div class="slot">
+      <span class="slot-mark">1</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>breadcrumbs</code> · Breadcrumbs
+      </div>
+      <div class="m-bread">
+        <a>Home</a> &nbsp;›&nbsp; <a>Subjects</a> &nbsp;›&nbsp; <span style="color:var(--tv-stone);">Forgiveness</span>
+      </div>
+    </div>
+
+    <!-- Slot 2: Hero-Subject -->
+    <div class="slot">
+      <span class="slot-mark">2</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>hero</code> · Hero (variant: <code>Hero-Subject</code>) · query.subjectSlug=forgiveness
+      </div>
+      <div class="m-hero-subj">
+        <div class="eyebrow">Subject Collection</div>
+        <h1>Forgiveness</h1>
+        <div class="tag">The work of releasing what we cannot change. Teachings on forgiving others, forgiving yourself, and what scripture actually says about it.</div>
+        <div class="stats">
+          124 teachings <span class="dot">·</span> 8 series <span class="dot">·</span> 14 ministries
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot 3: editorial framing -->
+    <div class="slot">
+      <span class="slot-mark">3</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>framing</code> · TextBlock · admin-authored
+      </div>
+      <div class="m-text">
+        Forgiveness is not the same as forgetting. It is not pretending the hurt did not happen, and it is not necessarily reconciliation. <em>Forgiveness is a choice — often a daily one — to release the debt and refuse to be defined by what was done to you.</em> The teachings here come from pastors who have sat with this in their own lives, in their own families, in their own losses.
+      </div>
+    </div>
+
+    <!-- Slot 4: scripture anchor -->
+    <div class="slot">
+      <span class="slot-mark">4</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>scripture</code> · ScriptureBlock · primary anchor for this subject
+      </div>
+      <div class="m-scripture">
+        "Bear with each other and forgive one another if any of you has a grievance against someone. Forgive as the Lord forgave you."
+        <span class="ref">Colossians 3:13 · NIV</span>
+      </div>
+    </div>
+
+    <!-- Slot 5: filter chips -->
+    <div class="slot">
+      <span class="slot-mark">5</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>filters</code> · FilterChips · multi=true
+      </div>
+      <div class="m-chips">
+        <span class="m-chip on">All teachings</span>
+        <span class="m-chip">Forgiving others</span>
+        <span class="m-chip">Forgiving yourself</span>
+        <span class="m-chip">Family wounds</span>
+        <span class="m-chip">When the other isn't sorry</span>
+        <span class="m-chip">Sermons</span>
+        <span class="m-chip">Devotionals</span>
+        <span class="m-chip">Under 15 min</span>
+      </div>
+    </div>
+
+    <!-- Slot 6: content grid -->
+    <div class="slot dynamic">
+      <span class="slot-mark">6</span>
+      <div class="slot-meta">
+        <span class="kind dynamic">Dynamic</span>
+        <code>content</code> · allows: ContentGrid · ContentRail · Library returned 1 grid + 1 personalized rail
+      </div>
+
+      <div class="m-rail" style="margin-bottom:22px;">
+        <div class="title">For where you are</div>
+        <p style="color:var(--tv-secondary); font-size:12px; margin:-4px 0 12px; font-style:italic;">Tuned to your faith and life journey signals</p>
+        <div class="m-cards-row">
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Forgiving the Unforgivable</div><div class="meta">Redemption Hill · 22 min</div><span class="badge">For you</span></div></div>
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">When Forgiveness Feels Impossible</div><div class="meta">Mercy Hill · 26 min</div><span class="badge">For you</span></div></div>
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">The Hard Conversation</div><div class="meta">Gospel Coalition · 31 min</div></div></div>
+          <div class="m-card" style="opacity:.5;"><div class="thumb"></div><div class="body"><div class="ttl">…</div></div></div>
+        </div>
+      </div>
+
+      <h3 style="color:var(--tv-stone); font-family:Jost; font-weight:600; font-size:18px; margin:24px 0 14px;">All teachings on forgiveness</h3>
+      <div class="m-grid">
+        <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">How to Forgive</div><div class="meta">Mercy Hill · 31 min</div></div></div>
+        <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Grace for the Wounded</div><div class="meta">Mercy Hill · 28 min</div></div></div>
+        <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">The Prodigal Father</div><div class="meta">Gospel Coalition · 24 min</div></div></div>
+        <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Choosing Peace</div><div class="meta">Mercy Hill · 19 min</div></div></div>
+        <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Letting Go of Resentment</div><div class="meta">Gospel Coalition · 24 min</div></div></div>
+        <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">When Family Hurts</div><div class="meta">Redemption Hill · 27 min</div></div></div>
+        <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">A Daily Mercy</div><div class="meta">Mercy Hill · 8 min</div></div></div>
+        <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Forgiving Yourself</div><div class="meta">Redemption Hill · 22 min</div></div></div>
+      </div>
+      <div style="text-align:center; margin-top:18px; color:var(--tv-cta-bright); font-size:12px; cursor:pointer;">Load more · 124 total</div>
+    </div>
+
+    <!-- Slot 7: Ministries on this subject -->
+    <div class="slot">
+      <span class="slot-mark">7</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>ministries</code> · MinistryRail · query.subject=forgiveness
+      </div>
+      <div class="m-rail">
+        <div class="title">Ministries teaching on forgiveness</div>
+        <div class="m-cards-row">
+          <div class="m-min">
+            <div class="logo"></div>
+            <div class="mname">Mercy Hill Church</div>
+            <div class="mpastor">Pastor Jane Doe</div>
+            <div class="mtag">Rooted in grace.</div>
+          </div>
+          <div class="m-min">
+            <div class="logo"></div>
+            <div class="mname">Redemption Hill</div>
+            <div class="mpastor">Pastor John Smith</div>
+            <div class="mtag">For the wounded heart.</div>
+          </div>
+          <div class="m-min">
+            <div class="logo"></div>
+            <div class="mname">Gospel Coalition</div>
+            <div class="mpastor">Multiple pastors</div>
+            <div class="mtag">Sound doctrine. Always.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot 8: Related subjects -->
+    <div class="slot">
+      <span class="slot-mark">8</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>related-subjects</code> · CTABlock array · Library-curated based on co-occurrence
+      </div>
+      <p style="color:var(--tv-secondary); font-size:13px; margin-bottom:10px;">Related subjects</p>
+      <div class="m-related">
+        <a class="m-related-chip">Grief &amp; Loss</a>
+        <a class="m-related-chip">Anger</a>
+        <a class="m-related-chip">Reconciliation</a>
+        <a class="m-related-chip">Family relationships</a>
+        <a class="m-related-chip">Healing</a>
+        <a class="m-related-chip">Mercy</a>
+        <a class="m-related-chip">Bitterness</a>
+      </div>
+    </div>
+
+    <!-- Slot 9: Subject-scoped Ask Anything -->
+    <div class="slot">
+      <span class="slot-mark">9</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>ask-anything</code> · AskAnythingBlock · scope hint: forgiveness
+      </div>
+      <div class="m-ask">
+        <div class="eyebrow">Make it personal</div>
+        <div class="q">"What's your specific question about forgiveness?"</div>
+        <div class="input">e.g. "How do I forgive my father?" — get a tailored response</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Annotated walkthrough</h2>
+
+<div class="annot">
+  <span class="num">1</span>
+  <div>
+    <strong>Breadcrumbs</strong>
+    Subjects sit at <code>/subject/[slug]</code>. Hierarchical subjects (parent → child) extend the breadcrumb chain.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">2</span>
+  <div>
+    <strong>Hero-Subject · subject identity</strong>
+    Subject name in display type, subtitle tagline, content stats. Background gradient is the same Abyss Teal palette — no subject-specific theming. Stats auto-computed from <code>content_items.subjects[]</code>.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">3</span>
+  <div>
+    <strong>Editorial framing · TextBlock</strong>
+    Admin-authored prose that contextualizes the subject. This is not Library-generated. Lives on the <code>subjects</code> row as a locale-keyed field. Sets the spiritual tone for the page.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">4</span>
+  <div>
+    <strong>Scripture anchor</strong>
+    The defining verse for this subject, pulled from <code>subjects.scripture_anchors[0]</code>. Editorial-authored. Distinct from Search Response scripture, which the Library picks per query.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">5</span>
+  <div>
+    <strong>FilterChips · sub-subject + format</strong>
+    First few chips are <em>sub-subjects</em> (forgiving others, forgiving yourself, family wounds) — these refine the content pool. Later chips are content-format filters. The blend lets users either drill down into sub-topics or narrow by format, in one row.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">6</span>
+  <div>
+    <strong>Dynamic content slot · personalized rail above the grid</strong>
+    Library returned two items: a personalized ContentRail labeled <em>"For where you are"</em> at the top (highest-relevance content for this user on this subject), then a ContentGrid showing all 124 teachings. The grid de-dupes against the personalized rail so the same content isn't shown twice.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">7</span>
+  <div>
+    <strong>Ministries on this subject</strong>
+    MinistryRail filtered by subject. Helps users discover which partner ministries focus on this topic. Click navigates to <code>/ministry/[slug]</code> (M3.5).
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">8</span>
+  <div>
+    <strong>Related subjects · Library-curated</strong>
+    Subjects that frequently co-occur with this one across the user base. Computed from the <code>content_items.subjects[]</code> co-occurrence matrix. Updated cold-tier nightly. Functions like Netflix's "Because you watched..." but for topics, not titles.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">9</span>
+  <div>
+    <strong>Subject-scoped Ask Anything</strong>
+    Same AskAnythingBlock component, but the prompt copy contextualizes the subject. Submission still creates a Search Response (M3.4) — the response can incorporate the subject scope as additional context.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Template definition</h2>
+
+<pre><code>{
+  <span class="k">"templateId"</span>: <span class="s">"subject-v1"</span>,
+  <span class="k">"pageType"</span>:   <span class="s">"subject"</span>,
+  <span class="k">"name"</span>:       <span class="s">"Subject Collection v1"</span>,
+  <span class="k">"inputs"</span>: [
+    { <span class="k">"name"</span>: <span class="s">"subjectSlug"</span>, <span class="k">"type"</span>: <span class="s">"slug"</span>, <span class="k">"required"</span>: <span class="n">true</span> }
+  ],
+  <span class="k">"slots"</span>: [
+    { <span class="k">"slotId"</span>: <span class="s">"breadcrumbs"</span>,    <span class="k">"kind"</span>: <span class="s">"FIXED"</span>, <span class="k">"component"</span>: <span class="s">"Breadcrumbs"</span> },
+
+    {
+      <span class="k">"slotId"</span>: <span class="s">"hero"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"Hero"</span>,
+      <span class="k">"instance"</span>: {
+        <span class="k">"config"</span>: { <span class="k">"variant"</span>: <span class="s">"Hero-Subject"</span> },
+        <span class="k">"query"</span>:  { <span class="k">"contentType"</span>: <span class="s">"subject"</span>, <span class="k">"filters"</span>: { <span class="k">"subject"</span>: <span class="s">"${input.subjectSlug}"</span> } }
+      }
+    },
+
+    { <span class="k">"slotId"</span>: <span class="s">"framing"</span>, <span class="k">"kind"</span>: <span class="s">"FIXED"</span>, <span class="k">"component"</span>: <span class="s">"TextBlock"</span>,
+      <span class="k">"instance"</span>: { <span class="k">"query"</span>: { <span class="k">"source"</span>: <span class="s">"subjects.description"</span> } } },
+
+    { <span class="k">"slotId"</span>: <span class="s">"scripture"</span>, <span class="k">"kind"</span>: <span class="s">"FIXED"</span>, <span class="k">"component"</span>: <span class="s">"ScriptureBlock"</span>,
+      <span class="k">"instance"</span>: { <span class="k">"query"</span>: { <span class="k">"source"</span>: <span class="s">"subjects.scripture_anchors[0]"</span> } } },
+
+    {
+      <span class="k">"slotId"</span>: <span class="s">"filters"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"FilterChips"</span>,
+      <span class="k">"instance"</span>: { <span class="k">"config"</span>: { <span class="k">"filterType"</span>: <span class="s">"compound"</span>, <span class="k">"multi"</span>: <span class="n">true</span>, <span class="k">"includeSubSubjects"</span>: <span class="n">true</span> } }
+    },
+
+    {
+      <span class="k">"slotId"</span>: <span class="s">"content"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"DYNAMIC"</span>,
+      <span class="k">"allows"</span>: [<span class="s">"ContentGrid"</span>, <span class="s">"ContentRail"</span>],
+      <span class="k">"minCount"</span>: <span class="n">1</span>,
+      <span class="k">"maxCount"</span>: <span class="n">3</span>,
+      <span class="k">"slotInput"</span>: { <span class="k">"subject"</span>: <span class="s">"${input.subjectSlug}"</span> }
+    },
+
+    {
+      <span class="k">"slotId"</span>: <span class="s">"ministries"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"MinistryRail"</span>,
+      <span class="k">"instance"</span>: { <span class="k">"query"</span>: { <span class="k">"filters"</span>: { <span class="k">"subject"</span>: <span class="s">"${input.subjectSlug}"</span> }, <span class="k">"sort"</span>: <span class="s">"content-count"</span>, <span class="k">"limit"</span>: <span class="n">8</span> } }
+    },
+
+    {
+      <span class="k">"slotId"</span>: <span class="s">"related-subjects"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"CTABlock"</span>,
+      <span class="k">"instance"</span>: { <span class="k">"config"</span>: { <span class="k">"style"</span>: <span class="s">"chip-array"</span> }, <span class="k">"query"</span>: { <span class="k">"source"</span>: <span class="s">"subjects.relatedByCooccurrence"</span> } }
+    },
+
+    {
+      <span class="k">"slotId"</span>: <span class="s">"ask-anything"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"AskAnythingBlock"</span>,
+      <span class="k">"instance"</span>: { <span class="k">"config"</span>: { <span class="k">"variant"</span>: <span class="s">"hero-card"</span>, <span class="k">"subjectContext"</span>: <span class="s">"${input.subjectSlug}"</span> } }
+    }
+  ]
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2>The subjects table fuels this template</h2>
+
+<p>
+  Unlike most templates, the Subject template draws heavily from editorial
+  fields on the <code>subjects</code> row (M1.3 §15). The framing copy,
+  scripture anchor, and sub-subjects are all editorial — admins author them
+  through the CMS. The dynamic content slot is the only Library-personalized
+  region.
+</p>
+
+<table>
+  <thead><tr><th>Slot</th><th>Source</th><th>Authored or generated?</th></tr></thead>
+  <tbody>
+    <tr><td>Hero subtitle</td><td><code>subjects.description.en</code></td><td>Editorial</td></tr>
+    <tr><td>Framing TextBlock</td><td><code>subjects.description.en</code> (long form)</td><td>Editorial</td></tr>
+    <tr><td>Scripture anchor</td><td><code>subjects.scripture_anchors[0]</code></td><td>Editorial</td></tr>
+    <tr><td>FilterChips sub-subjects</td><td>Child rows in <code>subjects</code> table (parent_subject_id)</td><td>Editorial (taxonomy)</td></tr>
+    <tr><td>Content rails &amp; grid</td><td>Library content query</td><td>Personalized + filtered</td></tr>
+    <tr><td>Ministry rail</td><td>Library, filtered by content_items.subjects[]</td><td>Algorithmic</td></tr>
+    <tr><td>Related subjects</td><td>Cold-tier co-occurrence matrix</td><td>Algorithmic, nightly</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Subject hierarchy</h2>
+
+<p>
+  Subjects can have parent/child relationships via
+  <code>subjects.parent_subject_id</code>. Examples:
+</p>
+
+<pre><code>Forgiveness                              <span class="c">// top-level subject</span>
+├─ Forgiving others                      <span class="c">// child</span>
+├─ Forgiving yourself                    <span class="c">// child</span>
+├─ Forgiving when they're not sorry      <span class="c">// child</span>
+└─ Family forgiveness                    <span class="c">// child</span>
+
+Grief &amp; Loss                            <span class="c">// top-level subject</span>
+├─ Loss of a parent                      <span class="c">// child</span>
+├─ Loss of a spouse                      <span class="c">// child</span>
+├─ Anticipatory grief                    <span class="c">// child</span>
+└─ Loss of faith                         <span class="c">// child</span></code></pre>
+
+<p>
+  When a child subject is visited (<code>/subject/forgiving-others</code>),
+  the template renders the same way — only the input slug changes. The
+  breadcrumb chain extends to show the parent.
+</p>
+
+<!-- ============================================================ -->
+<h2>Personalization in the dynamic content slot</h2>
+
+<p>
+  The dynamic content slot is where the Library does its work on Subject
+  pages. Signals that influence what shows:
+</p>
+
+<ul>
+  <li><strong><code>inferredFaithStage</code></strong> — Seekers see different teachings than Mature Believers, even on the same subject</li>
+  <li><strong><code>inferredLifeStage</code> + <code>inferredLifeEvents</code></strong> — A user with high <code>family-conflict</code> signal sees forgiveness content framed for family contexts</li>
+  <li><strong><code>visitedMinistries</code></strong> — Boosts content from ministries the user already trusts</li>
+  <li><strong><code>watchPatterns.formatAffinity</code></strong> — Sermon-leaners see sermons first; devotional-leaners see devotionals first</li>
+  <li><strong><code>preferredSessionMin</code></strong> — Tiebreaker on duration when relevance is close</li>
+  <li><strong>Already-watched suppression</strong> — completed content sinks lower or hides entirely</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2>Cold-start behavior</h2>
+
+<p>
+  First-visit users get the same template but with the personalized rail
+  collapsed or absent. The Library returns a single ContentGrid sorted by
+  popularity. Sub-subject chips are shown so users can self-narrow. As
+  signals accumulate, the personalized rail starts to appear above the
+  grid.
+</p>
+
+<!-- ============================================================ -->
+<h2>Template variants</h2>
+
+<table>
+  <thead><tr><th>Template ID</th><th>When selected</th><th>Differs from <code>subject-v1</code></th></tr></thead>
+  <tbody>
+    <tr><td><code>subject-v1</code></td><td>Default · all users + subjects</td><td>Baseline</td></tr>
+    <tr><td><code>subject-life-event-v1</code></td><td>Subject is a life event (grief, divorce, addiction)</td><td>Adds a CTABlock to professional/pastoral support resources near the top; subdued Ask Anything copy</td></tr>
+    <tr><td><code>subject-apologetics-v1</code></td><td>Subject is theological/apologetic (doubt, suffering, hell, atheism)</td><td>Hero-Subject swapped for Hero-Image. ScriptureBlock prominence increased. AIResponseBlock added with theological tone.</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Empty &amp; edge states</h2>
+
+<h3>Subject has &lt; 6 published items</h3>
+<p>Hero shows. Content slot renders single ContentGrid with all available items. No personalized rail (not enough pool to rank from). MinistryRail may be empty — hidden if so.</p>
+
+<h3>Subject has no scripture anchor</h3>
+<p>ScriptureBlock slot renders empty and is collapsed. Pastoral Board notified to backfill.</p>
+
+<h3>Subject has no editorial framing</h3>
+<p>TextBlock slot collapses. Page still renders normally. Editorial team flagged.</p>
+
+<h3>Subject not found</h3>
+<p>404 with a fallback page showing top subjects and a search prompt.</p>
+
+<h3>Sensitive subject (suicide, abuse, addiction)</h3>
+<p>Page renders with a crisis-resources CTABlock at the very top. Sub-subject filter pre-set to safe defaults. Editorial framing is mandatory for these subjects (validation enforced at publish).</p>
+
+<hr/>
+<div class="navlinks">
+  <a href="11-template-ministry.html">← M3.5 · Ministry Template</a>
+  <a href="13-template-series.html">M3.7 · Series Template →</a>
+</div>
+
+</div>
+</body>
+</html>

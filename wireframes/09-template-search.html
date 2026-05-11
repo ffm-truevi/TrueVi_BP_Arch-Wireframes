@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TrueVi — Search Template (M3.3)</title>
+<style>
+  :root {
+    --tv-canvas:#030C0F; --tv-rail:#051318; --tv-card:#0A2830; --tv-card-hover:#112F38;
+    --tv-element-mid:#1A4E5C; --tv-accent:#245F70; --tv-glow:#2E7A8A;
+    --tv-cta:#C9902A; --tv-cta-bright:#E8A832; --tv-glacia:#C8E4E8;
+    --tv-secondary:#8FB8BE; --tv-stone:#E8E8E2; --tv-text-dark:#1A1A1A;
+  }
+  * { box-sizing:border-box; }
+  html, body { margin:0; padding:0; background:var(--tv-canvas); color:var(--tv-glacia); }
+  body { font-family:"Jost","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-weight:300; line-height:1.6; font-size:15px; }
+  .docpage { max-width:1280px; margin:0 auto; padding:48px 32px 96px; }
+  .docmeta { color:var(--tv-secondary); font-size:12px; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--tv-element-mid); }
+  .wordmark { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:22px; margin-bottom:4px; }
+  .tagline { font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; color:var(--tv-secondary); font-size:14px; margin-bottom:24px; }
+  h1 { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:36px; margin:0 0 8px; }
+  h2 { font-family:"Jost",sans-serif; font-weight:700; color:var(--tv-stone); font-size:22px; margin:56px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--tv-element-mid); }
+  h3 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-stone); font-size:16px; margin:28px 0 8px; }
+  h4 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-glacia); font-size:13px; text-transform:uppercase; letter-spacing:.1em; margin:18px 0 6px; }
+  p, li { color:var(--tv-glacia); }
+  strong { color:var(--tv-stone); font-weight:600; }
+  em { color:var(--tv-secondary); font-style:italic; }
+  .lede { font-size:17px; color:var(--tv-glacia); margin-bottom:24px; }
+  .crumb { color:var(--tv-secondary); font-size:13px; margin-bottom:8px; }
+  .crumb a { color:var(--tv-cta-bright); text-decoration:none; }
+  code { font-family:"JetBrains Mono","Consolas",monospace; background:var(--tv-card); color:var(--tv-glacia); padding:2px 6px; border-radius:4px; font-size:13px; }
+  pre { font-family:"JetBrains Mono",monospace; background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:8px; padding:16px 20px; overflow-x:auto; font-size:12px; line-height:1.5; }
+  pre code { background:transparent; padding:0; }
+  pre .k { color: var(--tv-cta-bright); } pre .s { color: var(--tv-glacia); } pre .c { color: var(--tv-secondary); font-style:italic; } pre .n { color: var(--tv-glow); }
+  .callout { background:var(--tv-card); border-left:3px solid var(--tv-cta); padding:14px 18px; margin:18px 0; border-radius:0 6px 6px 0; }
+  .callout.principle { border-left-color: var(--tv-glow); }
+  .callout h4 { margin-top:0; color: var(--tv-stone); }
+  table { width:100%; border-collapse:collapse; margin:14px 0; font-size:13px; }
+  th { text-align:left; padding:9px 12px; background:var(--tv-rail); color:var(--tv-stone); font-weight:600; border-bottom:1px solid var(--tv-accent); }
+  td { padding:9px 12px; border-bottom:1px solid var(--tv-element-mid); color:var(--tv-glacia); vertical-align:top; }
+
+  .browser { background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:14px; overflow:hidden; margin:24px 0; box-shadow:0 12px 48px rgba(0,0,0,.4); }
+  .chrome { background:var(--tv-canvas); padding:10px 16px; border-bottom:1px solid var(--tv-element-mid); display:flex; align-items:center; gap:8px; font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--tv-secondary); }
+  .chrome .dot { width:9px; height:9px; border-radius:50%; background:var(--tv-accent); }
+  .chrome .url { margin-left:12px; }
+  .page-mock { padding:0; background:var(--tv-canvas); }
+  .slot-mark { position:absolute; left:-32px; width:24px; height:24px; background:var(--tv-cta); color:var(--tv-text-dark); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:"JetBrains Mono",monospace; font-weight:700; font-size:12px; }
+  .slot { position:relative; border-left:3px solid var(--tv-cta); padding:18px 22px 18px 28px; border-bottom:1px solid var(--tv-element-mid); }
+  .slot.dynamic { border-left-color:var(--tv-cta-bright); border-left-style:dashed; }
+  .slot-meta { color:var(--tv-secondary); font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.08em; margin-bottom:8px; }
+  .slot-meta .kind { display:inline-block; padding:2px 8px; border-radius:999px; font-weight:700; font-size:9px; letter-spacing:.12em; text-transform:uppercase; margin-right:8px; }
+  .slot-meta .kind.fixed { background:var(--tv-accent); color:var(--tv-stone); }
+  .slot-meta .kind.dynamic { background:var(--tv-cta); color:var(--tv-text-dark); }
+
+  /* search hero */
+  .m-search-hero {
+    background:linear-gradient(135deg, #07252e, #19536b);
+    border-radius:10px; padding:42px 36px; text-align:center;
+  }
+  .m-search-hero .eyebrow { color:var(--tv-cta-bright); font-size:11px; letter-spacing:.14em; text-transform:uppercase; }
+  .m-search-hero h1 { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:30px; margin:10px 0 18px; }
+  .m-search-input {
+    background:var(--tv-canvas); border:1px solid var(--tv-accent); border-radius:8px;
+    padding:14px 20px; color:var(--tv-secondary); font-size:14px;
+    max-width:640px; margin:0 auto; text-align:left;
+    display:flex; align-items:center; gap:12px;
+  }
+  .m-search-input .icon { color:var(--tv-cta-bright); font-size:16px; }
+  .m-search-input .typed { color:var(--tv-stone); }
+  .m-search-hero .suggest { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:14px; }
+  .m-search-hero .chip { background:transparent; border:1px solid var(--tv-accent); color:var(--tv-glacia); padding:5px 12px; border-radius:999px; font-size:11px; }
+
+  .m-context {
+    display:flex; align-items:center; gap:12px;
+    background:var(--tv-card); border:1px solid var(--tv-cta); border-radius:8px;
+    padding:12px 18px; color:var(--tv-glacia); font-size:13px;
+  }
+  .m-context .scope { color:var(--tv-secondary); }
+  .m-context .ms-name { color:var(--tv-stone); font-weight:600; }
+  .m-context .x { margin-left:auto; color:var(--tv-cta-bright); cursor:pointer; }
+
+  .m-chips { display:flex; gap:8px; flex-wrap:wrap; }
+  .m-chip { padding:5px 12px; border-radius:999px; background:transparent; border:1px solid var(--tv-accent); color:var(--tv-glacia); font-size:11px; }
+  .m-chip.on { background:var(--tv-cta); color:var(--tv-text-dark); border-color:var(--tv-cta); }
+
+  .m-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; }
+  .m-grid .card {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:8px; overflow:hidden;
+  }
+  .m-grid .thumb { height:110px; background:linear-gradient(135deg, var(--tv-element-mid), var(--tv-card)); }
+  .m-grid .body { padding:10px 12px; }
+  .m-grid .ttl { color:var(--tv-stone); font-weight:600; font-size:13px; line-height:1.2; }
+  .m-grid .meta { color:var(--tv-secondary); font-size:11px; margin-top:4px; }
+  .m-grid .badge { display:inline-block; background:var(--tv-cta); color:var(--tv-text-dark); padding:1px 6px; border-radius:3px; font-size:9px; font-weight:600; margin-top:6px; }
+
+  .m-results-meta { display:flex; align-items:baseline; gap:14px; margin-bottom:14px; }
+  .m-results-meta .count { color:var(--tv-stone); font-weight:600; }
+  .m-results-meta .sub { color:var(--tv-secondary); font-size:12px; }
+  .m-results-meta .sort { margin-left:auto; color:var(--tv-glacia); font-size:12px; }
+  .m-results-meta .sort .field { color:var(--tv-cta-bright); }
+
+  /* empty/no-results state */
+  .m-empty {
+    text-align:center; padding:40px 30px;
+    color:var(--tv-glacia); font-size:14px;
+    background:var(--tv-card); border:1px dashed var(--tv-accent); border-radius:10px;
+  }
+  .m-empty h3 { color:var(--tv-stone); font-family:"Jost",sans-serif; font-weight:700; font-size:18px; margin:0 0 8px; }
+  .m-empty .hint { color:var(--tv-secondary); font-size:12px; margin-top:6px; }
+
+  .annot { display:flex; gap:14px; background:var(--tv-card); border-left:3px solid var(--tv-glow); padding:12px 16px; margin-bottom:10px; border-radius:0 6px 6px 0; font-size:13px; }
+  .annot .num { background:var(--tv-cta); color:var(--tv-text-dark); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0; font-family:"JetBrains Mono",monospace; }
+  .annot strong { color:var(--tv-stone); display:block; margin-bottom:2px; }
+
+  hr { border:none; border-top:1px solid var(--tv-element-mid); margin:36px 0; }
+  .navlinks { display:flex; justify-content:space-between; margin-top:32px; font-size:12px; color:var(--tv-secondary); }
+  .navlinks a { color:var(--tv-cta-bright); text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="docpage">
+
+<p class="crumb"><a href="../index.html">← Index</a> · M3 · Page Templates</p>
+<div class="docmeta">Document M3.3 · Search Template · v0.1 · 2026-05-11 · Owner: Brian (COO) · Audience: TrueVi engineering team + design contractors</div>
+
+<div class="wordmark">TrueVi</div>
+<div class="tagline">Page Template Wireframe · M3.3</div>
+
+<h1>Search Template</h1>
+<p class="lede">
+  The search results page. Used for both global and ministry-scoped search
+  via URL parameter <code>?ministry=&lt;slug&gt;</code>. Important distinction:
+  this is the <em>list-style</em> search page. The free-form
+  <strong>Ask Anything</strong> conversation lands on the Search Response
+  Template (M3.4) instead.
+</p>
+
+<div class="callout principle">
+  <h4>One sentence</h4>
+  <p style="margin:0">
+    Search shows what TrueVi has matching the user's query — filterable,
+    sortable, deep-linkable. <strong>Ministry scope</strong> is a banner +
+    a Library content-pool filter, not a separate template.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2>Rendered page · annotated · global search</h2>
+
+<div class="browser">
+  <div class="chrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="url">truevi.tv/search?q=forgiveness</span>
+  </div>
+  <div class="page-mock">
+
+    <!-- Slot 1: Hero-Search -->
+    <div class="slot">
+      <span class="slot-mark">1</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>hero</code> · Hero (variant: <code>Hero-Search</code>)
+      </div>
+      <div class="m-search-hero">
+        <div class="eyebrow">Search</div>
+        <h1>What are you looking for?</h1>
+        <div class="m-search-input">
+          <span class="icon">🔍</span>
+          <span class="typed">forgiveness</span>
+        </div>
+        <div class="suggest">
+          <span class="chip">forgiving yourself</span>
+          <span class="chip">forgiving family</span>
+          <span class="chip">when forgiveness feels impossible</span>
+          <span class="chip">forgiveness in scripture</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot 2: filter chips -->
+    <div class="slot">
+      <span class="slot-mark">2</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>filters</code> · FilterChips · multi=true
+      </div>
+      <div class="m-chips">
+        <span class="m-chip on">All formats</span>
+        <span class="m-chip">Sermons</span>
+        <span class="m-chip">Devotionals</span>
+        <span class="m-chip">Teaching</span>
+        <span class="m-chip">Series</span>
+        <span class="m-chip">Under 15 min</span>
+        <span class="m-chip">This month</span>
+        <span class="m-chip">All ministries</span>
+      </div>
+    </div>
+
+    <!-- Slot 3: results grid -->
+    <div class="slot dynamic">
+      <span class="slot-mark">3</span>
+      <div class="slot-meta">
+        <span class="kind dynamic">Dynamic</span>
+        <code>results</code> · allows: ContentGrid · MinistryRail · SeriesRail · Library returned 3 sections
+      </div>
+
+      <div class="m-results-meta">
+        <span class="count">62 teachings</span>
+        <span class="sub">for "forgiveness"</span>
+        <span class="sort">Sort by <span class="field">Most relevant ▾</span></span>
+      </div>
+
+      <div class="m-grid">
+        <div class="card"><div class="thumb"></div><div class="body"><div class="ttl">How to Forgive</div><div class="meta">Mercy Hill · Pastor Jane Doe · 31 min</div><span class="badge">62% watched</span></div></div>
+        <div class="card"><div class="thumb"></div><div class="body"><div class="ttl">Forgiving the Unforgivable</div><div class="meta">Redemption Hill · 22 min</div></div></div>
+        <div class="card"><div class="thumb"></div><div class="body"><div class="ttl">The Prodigal Father</div><div class="meta">Gospel Coalition · 24 min</div></div></div>
+        <div class="card"><div class="thumb"></div><div class="body"><div class="ttl">Grace for the Wounded</div><div class="meta">Mercy Hill · 28 min</div></div></div>
+        <div class="card"><div class="thumb"></div><div class="body"><div class="ttl">When Forgiveness Feels Impossible</div><div class="meta">Redemption Hill · 26 min</div></div></div>
+        <div class="card"><div class="thumb"></div><div class="body"><div class="ttl">Choosing Peace</div><div class="meta">Mercy Hill · 19 min</div></div></div>
+        <div class="card"><div class="thumb"></div><div class="body"><div class="ttl">The Hard Conversation</div><div class="meta">Gospel Coalition · 31 min</div></div></div>
+        <div class="card"><div class="thumb"></div><div class="body"><div class="ttl">Letting Go of Resentment</div><div class="meta">Mercy Hill · 24 min</div></div></div>
+      </div>
+
+      <div style="text-align:center; margin-top:18px; color:var(--tv-cta-bright); font-size:12px; cursor:pointer;">Load more results</div>
+    </div>
+
+    <!-- Slot 4: Ask Anything (cross-sell to Search Response) -->
+    <div class="slot">
+      <span class="slot-mark">4</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>ask-anything</code> · AskAnythingBlock (variant: <code>inline</code>)
+      </div>
+      <div style="background:linear-gradient(135deg, rgba(46,122,138,.18), rgba(201,144,42,.10)); border:1px solid var(--tv-glow); border-radius:10px; padding:22px 26px; text-align:center;">
+        <div style="color:var(--tv-cta-bright); font-size:11px; letter-spacing:.14em; text-transform:uppercase;">Not finding what you need?</div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; color:var(--tv-stone); font-size:20px; margin:8px 0;">Tell us what's on your heart.</div>
+        <div style="background:var(--tv-canvas); border:1px solid var(--tv-accent); border-radius:6px; padding:10px 14px; color:var(--tv-secondary); font-size:12px; max-width:540px; margin:0 auto; text-align:left;">Ask anything in your own words…</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Rendered page · ministry-scoped variant</h2>
+
+<p>When the URL is <code>/search?ministry=mercy-hill&amp;q=forgiveness</code>, a ContextBanner appears between the hero and the filters. The content pool is filtered to Mercy Hill only.</p>
+
+<div class="browser">
+  <div class="chrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="url">truevi.tv/search?ministry=mercy-hill&amp;q=forgiveness</span>
+  </div>
+  <div class="page-mock">
+
+    <div class="slot">
+      <span class="slot-mark">1</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>hero</code> · Hero-Search (same as global)
+      </div>
+      <div class="m-search-hero">
+        <div class="eyebrow">Search</div>
+        <h1>What are you looking for?</h1>
+        <div class="m-search-input">
+          <span class="icon">🔍</span>
+          <span class="typed">forgiveness</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="slot">
+      <span class="slot-mark">2a</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>ministry-context</code> · ContextBanner · scope=ministry · dismissible
+      </div>
+      <div class="m-context">
+        <span class="scope">Searching within</span>
+        <span class="ms-name">Mercy Hill Church</span>
+        <span class="x">× Search all ministries</span>
+      </div>
+    </div>
+
+    <div class="slot">
+      <span class="slot-mark">2b</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>filters</code> · FilterChips
+      </div>
+      <div class="m-chips">
+        <span class="m-chip on">All formats</span>
+        <span class="m-chip">Sermons</span>
+        <span class="m-chip">Devotionals</span>
+        <span class="m-chip">Series</span>
+        <span class="m-chip">Under 15 min</span>
+      </div>
+    </div>
+
+    <div class="slot dynamic">
+      <span class="slot-mark">3</span>
+      <div class="slot-meta">
+        <span class="kind dynamic">Dynamic</span>
+        <code>results</code> · pool restricted to ministry=mercy-hill
+      </div>
+
+      <div class="m-results-meta">
+        <span class="count">18 teachings</span>
+        <span class="sub">for "forgiveness" · within Mercy Hill Church</span>
+        <span class="sort">Sort by <span class="field">Most relevant ▾</span></span>
+      </div>
+
+      <div class="m-grid">
+        <div class="card"><div class="thumb"></div><div class="body"><div class="ttl">How to Forgive</div><div class="meta">Pastor Jane Doe · 31 min</div></div></div>
+        <div class="card"><div class="thumb"></div><div class="body"><div class="ttl">Grace for the Wounded</div><div class="meta">Pastor Jane Doe · 28 min</div></div></div>
+        <div class="card"><div class="thumb"></div><div class="body"><div class="ttl">Choosing Peace</div><div class="meta">Pastor Sam Wright · 19 min</div></div></div>
+        <div class="card"><div class="thumb"></div><div class="body"><div class="ttl">Letting Go of Resentment</div><div class="meta">Pastor Jane Doe · 24 min</div></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Annotated walkthrough</h2>
+
+<div class="annot">
+  <span class="num">1</span>
+  <div>
+    <strong>Hero-Search · always present</strong>
+    The search input lives in the hero. Suggested-query chips beneath are
+    Library-generated from <code>searchHistory</code> and trending queries
+    of users with similar profiles. On the ministry-scoped variant, the
+    suggestions are restricted to ministry-relevant queries.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">2</span>
+  <div>
+    <strong>FilterChips · multi-select, URL-keyed</strong>
+    Every chip toggle rewrites the URL: <code>?q=forgiveness&amp;format=sermon&amp;duration=under-15</code>.
+    The filter row's content is admin-authored — admins decide which filter
+    types appear on this template.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">2a</span>
+  <div>
+    <strong>ContextBanner · ministry-scoped only</strong>
+    Only renders when <code>?ministry=&lt;slug&gt;</code> is present.
+    Dismissing it removes the parameter and re-runs the search globally,
+    preserving the <code>?q=</code> value. This is how users escape a
+    scoped search without losing their query.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">3</span>
+  <div>
+    <strong>Dynamic results slot</strong>
+    The admin allows <code>ContentGrid</code>, <code>MinistryRail</code>,
+    and <code>SeriesRail</code> here. The Library decides which components
+    to use and in what order. For most queries it returns one large
+    ContentGrid. For ambiguous queries it may return a MinistryRail or
+    SeriesRail above the grid ("Ministries on this topic" / "Series on
+    this topic"). The Library's choice depends on query intent and on
+    how many matching ministries/series exist.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">4</span>
+  <div>
+    <strong>Ask Anything cross-sell · inline variant</strong>
+    At the bottom of every search results page, the inline AskAnything
+    block invites the user to convert their literal query into a guided
+    question — driving them into the Search Response flow (M3.4).
+    Eventbased: <code>ask_anything_submitted</code> with
+    <code>fromPageType: "search"</code>.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Template definition</h2>
+
+<pre><code>{
+  <span class="k">"templateId"</span>: <span class="s">"search-v2"</span>,
+  <span class="k">"pageType"</span>:   <span class="s">"search"</span>,
+  <span class="k">"name"</span>:       <span class="s">"SearchTemplate v2"</span>,
+  <span class="k">"inputs"</span>: [
+    { <span class="k">"name"</span>: <span class="s">"q"</span>,        <span class="k">"type"</span>: <span class="s">"string"</span>, <span class="k">"required"</span>: <span class="n">false</span> },
+    { <span class="k">"name"</span>: <span class="s">"ministry"</span>, <span class="k">"type"</span>: <span class="s">"slug"</span>,   <span class="k">"required"</span>: <span class="n">false</span> }
+  ],
+  <span class="k">"slots"</span>: [
+    {
+      <span class="k">"slotId"</span>: <span class="s">"hero"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"Hero"</span>,
+      <span class="k">"instance"</span>: {
+        <span class="k">"config"</span>: { <span class="k">"variant"</span>: <span class="s">"Hero-Search"</span>, <span class="k">"showSuggestions"</span>: <span class="n">true</span> }
+      }
+    },
+    {
+      <span class="k">"slotId"</span>: <span class="s">"ministry-context"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"ContextBanner"</span>,
+      <span class="k">"instance"</span>: {
+        <span class="k">"config"</span>: { <span class="k">"scopeTarget"</span>: <span class="s">"ministry"</span>, <span class="k">"dismissible"</span>: <span class="n">true</span> },
+        <span class="k">"conditionalRender"</span>: <span class="s">"input.ministry != null"</span>   <span class="c">// only renders when scoped</span>
+      }
+    },
+    {
+      <span class="k">"slotId"</span>: <span class="s">"filters"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"FilterChips"</span>,
+      <span class="k">"instance"</span>: {
+        <span class="k">"config"</span>: { <span class="k">"filterType"</span>: <span class="s">"compound"</span>, <span class="k">"multi"</span>: <span class="n">true</span> }
+      }
+    },
+    {
+      <span class="k">"slotId"</span>: <span class="s">"results"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"DYNAMIC"</span>,
+      <span class="k">"allows"</span>: [<span class="s">"ContentGrid"</span>, <span class="s">"MinistryRail"</span>, <span class="s">"SeriesRail"</span>],
+      <span class="k">"minCount"</span>: <span class="n">0</span>,
+      <span class="k">"maxCount"</span>: <span class="n">4</span>
+    },
+    {
+      <span class="k">"slotId"</span>: <span class="s">"ask-anything"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"AskAnythingBlock"</span>,
+      <span class="k">"instance"</span>: {
+        <span class="k">"config"</span>: { <span class="k">"variant"</span>: <span class="s">"inline"</span>, <span class="k">"showSuggestions"</span>: <span class="n">false</span> },
+        <span class="k">"copy"</span>: {
+          <span class="k">"en"</span>: {
+            <span class="k">"eyebrowLabel"</span>: <span class="s">"Not finding what you need?"</span>,
+            <span class="k">"headline"</span>:     <span class="s">"Tell us what's on your heart."</span>,
+            <span class="k">"placeholder"</span>:  <span class="s">"Ask anything in your own words…"</span>
+          }
+        }
+      }
+    }
+  ]
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2>URL state model</h2>
+
+<table>
+  <thead><tr><th>Parameter</th><th>Type</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>?q=</code></td><td>string</td><td>The query string. Persisted across filter changes and ministry-scope toggles.</td></tr>
+    <tr><td><code>?ministry=</code></td><td>slug</td><td>Restrict content pool to this ministry. Triggers ContextBanner render.</td></tr>
+    <tr><td><code>?format=</code></td><td>enum/multi</td><td>Filter by sermon / devotional / teaching / series</td></tr>
+    <tr><td><code>?duration=</code></td><td>enum</td><td>under-15 / 15-30 / over-30</td></tr>
+    <tr><td><code>?recency=</code></td><td>enum</td><td>this-week / this-month / this-year</td></tr>
+    <tr><td><code>?sort=</code></td><td>enum</td><td>relevance (default) / recent / popular</td></tr>
+    <tr><td><code>?page=</code></td><td>int</td><td>Pagination cursor for ContentGrid (if numbered)</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Filter and sort changes preserve <code>?q=</code> and
+  <code>?ministry=</code>. Dismissing the ContextBanner removes
+  <code>?ministry=</code> but preserves <code>?q=</code> and active filters.
+</p>
+
+<!-- ============================================================ -->
+<h2>Library query · ministry-scoped vs global</h2>
+
+<pre><code><span class="c">// renderer → Library when ministry=mercy-hill</span>
+{
+  <span class="k">"pageType"</span>:    <span class="s">"search"</span>,
+  <span class="k">"route"</span>:       <span class="s">"/search"</span>,
+  <span class="k">"routeParams"</span>: {
+    <span class="k">"q"</span>:        <span class="s">"forgiveness"</span>,
+    <span class="k">"ministry"</span>: <span class="s">"mercy-hill"</span>,
+    <span class="k">"format"</span>:   [<span class="s">"sermon"</span>, <span class="s">"teaching"</span>],
+    <span class="k">"sort"</span>:     <span class="s">"relevance"</span>
+  },
+  <span class="k">"identity"</span>: { ... },
+  <span class="k">"request"</span>:  { ... }
+}</code></pre>
+
+<p>
+  The Library handles the ministry-scoping by adding a content-pool
+  filter to all DYNAMIC slot fills. The renderer does not need to alter
+  any of its hydration logic — the slot composition shape is identical
+  to the global variant; only the contents differ.
+</p>
+
+<!-- ============================================================ -->
+<h2>Empty &amp; edge states</h2>
+
+<h3>No query (landing on /search with no <code>?q=</code>)</h3>
+<p>Hero shows. Filters hidden. Results slot replaced with an editorial discovery panel: "Browse by subject" + popular subject chips + trending content rail.</p>
+
+<h3>No results</h3>
+<div class="m-empty" style="max-width:540px; margin:14px 0;">
+  <h3>No teachings match "&lt;query&gt;"</h3>
+  <p>Try different words, broaden your filters, or let us help you find what you need.</p>
+  <div class="hint" style="margin-top:12px;">Click "Ask anything" below to describe what you're looking for in your own words.</div>
+</div>
+
+<h3>Query too short (&lt; 2 chars)</h3>
+<p>Renderer does not call Library. Results slot shows trending searches + the suggestion chips.</p>
+
+<h3>Ministry-scope with no matches</h3>
+<p>Results grid shows: <em>"No teachings on this in this ministry. Search all ministries?"</em> with a one-click toggle to global scope.</p>
+
+<!-- ============================================================ -->
+<h2>Personalization in Search</h2>
+
+<p>
+  Search is heavily ranked by behavioral signal — the same query returns
+  different orderings for different users.
+</p>
+
+<ul>
+  <li><strong>Ministry preference</strong> · ministries the user has visited more recently rank higher</li>
+  <li><strong>Format affinity</strong> · users with high sermon-completion get sermons surfaced first; devotional-leaners see devotionals</li>
+  <li><strong>Faith stage alignment</strong> · content tagged for the user's <code>inferredFaithStage</code> gets a relevance boost</li>
+  <li><strong>Duration preference</strong> · <code>preferredSessionMin</code> shapes the duration sort tiebreaker</li>
+  <li><strong>Already-watched</strong> · completed content sinks lower; in-progress content rises</li>
+</ul>
+
+<p>
+  Confidence thresholds apply. Cold-start users see relevance-only ordering
+  with no personalization boosts. As inferences sharpen, personalization
+  weight increases.
+</p>
+
+<!-- ============================================================ -->
+<h2>Template variants</h2>
+
+<table>
+  <thead><tr><th>Template ID</th><th>When selected</th><th>Differs from <code>search-v2</code></th></tr></thead>
+  <tbody>
+    <tr><td><code>search-v2</code></td><td>Default · all users</td><td>Baseline</td></tr>
+    <tr><td><code>search-v2-grid-only</code></td><td>Experiment variant</td><td>Removes MinistryRail/SeriesRail from allowed list; ContentGrid only</td></tr>
+    <tr><td><code>search-discovery-v1</code></td><td>No <code>?q=</code> · cold-start visitor</td><td>Hero replaced with Hero-Image; subject-browse-first layout</td></tr>
+  </tbody>
+</table>
+
+<hr/>
+<div class="navlinks">
+  <a href="08-template-home.html">← M3.2 · Home Template</a>
+  <a href="10-template-search-response.html">M3.4 · Search Response Template →</a>
+</div>
+
+</div>
+</body>
+</html>

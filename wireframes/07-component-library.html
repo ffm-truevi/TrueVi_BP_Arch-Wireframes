@@ -1,0 +1,1353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TrueVi — Component Library (M3.1)</title>
+<style>
+  :root {
+    --tv-canvas:#030C0F; --tv-rail:#051318; --tv-card:#0A2830; --tv-card-hover:#112F38;
+    --tv-element-mid:#1A4E5C; --tv-accent:#245F70; --tv-glow:#2E7A8A;
+    --tv-cta:#C9902A; --tv-cta-bright:#E8A832; --tv-glacia:#C8E4E8;
+    --tv-secondary:#8FB8BE; --tv-stone:#E8E8E2; --tv-text-dark:#1A1A1A;
+  }
+  * { box-sizing:border-box; }
+  html, body { margin:0; padding:0; background:var(--tv-canvas); color:var(--tv-glacia); }
+  body { font-family:"Jost","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-weight:300; line-height:1.6; font-size:15px; }
+  .layout { display:grid; grid-template-columns: 240px 1fr; min-height:100vh; }
+  nav.toc { background:var(--tv-rail); border-right:1px solid var(--tv-element-mid); padding:32px 22px; position:sticky; top:0; height:100vh; overflow-y:auto; }
+  nav.toc h2 { font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--tv-secondary); margin:22px 0 6px; font-weight:500; }
+  nav.toc h2:first-of-type { margin-top:0; }
+  nav.toc a { display:block; color:var(--tv-glacia); text-decoration:none; padding:5px 0 5px 10px; font-size:12px; border-left:2px solid transparent; margin-left:-10px; }
+  nav.toc a:hover { color:var(--tv-stone); border-left-color:var(--tv-accent); }
+  main { padding:48px 56px 96px; max-width:1100px; }
+  .wordmark { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:22px; margin-bottom:4px; }
+  .tagline { font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; color:var(--tv-secondary); font-size:14px; margin-bottom:24px; }
+  h1 { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:36px; margin:0 0 8px; }
+  h2 { font-family:"Jost",sans-serif; font-weight:700; color:var(--tv-stone); font-size:22px; margin:56px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--tv-element-mid); }
+  h3 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-stone); font-size:18px; margin:28px 0 6px; }
+  h4 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-glacia); font-size:13px; text-transform:uppercase; letter-spacing:.1em; margin:18px 0 6px; }
+  p, li { color:var(--tv-glacia); }
+  strong { color:var(--tv-stone); font-weight:600; }
+  em { color:var(--tv-secondary); font-style:italic; }
+  .lede { font-size:17px; color:var(--tv-glacia); margin-bottom:24px; }
+  .docmeta { color:var(--tv-secondary); font-size:12px; margin-bottom:24px; padding-bottom:14px; border-bottom:1px solid var(--tv-element-mid); }
+  code { font-family:"JetBrains Mono","Consolas",monospace; background:var(--tv-card); color:var(--tv-glacia); padding:2px 6px; border-radius:4px; font-size:13px; }
+  pre { font-family:"JetBrains Mono",monospace; background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:8px; padding:14px 18px; overflow-x:auto; font-size:12px; line-height:1.5; }
+  pre code { background:transparent; padding:0; }
+  pre .k { color: var(--tv-cta-bright); } pre .s { color:var(--tv-glacia); } pre .c { color: var(--tv-secondary); font-style:italic; } pre .n { color: var(--tv-glow); }
+
+  .callout { background:var(--tv-card); border-left:3px solid var(--tv-cta); padding:14px 18px; margin:18px 0; border-radius:0 6px 6px 0; font-size:14px; }
+  .callout.principle { border-left-color:var(--tv-glow); }
+  .callout h4 { margin-top:0; color:var(--tv-stone); }
+
+  /* Component spec card */
+  .comp {
+    background:var(--tv-rail); border:1px solid var(--tv-element-mid);
+    border-radius:14px; padding:0; margin:24px 0 36px; overflow:hidden;
+  }
+  .comp-head { background:var(--tv-card); padding:16px 22px; border-bottom:1px solid var(--tv-element-mid); display:flex; align-items:center; gap:14px; }
+  .comp-head .name { font-family:"JetBrains Mono", monospace; color:var(--tv-stone); font-size:17px; font-weight:700; }
+  .comp-head .ver { color:var(--tv-secondary); font-family:monospace; font-size:11px; }
+  .comp-head .badges { margin-left:auto; display:flex; gap:6px; }
+  .badge { padding:2px 8px; border-radius:999px; font-size:10px; letter-spacing:.08em; text-transform:uppercase; font-weight:600; }
+  .badge.cat { background:var(--tv-accent); color:var(--tv-stone); }
+  .badge.tier { background:var(--tv-cta); color:var(--tv-text-dark); }
+
+  .comp-body { padding:18px 22px; }
+  .comp-body .desc { color:var(--tv-glacia); font-size:14px; margin-bottom:14px; }
+
+  /* Visual mock */
+  .mock-wrap {
+    background:var(--tv-canvas); border:1px solid var(--tv-element-mid);
+    border-radius:8px; padding:18px; margin:14px 0 18px;
+  }
+  .mock-label { color:var(--tv-secondary); font-size:10px; letter-spacing:.12em; text-transform:uppercase; margin-bottom:10px; }
+
+  /* visual primitives for mocks */
+  .vc-card {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:8px;
+    width:140px; height:90px; flex-shrink:0; padding:8px;
+    color:var(--tv-glacia); font-size:10px;
+  }
+  .vc-card .thumb { background:var(--tv-element-mid); height:50px; border-radius:4px; margin-bottom:4px; }
+  .vc-card .ttl { color:var(--tv-stone); font-weight:600; font-size:10px; line-height:1.2; overflow:hidden; }
+  .vc-card .sub { color:var(--tv-secondary); font-size:9px; }
+
+  .vc-rail { display:flex; gap:10px; overflow:hidden; }
+  .vc-rail .ttl { color:var(--tv-stone); font-weight:600; font-size:13px; margin-bottom:8px; font-family:"Jost",sans-serif; }
+
+  .vc-hero {
+    background:linear-gradient(135deg, var(--tv-card), var(--tv-accent));
+    height:200px; border-radius:8px; padding:20px;
+    color:var(--tv-stone); display:flex; flex-direction:column; justify-content:flex-end;
+    border:1px solid var(--tv-accent);
+  }
+  .vc-hero .eyebrow { color:var(--tv-cta-bright); font-size:10px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:6px; }
+  .vc-hero .h-title { font-family:"Jost",sans-serif; font-weight:800; font-size:22px; color:var(--tv-stone); line-height:1.1; }
+  .vc-hero .h-sub { color:var(--tv-glacia); font-size:12px; margin-top:6px; }
+  .vc-hero .cta { display:inline-block; background:var(--tv-cta); color:var(--tv-text-dark); padding:6px 14px; border-radius:4px; margin-top:10px; font-size:11px; font-weight:600; align-self:flex-start; }
+  .vc-hero .dots { display:flex; gap:4px; margin-top:8px; }
+  .vc-hero .dot { width:6px; height:6px; border-radius:50%; background:var(--tv-secondary); }
+  .vc-hero .dot.on { background:var(--tv-cta); }
+
+  .vc-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:10px; }
+
+  .vc-chips { display:flex; gap:6px; flex-wrap:wrap; }
+  .vc-chip { padding:5px 12px; border-radius:999px; background:transparent; border:1px solid var(--tv-accent); color:var(--tv-glacia); font-size:11px; }
+  .vc-chip.on { background:var(--tv-cta); color:var(--tv-text-dark); border-color:var(--tv-cta); }
+
+  .vc-ctx-banner {
+    display:flex; align-items:center; gap:12px;
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:8px;
+    padding:10px 14px; color:var(--tv-glacia); font-size:12px;
+  }
+  .vc-ctx-banner .scope { color:var(--tv-secondary); }
+  .vc-ctx-banner .ms-name { color:var(--tv-stone); font-weight:600; }
+  .vc-ctx-banner .x { margin-left:auto; color:var(--tv-cta-bright); cursor:pointer; }
+
+  .vc-ask {
+    background:linear-gradient(135deg, rgba(46,122,138,.18), rgba(201,144,42,.10));
+    border:1px solid var(--tv-glow); border-radius:10px; padding:20px;
+  }
+  .vc-ask .eyebrow { color:var(--tv-cta-bright); font-size:10px; letter-spacing:.14em; text-transform:uppercase; }
+  .vc-ask .q { font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; color:var(--tv-stone); font-size:18px; margin:8px 0; }
+  .vc-ask .input {
+    background:var(--tv-canvas); border:1px solid var(--tv-accent); border-radius:6px;
+    padding:8px 12px; color:var(--tv-secondary); font-size:12px; font-family:"Jost",sans-serif;
+  }
+
+  .vc-scripture {
+    background:var(--tv-card); border-left:3px solid var(--tv-cta); border-radius:0 8px 8px 0;
+    padding:14px 18px; font-family:"Cormorant Garamond",Georgia,serif;
+    color:var(--tv-glacia); font-style:italic; font-size:14px;
+  }
+  .vc-scripture .ref { color:var(--tv-cta-bright); font-size:11px; letter-spacing:.1em; text-transform:uppercase; font-style:normal; font-family:"Jost",sans-serif; margin-top:8px; display:block; }
+
+  .vc-air {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:10px; padding:18px;
+  }
+  .vc-air .resp { color:var(--tv-stone); font-size:13px; line-height:1.6; }
+  .vc-air .resp em { color:var(--tv-cta-bright); font-style:normal; }
+
+  .vc-pastor {
+    display:flex; gap:14px; background:var(--tv-card); border:1px solid var(--tv-accent);
+    border-radius:10px; padding:14px;
+  }
+  .vc-pastor .avatar { width:64px; height:64px; border-radius:50%; background:var(--tv-element-mid); flex-shrink:0; }
+  .vc-pastor .pname { color:var(--tv-stone); font-weight:600; font-size:14px; }
+  .vc-pastor .pmin { color:var(--tv-secondary); font-size:11px; }
+  .vc-pastor .pbio { color:var(--tv-glacia); font-size:11px; margin-top:4px; line-height:1.4; }
+
+  .vc-ministry {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:8px;
+    padding:12px; width:200px; flex-shrink:0;
+  }
+  .vc-ministry .logo { width:60px; height:60px; border-radius:8px; background:var(--tv-element-mid); margin-bottom:10px; }
+  .vc-ministry .mname { color:var(--tv-stone); font-weight:600; font-size:13px; }
+  .vc-ministry .mpastor { color:var(--tv-secondary); font-size:11px; }
+  .vc-ministry .mtag { color:var(--tv-glacia); font-size:11px; margin-top:6px; font-style:italic; }
+  .vc-ministry .mcount { color:var(--tv-cta-bright); font-size:10px; margin-top:8px; font-weight:600; }
+
+  .vc-series {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:8px;
+    width:180px; flex-shrink:0; overflow:hidden;
+  }
+  .vc-series .sthumb { background:linear-gradient(135deg, var(--tv-accent), var(--tv-glow)); height:90px; }
+  .vc-series .sbody { padding:10px; }
+  .vc-series .sname { color:var(--tv-stone); font-weight:600; font-size:12px; }
+  .vc-series .sep { color:var(--tv-secondary); font-size:10px; margin-top:4px; }
+  .vc-series .scomplete { color:var(--tv-cta-bright); font-size:10px; font-weight:600; margin-top:4px; }
+
+  .vc-episodes { display:flex; flex-direction:column; gap:6px; }
+  .vc-episode {
+    display:flex; gap:12px; align-items:center; padding:10px 14px;
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:6px;
+  }
+  .vc-episode .num { font-family:"JetBrains Mono",monospace; color:var(--tv-cta); font-weight:700; font-size:13px; min-width:24px; }
+  .vc-episode .ethumb { width:80px; height:50px; background:var(--tv-element-mid); border-radius:4px; flex-shrink:0; }
+  .vc-episode .einfo { flex:1; }
+  .vc-episode .ename { color:var(--tv-stone); font-size:12px; font-weight:600; }
+  .vc-episode .esub { color:var(--tv-secondary); font-size:10px; }
+  .vc-episode .edur { color:var(--tv-glacia); font-size:11px; font-family:monospace; }
+
+  .vc-bread { color:var(--tv-secondary); font-size:12px; }
+  .vc-bread a { color:var(--tv-cta-bright); }
+
+  .vc-text { color:var(--tv-glacia); font-size:13px; max-width:560px; }
+
+  .vc-cta {
+    display:inline-block; background:var(--tv-cta); color:var(--tv-text-dark);
+    padding:10px 24px; border-radius:6px; font-weight:600; font-size:14px;
+  }
+
+  .vc-upgrade {
+    background:linear-gradient(135deg, rgba(201,144,42,.2), rgba(46,122,138,.15));
+    border:1px solid var(--tv-cta); border-radius:10px; padding:18px;
+    display:flex; align-items:center; gap:16px;
+  }
+  .vc-upgrade .label { color:var(--tv-cta-bright); font-size:10px; letter-spacing:.14em; text-transform:uppercase; }
+  .vc-upgrade .head { font-family:"Jost",sans-serif; color:var(--tv-stone); font-size:15px; font-weight:700; margin-top:4px; }
+  .vc-upgrade .sub { color:var(--tv-glacia); font-size:12px; margin-top:4px; }
+  .vc-upgrade .btn { background:var(--tv-cta); color:var(--tv-text-dark); padding:8px 18px; border-radius:5px; font-weight:600; font-size:12px; margin-left:auto; flex-shrink:0; }
+
+  /* tables and props */
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:13px; }
+  th { text-align:left; padding:9px 12px; background:var(--tv-card); color:var(--tv-stone); font-weight:600; border-bottom:1px solid var(--tv-accent); font-size:11px; letter-spacing:.08em; text-transform:uppercase; }
+  td { padding:9px 12px; border-bottom:1px solid var(--tv-element-mid); color:var(--tv-glacia); vertical-align:top; font-size:13px; }
+  td code { font-size:12px; }
+
+  .props-grid { display:grid; grid-template-columns: 1fr 1fr; gap:18px; margin-top:14px; }
+  @media (max-width: 980px) { .props-grid { grid-template-columns: 1fr; } }
+  .props-grid h4 { margin-top:0; }
+
+  .var-tabs { display:flex; gap:6px; flex-wrap:wrap; margin:14px 0 10px; }
+  .var-tab { padding:6px 12px; background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:6px; color:var(--tv-glacia); font-size:11px; font-family:monospace; }
+  .var-tab.on { background:var(--tv-cta); color:var(--tv-text-dark); border-color:var(--tv-cta); font-weight:700; }
+
+  hr { border:none; border-top:1px solid var(--tv-element-mid); margin:36px 0; }
+  .crumb { color:var(--tv-secondary); font-size:13px; margin-bottom:8px; }
+  .crumb a { color:var(--tv-cta-bright); text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="toc">
+  <div class="wordmark">TrueVi</div>
+  <div class="tagline">Component Library · M3.1</div>
+
+  <h2>About</h2>
+  <a href="#intro">Intro · How to read</a>
+  <a href="#categories">Component categories</a>
+
+  <h2>Heroes</h2>
+  <a href="#hero">Hero · 8 variants</a>
+
+  <h2>Content</h2>
+  <a href="#contentrail">ContentRail</a>
+  <a href="#contentgrid">ContentGrid</a>
+  <a href="#episodelist">EpisodeList</a>
+
+  <h2>Discovery</h2>
+  <a href="#filterchips">FilterChips</a>
+  <a href="#ministryrail">MinistryRail</a>
+  <a href="#seriesrail">SeriesRail</a>
+  <a href="#contextbanner">ContextBanner</a>
+  <a href="#breadcrumbs">Breadcrumbs</a>
+
+  <h2>Guidance</h2>
+  <a href="#askanything">AskAnythingBlock</a>
+  <a href="#scripture">ScriptureBlock</a>
+  <a href="#airesponse">AIResponseBlock</a>
+
+  <h2>People</h2>
+  <a href="#pastorcard">PastorCard</a>
+  <a href="#ministrycard">MinistryCard</a>
+  <a href="#seriescard">SeriesCard</a>
+
+  <h2>Editorial</h2>
+  <a href="#textblock">TextBlock</a>
+  <a href="#ctablock">CTABlock</a>
+
+  <h2>Monetization</h2>
+  <a href="#upgrade">UpgradeTeaser</a>
+
+  <h2>Phase 2</h2>
+  <a href="#columnrow">ColumnRow (planned)</a>
+
+  <h2>Reference</h2>
+  <a href="#index">Component matrix</a>
+  <a href="../index.html" style="color:var(--tv-cta-bright)">← Back to index</a>
+</nav>
+
+<main>
+
+<p class="crumb"><a href="../index.html">← Index</a> · M3 · Page Templates</p>
+<div class="docmeta">Document M3.1 · Component Library · v0.1 · 2026-05-11 · Owner: Brian (COO) · Audience: TrueVi engineering team + design contractors</div>
+
+<div class="wordmark">TrueVi</div>
+<div class="tagline">Component Library · M3.1</div>
+
+<h1>Component Library</h1>
+<p class="lede">
+  The complete catalog of reusable, generic UI blocks that templates compose
+  from. Eighteen distinct components, one with eight variants. Every page in
+  TrueVi is a slot-arrangement of these blocks. This is the dictionary every
+  page template references.
+</p>
+
+<!-- ============================================================ -->
+<h2 id="intro">How to read each component spec</h2>
+
+<p>Each component is documented in a spec card containing:</p>
+
+<ol>
+  <li><strong>Visual mock</strong> — a small but realistic rendering in Abyss Teal so designers and PMs recognize what the component is</li>
+  <li><strong>Config schema</strong> — admin-authored knobs (title, layout, maxItems, etc.) — set in the Template Builder Properties panel</li>
+  <li><strong>Query schema</strong> — what the component asks the Library for (only on content-fetching components)</li>
+  <li><strong>Personalization signals</strong> — which derived signals (M1.1 §6) the component may consume</li>
+  <li><strong>Visibility</strong> — tier and device targeting</li>
+  <li><strong>Variants</strong> — sub-types where applicable (e.g., Hero)</li>
+  <li><strong>Where used</strong> — which page templates the component appears in</li>
+</ol>
+
+<div class="callout principle">
+  <h4>The Component Contract</h4>
+  <p style="margin:0">
+    Every component implements the ComponentInstance shape from
+    M1.2 §8. Properties on each spec card map directly to keys in that
+    shape. The Library's <code>FilledInstance</code> response (M1.2 §9)
+    is the runtime payload the component renders from.
+  </p>
+</div>
+
+<h2 id="categories">Component categories</h2>
+<table>
+  <thead><tr><th>Category</th><th>Purpose</th><th>Components</th></tr></thead>
+  <tbody>
+    <tr><td>Heroes</td><td>Above-the-fold attention &amp; entry-point</td><td>Hero (8 variants)</td></tr>
+    <tr><td>Content</td><td>Surfacing video / content items</td><td>ContentRail · ContentGrid · EpisodeList</td></tr>
+    <tr><td>Discovery</td><td>Filter, navigate, contextualize</td><td>FilterChips · MinistryRail · SeriesRail · ContextBanner · Breadcrumbs</td></tr>
+    <tr><td>Guidance</td><td>Personalized AI-mediated experiences</td><td>AskAnythingBlock · ScriptureBlock · AIResponseBlock</td></tr>
+    <tr><td>People</td><td>Pastor / ministry / series identity</td><td>PastorCard · MinistryCard · SeriesCard</td></tr>
+    <tr><td>Editorial</td><td>Authored copy, calls-to-action</td><td>TextBlock · CTABlock</td></tr>
+    <tr><td>Monetization</td><td>Upgrade prompts</td><td>UpgradeTeaser</td></tr>
+  </tbody>
+</table>
+
+<!-- ================================================================ -->
+<!--                              HEROES                                 -->
+<!-- ================================================================ -->
+<h2>Heroes</h2>
+
+<div class="comp" id="hero">
+  <div class="comp-head">
+    <span class="name">Hero</span>
+    <span class="ver">v2.1.0</span>
+    <div class="badges"><span class="badge cat">Hero</span></div>
+  </div>
+  <div class="comp-body">
+    <p class="desc">
+      Above-the-fold attention block. One component, eight variants — admins
+      select a variant; the rest of the schema is shared. Heroes are
+      single-instance per page; usually FIXED at the top of a template.
+    </p>
+
+    <h4>Variants</h4>
+    <div class="var-tabs">
+      <span class="var-tab on">Hero-Carousel</span>
+      <span class="var-tab">Hero-Video</span>
+      <span class="var-tab">Hero-Image</span>
+      <span class="var-tab">Hero-Search</span>
+      <span class="var-tab">Hero-AskAnything</span>
+      <span class="var-tab">Hero-Ministry</span>
+      <span class="var-tab">Hero-Subject</span>
+      <span class="var-tab">Hero-Series</span>
+    </div>
+
+    <div class="mock-wrap">
+      <div class="mock-label">Visual · Hero-Carousel</div>
+      <div class="vc-hero">
+        <div class="eyebrow">Featured</div>
+        <div class="h-title">Find what speaks to you</div>
+        <div class="h-sub">A teaching for where you are right now.</div>
+        <span class="cta">Watch now</span>
+        <div class="dots"><span class="dot on"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      </div>
+    </div>
+
+    <div class="props-grid">
+      <div>
+        <h4>Config</h4>
+        <table>
+          <tbody>
+            <tr><td><code>variant</code></td><td>enum · 8 values</td></tr>
+            <tr><td><code>maxSlides</code></td><td>int (carousel only)</td></tr>
+            <tr><td><code>autoplay</code></td><td>boolean (carousel)</td></tr>
+            <tr><td><code>dwellSec</code></td><td>int (carousel autoplay interval)</td></tr>
+            <tr><td><code>aspectRatio</code></td><td>16:9 · 21:9 · 4:3</td></tr>
+            <tr><td><code>overlayDarkness</code></td><td>0..1</td></tr>
+            <tr><td><code>ctaLabel</code></td><td>locale-keyed string</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h4>Query (variant-dependent)</h4>
+        <table>
+          <tbody>
+            <tr><td><code>contentType</code></td><td>video · ministry · subject · series</td></tr>
+            <tr><td><code>mode</code></td><td>auto · curated</td></tr>
+            <tr><td><code>sort</code></td><td>featured · trending · recommended</td></tr>
+            <tr><td><code>limit</code></td><td>1 (single hero) or maxSlides (carousel)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="props-grid">
+      <div>
+        <h4>Personalization signals</h4>
+        <ul style="margin:0; padding-left:18px;">
+          <li><code>inferredFaithStage</code></li>
+          <li><code>inferredLifeStage</code></li>
+          <li><code>visitorType</code></li>
+          <li><code>lastActiveMinistry</code></li>
+          <li><code>askAnythingHistory</code></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Where used</h4>
+        <ul style="margin:0; padding-left:18px;">
+          <li>Home Template (Hero-Carousel)</li>
+          <li>Ministry Template (Hero-Ministry)</li>
+          <li>Subject Template (Hero-Subject)</li>
+          <li>Series Template (Hero-Series)</li>
+          <li>Search Template (Hero-Search)</li>
+          <li>Search Response Template (Hero-AskAnything)</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4>Variant behavior summary</h4>
+    <table>
+      <thead><tr><th>Variant</th><th>What it shows</th><th>Typical page</th></tr></thead>
+      <tbody>
+        <tr><td><code>Hero-Carousel</code></td><td>3-5 rotating featured items, autoplay optional</td><td>Home</td></tr>
+        <tr><td><code>Hero-Video</code></td><td>Single featured video with overlaid copy + CTA</td><td>Home alt, Subject</td></tr>
+        <tr><td><code>Hero-Image</code></td><td>Editorial banner with copy + CTA, no video</td><td>Subject, marketing pages</td></tr>
+        <tr><td><code>Hero-Search</code></td><td>Search input prominent; copy framed as "find"</td><td>Search</td></tr>
+        <tr><td><code>Hero-AskAnything</code></td><td>Curated AI answer summary at top of response page</td><td>Search Response</td></tr>
+        <tr><td><code>Hero-Ministry</code></td><td>Ministry logo, name, pastor, tagline</td><td>Ministry</td></tr>
+        <tr><td><code>Hero-Subject</code></td><td>Subject name, scripture anchor, framing copy</td><td>Subject</td></tr>
+        <tr><td><code>Hero-Series</code></td><td>Series art, name, episode count, ministry</td><td>Series</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!--                              CONTENT                                -->
+<!-- ================================================================ -->
+<h2>Content</h2>
+
+<!-- ContentRail -->
+<div class="comp" id="contentrail">
+  <div class="comp-head">
+    <span class="name">ContentRail</span>
+    <span class="ver">v1.4.2</span>
+    <div class="badges"><span class="badge cat">Content</span></div>
+  </div>
+  <div class="comp-body">
+    <p class="desc">
+      Horizontally-scrolling row of VideoCards. The workhorse of the
+      platform — appears on virtually every page. Library decides content
+      based on the query and the user's signals.
+    </p>
+
+    <div class="mock-wrap">
+      <div class="mock-label">Visual</div>
+      <div class="vc-rail">
+        <div class="ttl" style="width:100%;">Continue Watching</div>
+      </div>
+      <div class="vc-rail">
+        <div class="vc-card"><div class="thumb"></div><div class="ttl">How to Forgive</div><div class="sub">Mercy Hill · 31 min</div></div>
+        <div class="vc-card"><div class="thumb"></div><div class="ttl">The Prodigal Father</div><div class="sub">Gospel Coalition · 24 min</div></div>
+        <div class="vc-card"><div class="thumb"></div><div class="ttl">When God Feels Distant</div><div class="sub">Mercy Hill · 28 min</div></div>
+        <div class="vc-card"><div class="thumb"></div><div class="ttl">Prayer in Crisis</div><div class="sub">Redemption Hill · 19 min</div></div>
+        <div class="vc-card" style="opacity:.5;"><div class="thumb"></div><div class="ttl">…</div></div>
+      </div>
+    </div>
+
+    <div class="props-grid">
+      <div>
+        <h4>Config</h4>
+        <table>
+          <tbody>
+            <tr><td><code>title</code></td><td>locale-keyed string</td></tr>
+            <tr><td><code>subtitle</code></td><td>locale-keyed (optional)</td></tr>
+            <tr><td><code>layout</code></td><td>horizontal-scroll · grid-wrap</td></tr>
+            <tr><td><code>cardSize</code></td><td>small · medium · large</td></tr>
+            <tr><td><code>maxItems</code></td><td>int (default 12)</td></tr>
+            <tr><td><code>showAllLink</code></td><td>boolean</td></tr>
+            <tr><td><code>showPosition</code></td><td>boolean (numbered rails)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h4>Query</h4>
+        <table>
+          <tbody>
+            <tr><td><code>contentType</code></td><td>video (default)</td></tr>
+            <tr><td><code>mode</code></td><td>auto · curated</td></tr>
+            <tr><td><code>sort</code></td><td>recommended · recent · trending · curated</td></tr>
+            <tr><td><code>filters</code></td><td>faithStage · lifeStage · ministry · subject · tags</td></tr>
+            <tr><td><code>limit</code></td><td>int</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="props-grid">
+      <div>
+        <h4>Signals consumed</h4>
+        <ul style="margin:0; padding-left:18px;">
+          <li><code>inferredFaithStage</code> · <code>inferredLifeStage</code></li>
+          <li><code>watchPatterns</code> · <code>watchHistory</code></li>
+          <li><code>exploredSubjects</code> · <code>visitedMinistries</code></li>
+          <li><code>lifeEvents</code></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Where used</h4>
+        <ul style="margin:0; padding-left:18px;">
+          <li>Home (dynamic-rails slot)</li>
+          <li>Ministry (content sections)</li>
+          <li>Subject (related content)</li>
+          <li>Series (related series content)</li>
+          <li>Search Response (recommended content)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ContentGrid -->
+<div class="comp" id="contentgrid">
+  <div class="comp-head">
+    <span class="name">ContentGrid</span>
+    <span class="ver">v1.2.0</span>
+    <div class="badges"><span class="badge cat">Content</span></div>
+  </div>
+  <div class="comp-body">
+    <p class="desc">
+      Paginated grid of VideoCards. Used when the user has signaled they
+      want to <em>browse</em> rather than be guided — search results,
+      subject deep-dives, "see all" expansions.
+    </p>
+
+    <div class="mock-wrap">
+      <div class="mock-label">Visual</div>
+      <div class="vc-grid">
+        <div class="vc-card"><div class="thumb"></div><div class="ttl">Forgiving the Unforgivable</div><div class="sub">22 min</div></div>
+        <div class="vc-card"><div class="thumb"></div><div class="ttl">When Anger Runs Deep</div><div class="sub">17 min</div></div>
+        <div class="vc-card"><div class="thumb"></div><div class="ttl">Grace for the Wounded</div><div class="sub">28 min</div></div>
+        <div class="vc-card"><div class="thumb"></div><div class="ttl">Choosing Peace</div><div class="sub">19 min</div></div>
+        <div class="vc-card"><div class="thumb"></div><div class="ttl">The Hard Conversation</div><div class="sub">31 min</div></div>
+        <div class="vc-card"><div class="thumb"></div><div class="ttl">Letting Go of Resentment</div><div class="sub">24 min</div></div>
+      </div>
+    </div>
+
+    <div class="props-grid">
+      <div>
+        <h4>Config</h4>
+        <table>
+          <tbody>
+            <tr><td><code>columns</code></td><td>1-6 (responsive)</td></tr>
+            <tr><td><code>pageSize</code></td><td>int (default 24)</td></tr>
+            <tr><td><code>paginationStyle</code></td><td>infinite · numbered · load-more</td></tr>
+            <tr><td><code>cardSize</code></td><td>small · medium · large</td></tr>
+            <tr><td><code>showFilters</code></td><td>boolean (auto-renders filter chips above)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h4>Query · Where used</h4>
+        <p style="margin:6px 0; font-size:13px;">Same query schema as ContentRail. Used in:</p>
+        <ul style="margin:0; padding-left:18px;">
+          <li>Search Template (results)</li>
+          <li>Subject Template (full content)</li>
+          <li>Browse / "see all" pages</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EpisodeList -->
+<div class="comp" id="episodelist">
+  <div class="comp-head">
+    <span class="name">EpisodeList</span>
+    <span class="ver">v1.0.1</span>
+    <div class="badges"><span class="badge cat">Content</span></div>
+  </div>
+  <div class="comp-body">
+    <p class="desc">
+      Vertical, ordered list of episodes within a series. Numbered, with
+      title, duration, watch-progress badge, and (optionally) episode
+      description. Specialized for the Series Template.
+    </p>
+
+    <div class="mock-wrap">
+      <div class="mock-label">Visual</div>
+      <div class="vc-episodes">
+        <div class="vc-episode">
+          <div class="num">01</div><div class="ethumb"></div>
+          <div class="einfo"><div class="ename">The Beginning of Mercy</div><div class="esub">Watched · 28 min</div></div>
+          <div class="edur">28:14</div>
+        </div>
+        <div class="vc-episode">
+          <div class="num">02</div><div class="ethumb"></div>
+          <div class="einfo"><div class="ename">Recognizing Hurt</div><div class="esub">63% watched · 24 min</div></div>
+          <div class="edur">24:02</div>
+        </div>
+        <div class="vc-episode">
+          <div class="num">03</div><div class="ethumb"></div>
+          <div class="einfo"><div class="ename">The Choice to Forgive</div><div class="esub">Not started · 31 min</div></div>
+          <div class="edur">31:48</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="props-grid">
+      <div>
+        <h4>Config</h4>
+        <table>
+          <tbody>
+            <tr><td><code>showThumbnails</code></td><td>boolean</td></tr>
+            <tr><td><code>showDescriptions</code></td><td>boolean</td></tr>
+            <tr><td><code>showProgress</code></td><td>boolean (default true)</td></tr>
+            <tr><td><code>autoplayNext</code></td><td>boolean</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h4>Query</h4>
+        <table>
+          <tbody>
+            <tr><td><code>seriesId</code></td><td>uuid (template input)</td></tr>
+            <tr><td><code>sort</code></td><td>episode-number (default)</td></tr>
+          </tbody>
+        </table>
+        <h4 style="margin-top:14px;">Where used</h4>
+        <ul style="margin:0; padding-left:18px;"><li>Series Template (primary)</li></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!--                            DISCOVERY                                -->
+<!-- ================================================================ -->
+<h2>Discovery</h2>
+
+<!-- FilterChips -->
+<div class="comp" id="filterchips">
+  <div class="comp-head">
+    <span class="name">FilterChips</span>
+    <span class="ver">v1.1.0</span>
+    <div class="badges"><span class="badge cat">Discovery</span></div>
+  </div>
+  <div class="comp-body">
+    <p class="desc">
+      Pill-shaped filter row. Used above grids to narrow content. State is
+      reflected in the URL via query params so filtered views are shareable.
+    </p>
+
+    <div class="mock-wrap">
+      <div class="mock-label">Visual</div>
+      <div class="vc-chips">
+        <span class="vc-chip on">All</span>
+        <span class="vc-chip">Sermons</span>
+        <span class="vc-chip">Devotionals</span>
+        <span class="vc-chip">Teaching</span>
+        <span class="vc-chip">Under 15 min</span>
+        <span class="vc-chip">This week</span>
+      </div>
+    </div>
+
+    <div class="props-grid">
+      <div>
+        <h4>Config</h4>
+        <table>
+          <tbody>
+            <tr><td><code>filterType</code></td><td>format · duration · faithStage · lifeStage · subject · recency</td></tr>
+            <tr><td><code>options</code></td><td>array of <code>{value, label}</code></td></tr>
+            <tr><td><code>defaultSelected</code></td><td>value</td></tr>
+            <tr><td><code>multi</code></td><td>boolean (allow multiple active)</td></tr>
+            <tr><td><code>urlParam</code></td><td>string (default = filterType)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h4>Behavior · Where used</h4>
+        <p style="margin:6px 0; font-size:13px;">Emits <code>filter_applied</code> event on every change. Adjacent content components (Grid, Rail) re-query with the active filter.</p>
+        <ul style="margin:0; padding-left:18px;">
+          <li>Search Template</li>
+          <li>Subject Template</li>
+          <li>Browse pages</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MinistryRail -->
+<div class="comp" id="ministryrail">
+  <div class="comp-head">
+    <span class="name">MinistryRail</span>
+    <span class="ver">v1.2.0</span>
+    <div class="badges"><span class="badge cat">Discovery</span></div>
+  </div>
+  <div class="comp-body">
+    <p class="desc">
+      Horizontal row of MinistryCards. Surfaces partner ministries — used on
+      Home dynamic rails, on Subject pages ("ministries teaching on this"),
+      and on the Ministry browse landing page.
+    </p>
+
+    <div class="mock-wrap">
+      <div class="mock-label">Visual</div>
+      <div class="vc-rail">
+        <div class="vc-ministry">
+          <div class="logo"></div>
+          <div class="mname">Mercy Hill Church</div>
+          <div class="mpastor">Pastor Jane Doe</div>
+          <div class="mtag">Rooted in grace.</div>
+          <div class="mcount">82 teachings</div>
+        </div>
+        <div class="vc-ministry">
+          <div class="logo"></div>
+          <div class="mname">Redemption Hill</div>
+          <div class="mpastor">Pastor John Smith</div>
+          <div class="mtag">For the wounded heart.</div>
+          <div class="mcount">114 teachings</div>
+        </div>
+        <div class="vc-ministry">
+          <div class="logo"></div>
+          <div class="mname">Gospel Coalition</div>
+          <div class="mpastor">Multiple pastors</div>
+          <div class="mtag">Sound doctrine. Always.</div>
+          <div class="mcount">340 teachings</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="props-grid">
+      <div>
+        <h4>Query</h4>
+        <table>
+          <tbody>
+            <tr><td><code>mode</code></td><td>auto · curated</td></tr>
+            <tr><td><code>sort</code></td><td>recommended · alphabetical · content-count</td></tr>
+            <tr><td><code>filters</code></td><td>denomination · faithStage · subjectAlignment</td></tr>
+            <tr><td><code>limit</code></td><td>int (default 8)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h4>Where used</h4>
+        <ul style="margin:0; padding-left:18px;">
+          <li>Home (dynamic-rails)</li>
+          <li>Subject (related ministries)</li>
+          <li>Browse Ministries (full grid)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SeriesRail -->
+<div class="comp" id="seriesrail">
+  <div class="comp-head">
+    <span class="name">SeriesRail</span>
+    <span class="ver">v1.1.0</span>
+    <div class="badges"><span class="badge cat">Discovery</span></div>
+  </div>
+  <div class="comp-body">
+    <p class="desc">
+      Horizontal row of SeriesCards. Surfaces multi-episode arcs from
+      partner ministries.
+    </p>
+
+    <div class="mock-wrap">
+      <div class="mock-label">Visual</div>
+      <div class="vc-rail">
+        <div class="vc-series">
+          <div class="sthumb"></div>
+          <div class="sbody">
+            <div class="sname">Forgiveness Series</div>
+            <div class="sep">7 episodes · Mercy Hill</div>
+            <div class="scomplete">Complete</div>
+          </div>
+        </div>
+        <div class="vc-series">
+          <div class="sthumb"></div>
+          <div class="sbody">
+            <div class="sname">When Faith is Hard</div>
+            <div class="sep">5 episodes · Redemption Hill</div>
+          </div>
+        </div>
+        <div class="vc-series">
+          <div class="sthumb"></div>
+          <div class="sbody">
+            <div class="sname">The Apologetics Course</div>
+            <div class="sep">12 episodes · Gospel Coalition</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h4>Where used</h4>
+    <ul style="margin:0; padding-left:18px;">
+      <li>Ministry Template (primary — series for this ministry)</li>
+      <li>Home (dynamic-rails)</li>
+      <li>Subject Template (series on this subject)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ContextBanner -->
+<div class="comp" id="contextbanner">
+  <div class="comp-head">
+    <span class="name">ContextBanner</span>
+    <span class="ver">v1.0.3</span>
+    <div class="badges"><span class="badge cat">Discovery</span></div>
+  </div>
+  <div class="comp-body">
+    <p class="desc">
+      Dismissible banner that tells the user the current scope of what
+      they're viewing — e.g., "You are searching within Mercy Hill Church"
+      with a button to dismiss and return to global scope.
+    </p>
+
+    <div class="mock-wrap">
+      <div class="mock-label">Visual</div>
+      <div class="vc-ctx-banner">
+        <span class="scope">Searching within</span>
+        <span class="ms-name">Mercy Hill Church</span>
+        <span class="x">× Search all ministries</span>
+      </div>
+    </div>
+
+    <div class="props-grid">
+      <div>
+        <h4>Config</h4>
+        <table>
+          <tbody>
+            <tr><td><code>scopeLabel</code></td><td>locale-keyed</td></tr>
+            <tr><td><code>backLabel</code></td><td>locale-keyed dismiss action</td></tr>
+            <tr><td><code>scopeTarget</code></td><td>ministry · subject · series</td></tr>
+            <tr><td><code>dismissible</code></td><td>boolean</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h4>Where used</h4>
+        <ul style="margin:0; padding-left:18px;">
+          <li>Search Template (ministry-scoped mode)</li>
+          <li>Subject Template (sub-subject context)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Breadcrumbs -->
+<div class="comp" id="breadcrumbs">
+  <div class="comp-head">
+    <span class="name">Breadcrumbs</span>
+    <span class="ver">v1.0.0</span>
+    <div class="badges"><span class="badge cat">Discovery</span></div>
+  </div>
+  <div class="comp-body">
+    <p class="desc">
+      Navigation aid showing the user's path. Generated from the route
+      hierarchy and current page type.
+    </p>
+
+    <div class="mock-wrap">
+      <div class="mock-label">Visual</div>
+      <div class="vc-bread">
+        <a>Home</a> &nbsp;›&nbsp; <a>Ministries</a> &nbsp;›&nbsp; <a>Mercy Hill Church</a> &nbsp;›&nbsp; <span style="color:var(--tv-stone);">Forgiveness Series</span>
+      </div>
+    </div>
+
+    <h4>Where used</h4>
+    <ul style="margin:0; padding-left:18px;">
+      <li>Ministry Template</li>
+      <li>Series Template</li>
+      <li>Subject Template (deep nav)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!--                            GUIDANCE                                 -->
+<!-- ================================================================ -->
+<h2>Guidance</h2>
+
+<!-- AskAnythingBlock -->
+<div class="comp" id="askanything">
+  <div class="comp-head">
+    <span class="name">AskAnythingBlock</span>
+    <span class="ver">v1.3.0</span>
+    <div class="badges"><span class="badge cat">Guidance</span></div>
+  </div>
+  <div class="comp-body">
+    <p class="desc">
+      The free-form question input. The heart of the guided experience.
+      User types a question; submission lands on a Search Response page
+      (M3.4). Three visual variants: hero-card · inline · sticky-bottom.
+    </p>
+
+    <div class="mock-wrap">
+      <div class="mock-label">Visual · hero-card variant</div>
+      <div class="vc-ask">
+        <div class="eyebrow">Personalized Guidance</div>
+        <div class="q">"What's on your heart today?"</div>
+        <div class="input">Ask anything — "I'm struggling to forgive…"</div>
+      </div>
+    </div>
+
+    <div class="props-grid">
+      <div>
+        <h4>Config</h4>
+        <table>
+          <tbody>
+            <tr><td><code>variant</code></td><td>hero-card · inline · sticky-bottom</td></tr>
+            <tr><td><code>placeholder</code></td><td>locale-keyed string</td></tr>
+            <tr><td><code>eyebrowLabel</code></td><td>locale-keyed</td></tr>
+            <tr><td><code>headline</code></td><td>locale-keyed (hero-card only)</td></tr>
+            <tr><td><code>maxQueryLength</code></td><td>int</td></tr>
+            <tr><td><code>showSuggestions</code></td><td>boolean</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h4>Behavior · Where used</h4>
+        <p style="margin:6px 0; font-size:13px;">
+          On submit: emits <code>ask_anything_submitted</code> event and
+          navigates to <code>/answer/[hash]</code>. When
+          <code>showSuggestions</code> is true, the Library returns
+          pre-built suggestion chips tuned to the user's inferences.
+        </p>
+        <ul style="margin:0; padding-left:18px;">
+          <li>Home Template</li>
+          <li>Search Template (alternative entry)</li>
+          <li>Subject Template (subject-scoped)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ScriptureBlock -->
+<div class="comp" id="scripture">
+  <div class="comp-head">
+    <span class="name">ScriptureBlock</span>
+    <span class="ver">v1.1.0</span>
+    <div class="badges"><span class="badge cat">Guidance</span> <span class="badge tier">TrueVi+ feature</span></div>
+  </div>
+  <div class="comp-body">
+    <p class="desc">
+      A verse callout. Displays scripture text in elegant typography with
+      reference link. Used as a contextual anchor on Subject pages, in
+      Search Responses, and woven into editorial content. TrueVi+ tier
+      links open the full ScriptureViewer.
+    </p>
+
+    <div class="mock-wrap">
+      <div class="mock-label">Visual</div>
+      <div class="vc-scripture">
+        "Then Peter came up and said to him, 'Lord, how often will my brother sin against me, and I forgive him? As many as seven times?' Jesus said to him, 'I do not say to you seven times, but seventy-seven times.'"
+        <span class="ref">Matthew 18:21–22 · ESV</span>
+      </div>
+    </div>
+
+    <div class="props-grid">
+      <div>
+        <h4>Config</h4>
+        <table>
+          <tbody>
+            <tr><td><code>reference</code></td><td>e.g. "Matthew 18:21-22"</td></tr>
+            <tr><td><code>translation</code></td><td>ESV · KJV · NIV · WEB</td></tr>
+            <tr><td><code>showVerseNumbers</code></td><td>boolean</td></tr>
+            <tr><td><code>alignment</code></td><td>left · center</td></tr>
+            <tr><td><code>openInViewer</code></td><td>boolean (TrueVi+ only)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h4>Query</h4>
+        <p style="font-size:13px;">Resolves <code>reference</code> + <code>translation</code> to verse text via the Bible API. Cacheable for hours.</p>
+        <h4 style="margin-top:14px;">Where used</h4>
+        <ul style="margin:0; padding-left:18px;">
+          <li>Subject Template (scripture anchor)</li>
+          <li>Search Response Template (verse support)</li>
+          <li>Ministry Template (optional)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AIResponseBlock -->
+<div class="comp" id="airesponse">
+  <div class="comp-head">
+    <span class="name">AIResponseBlock</span>
+    <span class="ver">v1.0.0</span>
+    <div class="badges"><span class="badge cat">Guidance</span></div>
+  </div>
+  <div class="comp-body">
+    <p class="desc">
+      Renders the curated Library response to an Ask Anything query.
+      Never labeled "AI" — copy positions it as "guidance" or
+      "what we've gathered." Specialized for the Search Response Template
+      (M3.4).
+    </p>
+
+    <div class="mock-wrap">
+      <div class="mock-label">Visual</div>
+      <div class="vc-air">
+        <div class="resp">
+          Forgiveness is one of the hardest things we are asked to do — especially with a father who has wounded us. Scripture is clear that <em>forgiveness is not about excusing what was done</em>, but about releasing the debt so we are not bound by bitterness. It is often a process, not a moment. The teachings below speak directly to where you are.
+        </div>
+      </div>
+    </div>
+
+    <div class="props-grid">
+      <div>
+        <h4>Config</h4>
+        <table>
+          <tbody>
+            <tr><td><code>tone</code></td><td>empathic · theological · practical · scriptural</td></tr>
+            <tr><td><code>maxLength</code></td><td>chars (default 600)</td></tr>
+            <tr><td><code>showSourceCount</code></td><td>boolean ("based on 12 teachings")</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h4>Where used</h4>
+        <ul style="margin:0; padding-left:18px;">
+          <li>Search Response Template (primary)</li>
+        </ul>
+        <p style="margin-top:10px; font-size:12px; color:var(--tv-secondary); font-style:italic;">
+          Library may choose a different Search Response template based on
+          the question's classified intent, which in turn changes which
+          tone this block uses.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!--                              PEOPLE                                 -->
+<!-- ================================================================ -->
+<h2>People</h2>
+
+<!-- PastorCard -->
+<div class="comp" id="pastorcard">
+  <div class="comp-head">
+    <span class="name">PastorCard</span>
+    <span class="ver">v1.0.0</span>
+    <div class="badges"><span class="badge cat">People</span></div>
+  </div>
+  <div class="comp-body">
+    <p class="desc">
+      Pastor bio block — avatar, name, ministry affiliation, short bio.
+      Appears on Ministry pages and (optionally) on individual video pages.
+    </p>
+
+    <div class="mock-wrap">
+      <div class="mock-label">Visual</div>
+      <div class="vc-pastor">
+        <div class="avatar"></div>
+        <div>
+          <div class="pname">Pastor Jane Doe</div>
+          <div class="pmin">Mercy Hill Church · Nondenominational</div>
+          <div class="pbio">Pastor Jane has served Mercy Hill for 14 years. Her teaching focuses on grace, forgiveness, and the everyday work of discipleship.</div>
+        </div>
+      </div>
+    </div>
+
+    <h4>Config</h4>
+    <table>
+      <tbody>
+        <tr><td><code>showBio</code></td><td>boolean</td></tr>
+        <tr><td><code>showAffiliation</code></td><td>boolean</td></tr>
+        <tr><td><code>linkToMinistry</code></td><td>boolean</td></tr>
+      </tbody>
+    </table>
+    <h4>Where used</h4>
+    <ul style="margin:0; padding-left:18px;"><li>Ministry Template (primary)</li></ul>
+  </div>
+</div>
+
+<!-- MinistryCard -->
+<div class="comp" id="ministrycard">
+  <div class="comp-head">
+    <span class="name">MinistryCard</span>
+    <span class="ver">v1.0.2</span>
+    <div class="badges"><span class="badge cat">People</span></div>
+  </div>
+  <div class="comp-body">
+    <p class="desc">
+      A single ministry's identity card. Logo, name, pastor, tagline,
+      content count. Used inside MinistryRail and on the Browse Ministries
+      grid. Same content shape, two layouts (card vs row).
+    </p>
+    <div class="mock-wrap">
+      <div class="mock-label">Visual</div>
+      <div class="vc-ministry">
+        <div class="logo"></div>
+        <div class="mname">Mercy Hill Church</div>
+        <div class="mpastor">Pastor Jane Doe</div>
+        <div class="mtag">Rooted in grace.</div>
+        <div class="mcount">82 teachings · 12 series</div>
+      </div>
+    </div>
+    <h4>Where used</h4>
+    <ul style="margin:0; padding-left:18px;">
+      <li>MinistryRail (as a child)</li>
+      <li>Browse Ministries grid</li>
+    </ul>
+  </div>
+</div>
+
+<!-- SeriesCard -->
+<div class="comp" id="seriescard">
+  <div class="comp-head">
+    <span class="name">SeriesCard</span>
+    <span class="ver">v1.0.1</span>
+    <div class="badges"><span class="badge cat">People</span></div>
+  </div>
+  <div class="comp-body">
+    <p class="desc">
+      Series identity card. Thumbnail, title, ministry, episode count,
+      completion state. Used inside SeriesRail and on Ministry pages.
+    </p>
+    <div class="mock-wrap">
+      <div class="mock-label">Visual</div>
+      <div class="vc-series" style="width:200px;">
+        <div class="sthumb"></div>
+        <div class="sbody">
+          <div class="sname">Forgiveness Series</div>
+          <div class="sep">7 episodes · Mercy Hill</div>
+          <div class="scomplete">Complete</div>
+        </div>
+      </div>
+    </div>
+    <h4>Where used</h4>
+    <ul style="margin:0; padding-left:18px;">
+      <li>SeriesRail (as a child)</li>
+      <li>Ministry Template (series section)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!--                             EDITORIAL                               -->
+<!-- ================================================================ -->
+<h2>Editorial</h2>
+
+<!-- TextBlock -->
+<div class="comp" id="textblock">
+  <div class="comp-head">
+    <span class="name">TextBlock</span>
+    <span class="ver">v1.0.0</span>
+    <div class="badges"><span class="badge cat">Editorial</span></div>
+  </div>
+  <div class="comp-body">
+    <p class="desc">
+      A passage of authored copy. Locale-keyed, Markdown-supported.
+      Used for editorial framing, theological context, and section dividers.
+    </p>
+    <div class="mock-wrap">
+      <div class="mock-label">Visual</div>
+      <div class="vc-text">
+        Forgiveness is not the same as forgetting. It is not pretending the
+        hurt did not happen. It is a choice — often a daily one — to release
+        the debt and refuse to be defined by what was done to you. The
+        teachings here come from pastors who have sat with this in their own
+        lives.
+      </div>
+    </div>
+    <h4>Config</h4>
+    <table>
+      <tbody>
+        <tr><td><code>body</code></td><td>locale-keyed Markdown</td></tr>
+        <tr><td><code>maxWidth</code></td><td>px (default 720)</td></tr>
+        <tr><td><code>alignment</code></td><td>left · center</td></tr>
+      </tbody>
+    </table>
+    <h4>Where used</h4>
+    <ul style="margin:0; padding-left:18px;">
+      <li>Subject Template (framing)</li>
+      <li>Ministry Template (about section)</li>
+      <li>Marketing / static pages</li>
+    </ul>
+  </div>
+</div>
+
+<!-- CTABlock -->
+<div class="comp" id="ctablock">
+  <div class="comp-head">
+    <span class="name">CTABlock</span>
+    <span class="ver">v1.0.0</span>
+    <div class="badges"><span class="badge cat">Editorial</span></div>
+  </div>
+  <div class="comp-body">
+    <p class="desc">
+      A standalone call-to-action button or banner. Used to drive specific
+      conversions — signup, "see all," explore a subject, share. Click
+      destinations and copy are admin-authored.
+    </p>
+    <div class="mock-wrap">
+      <div class="mock-label">Visual</div>
+      <span class="vc-cta">Get personalized guidance</span>
+    </div>
+    <h4>Config</h4>
+    <table>
+      <tbody>
+        <tr><td><code>label</code></td><td>locale-keyed</td></tr>
+        <tr><td><code>destination</code></td><td>URL or page-type reference</td></tr>
+        <tr><td><code>style</code></td><td>primary · ghost · link</td></tr>
+        <tr><td><code>alignment</code></td><td>left · center · right · full-width</td></tr>
+        <tr><td><code>eventName</code></td><td>analytics tag (e.g. "signup_started")</td></tr>
+      </tbody>
+    </table>
+    <h4>Where used</h4>
+    <ul style="margin:0; padding-left:18px;">
+      <li>Home, Ministry, Subject Templates (signup pushes)</li>
+      <li>End-of-page conversion blocks</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!--                            MONETIZATION                             -->
+<!-- ================================================================ -->
+<h2>Monetization</h2>
+
+<div class="comp" id="upgrade">
+  <div class="comp-head">
+    <span class="name">UpgradeTeaser</span>
+    <span class="ver">v1.0.0</span>
+    <div class="badges"><span class="badge cat">Monetization</span><span class="badge tier">Tier-inverse</span></div>
+  </div>
+  <div class="comp-body">
+    <p class="desc">
+      The prompt to upgrade subscription tier. <em>Inverse tier visibility</em> —
+      appears only for users <strong>below</strong> the target tier. When
+      <code>monetizationMode = "open-all"</code>, the component renders only
+      as a preview in Console and is hidden in production.
+    </p>
+    <div class="mock-wrap">
+      <div class="mock-label">Visual</div>
+      <div class="vc-upgrade">
+        <div>
+          <div class="label">TrueVi · The Vine</div>
+          <div class="head">Unlock personalized guidance</div>
+          <div class="sub">Free for 14 days. Ask anything. Get tailored teachings.</div>
+        </div>
+        <span class="btn">Start free trial</span>
+      </div>
+    </div>
+
+    <div class="props-grid">
+      <div>
+        <h4>Config</h4>
+        <table>
+          <tbody>
+            <tr><td><code>targetTier</code></td><td>vine · plus</td></tr>
+            <tr><td><code>trigger</code></td><td>placement · time-on-site · post-watch · post-ask</td></tr>
+            <tr><td><code>headline</code></td><td>locale-keyed</td></tr>
+            <tr><td><code>subhead</code></td><td>locale-keyed</td></tr>
+            <tr><td><code>ctaLabel</code></td><td>locale-keyed</td></tr>
+            <tr><td><code>destination</code></td><td>signup URL with attribution</td></tr>
+            <tr><td><code>dismissible</code></td><td>boolean</td></tr>
+            <tr><td><code>frequencyCapPerWeek</code></td><td>int</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h4>Signals consumed</h4>
+        <ul style="margin:0; padding-left:18px;">
+          <li><code>tier</code> (current user tier)</li>
+          <li><code>sessionCount</code></li>
+          <li><code>watchPatterns.completionRate</code></li>
+          <li><code>askAnythingHistory</code> (frustration / curiosity signal)</li>
+        </ul>
+        <h4 style="margin-top:14px;">Where used</h4>
+        <ul style="margin:0; padding-left:18px;">
+          <li>Home Template (free-tier users)</li>
+          <li>Search Response Template (post-answer)</li>
+          <li>End-of-video page</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:14px;">
+      <h4>Trigger logic deferred</h4>
+      <p style="margin:0">
+        Detailed trigger thresholds (after X sessions? after Y video
+        completions?) are deferred to a later spec. For v1, admins place
+        UpgradeTeaser in slots manually and the Library decides whether
+        to fill the slot based on signals.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!--                            PHASE 2                                  -->
+<!-- ================================================================ -->
+<h2 id="columnrow">Phase 2 · ColumnRow</h2>
+<p>
+  <code>ColumnRow</code> is a layout container that holds 2 or 3 child slots
+  side-by-side. It enables multi-column compositions without nesting at the
+  template level. <strong>Reserved in the schema, not built in v1.</strong>
+  When ColumnRow ships, every existing template continues to render
+  unchanged.
+</p>
+
+<h4>Planned config</h4>
+<pre><code>{
+  <span class="k">"type"</span>: <span class="s">"ColumnRow"</span>,
+  <span class="k">"config"</span>: {
+    <span class="k">"columns"</span>: <span class="n">2</span>,
+    <span class="k">"gap"</span>: <span class="n">24</span>,
+    <span class="k">"breakpointStack"</span>: <span class="s">"mobile"</span>     <span class="c">// collapses to vertical on mobile</span>
+  },
+  <span class="k">"childSlots"</span>: [ SlotSpec, SlotSpec ]                <span class="c">// nested slots</span>
+}</code></pre>
+
+<!-- ================================================================ -->
+<h2 id="index">Component matrix</h2>
+
+<table>
+  <thead><tr><th>Component</th><th>Fetches content</th><th>Personalizable</th><th>Used in templates</th></tr></thead>
+  <tbody>
+    <tr><td><code>Hero</code></td><td>Yes (8 variants)</td><td>Yes</td><td>Home · Ministry · Subject · Series · Search · Search Response</td></tr>
+    <tr><td><code>ContentRail</code></td><td>Yes</td><td>Yes</td><td>Home · Ministry · Subject · Series · Search Response</td></tr>
+    <tr><td><code>ContentGrid</code></td><td>Yes</td><td>Yes</td><td>Search · Subject</td></tr>
+    <tr><td><code>EpisodeList</code></td><td>Yes</td><td>No (ordered)</td><td>Series</td></tr>
+    <tr><td><code>FilterChips</code></td><td>No</td><td>No</td><td>Search · Subject</td></tr>
+    <tr><td><code>MinistryRail</code></td><td>Yes</td><td>Yes</td><td>Home · Subject</td></tr>
+    <tr><td><code>SeriesRail</code></td><td>Yes</td><td>Yes</td><td>Home · Ministry · Subject</td></tr>
+    <tr><td><code>ContextBanner</code></td><td>No</td><td>No</td><td>Search · Subject</td></tr>
+    <tr><td><code>Breadcrumbs</code></td><td>No</td><td>No</td><td>Ministry · Series · Subject</td></tr>
+    <tr><td><code>AskAnythingBlock</code></td><td>No</td><td>Suggestions only</td><td>Home · Search · Subject · Ministry</td></tr>
+    <tr><td><code>ScriptureBlock</code></td><td>Bible API</td><td>No (authored)</td><td>Subject · Search Response · Ministry</td></tr>
+    <tr><td><code>AIResponseBlock</code></td><td>Generated</td><td>Tone variation</td><td>Search Response</td></tr>
+    <tr><td><code>PastorCard</code></td><td>Yes (ministry-scoped)</td><td>No</td><td>Ministry</td></tr>
+    <tr><td><code>MinistryCard</code></td><td>n/a (child)</td><td>n/a</td><td>inside MinistryRail</td></tr>
+    <tr><td><code>SeriesCard</code></td><td>n/a (child)</td><td>n/a</td><td>inside SeriesRail</td></tr>
+    <tr><td><code>TextBlock</code></td><td>No</td><td>No</td><td>Subject · Ministry · marketing</td></tr>
+    <tr><td><code>CTABlock</code></td><td>No</td><td>No (placement-scoped)</td><td>Home · Subject · Ministry</td></tr>
+    <tr><td><code>UpgradeTeaser</code></td><td>No</td><td>Yes (trigger signals)</td><td>Home · Search Response · post-watch</td></tr>
+  </tbody>
+</table>
+
+<hr/>
+<p style="color:var(--tv-secondary); font-size:12px; text-align:center;">
+  Next: <a href="08-template-home.html" style="color:var(--tv-cta-bright)">M3.2 · Home Template</a> ·
+  <a href="../index.html" style="color:var(--tv-cta-bright)">Index</a>
+</p>
+
+</main>
+</div>
+</body>
+</html>

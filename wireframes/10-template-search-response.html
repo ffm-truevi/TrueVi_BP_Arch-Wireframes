@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TrueVi — Search Response Template (M3.4)</title>
+<style>
+  :root {
+    --tv-canvas:#030C0F; --tv-rail:#051318; --tv-card:#0A2830; --tv-card-hover:#112F38;
+    --tv-element-mid:#1A4E5C; --tv-accent:#245F70; --tv-glow:#2E7A8A;
+    --tv-cta:#C9902A; --tv-cta-bright:#E8A832; --tv-glacia:#C8E4E8;
+    --tv-secondary:#8FB8BE; --tv-stone:#E8E8E2; --tv-text-dark:#1A1A1A;
+  }
+  * { box-sizing:border-box; }
+  html, body { margin:0; padding:0; background:var(--tv-canvas); color:var(--tv-glacia); }
+  body { font-family:"Jost","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-weight:300; line-height:1.6; font-size:15px; }
+  .docpage { max-width:1280px; margin:0 auto; padding:48px 32px 96px; }
+  .docmeta { color:var(--tv-secondary); font-size:12px; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--tv-element-mid); }
+  .wordmark { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:22px; margin-bottom:4px; }
+  .tagline { font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; color:var(--tv-secondary); font-size:14px; margin-bottom:24px; }
+  h1 { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:36px; margin:0 0 8px; }
+  h2 { font-family:"Jost",sans-serif; font-weight:700; color:var(--tv-stone); font-size:22px; margin:56px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--tv-element-mid); }
+  h3 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-stone); font-size:16px; margin:28px 0 8px; }
+  h4 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-glacia); font-size:13px; text-transform:uppercase; letter-spacing:.1em; margin:18px 0 6px; }
+  p, li { color:var(--tv-glacia); }
+  strong { color:var(--tv-stone); font-weight:600; }
+  em { color:var(--tv-secondary); font-style:italic; }
+  .lede { font-size:17px; color:var(--tv-glacia); margin-bottom:24px; }
+  .crumb { color:var(--tv-secondary); font-size:13px; margin-bottom:8px; }
+  .crumb a { color:var(--tv-cta-bright); text-decoration:none; }
+  code { font-family:"JetBrains Mono","Consolas",monospace; background:var(--tv-card); color:var(--tv-glacia); padding:2px 6px; border-radius:4px; font-size:13px; }
+  pre { font-family:"JetBrains Mono",monospace; background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:8px; padding:16px 20px; overflow-x:auto; font-size:12px; line-height:1.5; }
+  pre code { background:transparent; padding:0; }
+  pre .k { color: var(--tv-cta-bright); } pre .s { color: var(--tv-glacia); } pre .c { color: var(--tv-secondary); font-style:italic; } pre .n { color: var(--tv-glow); }
+  .callout { background:var(--tv-card); border-left:3px solid var(--tv-cta); padding:14px 18px; margin:18px 0; border-radius:0 6px 6px 0; }
+  .callout.principle { border-left-color: var(--tv-glow); }
+  .callout.warning { border-left-color: var(--tv-cta-bright); }
+  .callout h4 { margin-top:0; color: var(--tv-stone); }
+  table { width:100%; border-collapse:collapse; margin:14px 0; font-size:13px; }
+  th { text-align:left; padding:9px 12px; background:var(--tv-rail); color:var(--tv-stone); font-weight:600; border-bottom:1px solid var(--tv-accent); }
+  td { padding:9px 12px; border-bottom:1px solid var(--tv-element-mid); color:var(--tv-glacia); vertical-align:top; }
+
+  .browser { background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:14px; overflow:hidden; margin:24px 0; box-shadow:0 12px 48px rgba(0,0,0,.4); }
+  .chrome { background:var(--tv-canvas); padding:10px 16px; border-bottom:1px solid var(--tv-element-mid); display:flex; align-items:center; gap:8px; font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--tv-secondary); }
+  .chrome .dot { width:9px; height:9px; border-radius:50%; background:var(--tv-accent); }
+  .chrome .url { margin-left:12px; }
+  .page-mock { padding:0; background:var(--tv-canvas); }
+  .slot-mark { position:absolute; left:-32px; width:24px; height:24px; background:var(--tv-cta); color:var(--tv-text-dark); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:"JetBrains Mono",monospace; font-weight:700; font-size:12px; }
+  .slot { position:relative; border-left:3px solid var(--tv-cta); padding:18px 22px 18px 28px; border-bottom:1px solid var(--tv-element-mid); }
+  .slot.dynamic { border-left-color:var(--tv-cta-bright); border-left-style:dashed; }
+  .slot-meta { color:var(--tv-secondary); font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.08em; margin-bottom:8px; }
+  .slot-meta .kind { display:inline-block; padding:2px 8px; border-radius:999px; font-weight:700; font-size:9px; letter-spacing:.12em; text-transform:uppercase; margin-right:8px; }
+  .slot-meta .kind.fixed { background:var(--tv-accent); color:var(--tv-stone); }
+  .slot-meta .kind.dynamic { background:var(--tv-cta); color:var(--tv-text-dark); }
+
+  /* mocks */
+  .m-q {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:10px;
+    padding:18px 24px;
+  }
+  .m-q .label { color:var(--tv-cta-bright); font-size:10px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:6px; }
+  .m-q .qtext { color:var(--tv-stone); font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; font-size:22px; line-height:1.3; }
+  .m-q .meta { color:var(--tv-secondary); font-size:11px; margin-top:8px; }
+  .m-q .actions { float:right; display:flex; gap:8px; }
+  .m-q .iconbtn {
+    width:34px; height:34px; border-radius:50%;
+    background:transparent; border:1px solid var(--tv-accent); color:var(--tv-glacia);
+    display:flex; align-items:center; justify-content:center; font-size:13px; cursor:pointer;
+  }
+  .m-q .iconbtn:hover { background:var(--tv-card-hover); border-color:var(--tv-cta-bright); color:var(--tv-cta-bright); }
+
+  .m-air {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:10px;
+    padding:24px 28px;
+  }
+  .m-air .eyebrow { color:var(--tv-secondary); font-size:10px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:10px; }
+  .m-air .resp { color:var(--tv-stone); font-size:15px; line-height:1.7; }
+  .m-air .resp em { color:var(--tv-cta-bright); font-style:normal; }
+  .m-air .resp p { margin:0 0 14px; }
+  .m-air .resp p:last-child { margin-bottom:0; }
+  .m-air .meta { color:var(--tv-secondary); font-size:11px; margin-top:14px; font-style:italic; }
+
+  .m-scripture {
+    background:var(--tv-card); border-left:3px solid var(--tv-cta); border-radius:0 8px 8px 0;
+    padding:18px 24px; font-family:"Cormorant Garamond",Georgia,serif;
+    color:var(--tv-glacia); font-style:italic; font-size:16px; line-height:1.6;
+  }
+  .m-scripture .ref { color:var(--tv-cta-bright); font-size:11px; letter-spacing:.12em; text-transform:uppercase; font-style:normal; font-family:"Jost",sans-serif; margin-top:12px; display:block; }
+
+  .m-rail .title { color:var(--tv-stone); font-family:"Jost",sans-serif; font-weight:600; font-size:18px; margin-bottom:6px; }
+  .m-rail .subtitle { color:var(--tv-secondary); font-size:12px; margin-bottom:12px; font-style:italic; }
+  .m-cards { display:flex; gap:12px; overflow:hidden; }
+  .m-card {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:8px;
+    width:200px; flex-shrink:0; overflow:hidden;
+  }
+  .m-card .thumb { background:linear-gradient(135deg, var(--tv-element-mid), var(--tv-card)); height:110px; }
+  .m-card .body { padding:10px 12px; }
+  .m-card .ttl { color:var(--tv-stone); font-weight:600; font-size:13px; line-height:1.2; }
+  .m-card .meta { color:var(--tv-secondary); font-size:11px; margin-top:4px; }
+
+  .m-followup {
+    background:linear-gradient(135deg, rgba(46,122,138,.18), rgba(201,144,42,.10));
+    border:1px solid var(--tv-glow); border-radius:10px; padding:22px;
+  }
+  .m-followup .eyebrow { color:var(--tv-cta-bright); font-size:10px; letter-spacing:.14em; text-transform:uppercase; }
+  .m-followup .head { color:var(--tv-stone); font-family:"Jost",sans-serif; font-size:16px; font-weight:600; margin-top:6px; margin-bottom:10px; }
+  .m-followup .input { background:var(--tv-canvas); border:1px solid var(--tv-accent); border-radius:6px; padding:10px 14px; color:var(--tv-secondary); font-size:12px; }
+  .m-followup .chips { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+  .m-followup .chip { background:transparent; border:1px solid var(--tv-accent); color:var(--tv-glacia); padding:5px 12px; border-radius:999px; font-size:11px; }
+
+  .m-share {
+    color:var(--tv-secondary); font-size:11px; text-align:center; padding:14px;
+    border:1px dashed var(--tv-accent); border-radius:8px;
+  }
+  .m-share .url { color:var(--tv-cta-bright); font-family:"JetBrains Mono",monospace; }
+
+  .annot { display:flex; gap:14px; background:var(--tv-card); border-left:3px solid var(--tv-glow); padding:12px 16px; margin-bottom:10px; border-radius:0 6px 6px 0; font-size:13px; }
+  .annot .num { background:var(--tv-cta); color:var(--tv-text-dark); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0; font-family:"JetBrains Mono",monospace; }
+  .annot strong { color:var(--tv-stone); display:block; margin-bottom:2px; }
+
+  hr { border:none; border-top:1px solid var(--tv-element-mid); margin:36px 0; }
+  .navlinks { display:flex; justify-content:space-between; margin-top:32px; font-size:12px; color:var(--tv-secondary); }
+  .navlinks a { color:var(--tv-cta-bright); text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="docpage">
+
+<p class="crumb"><a href="../index.html">← Index</a> · M3 · Page Templates</p>
+<div class="docmeta">Document M3.4 · Search Response Template · v0.1 · 2026-05-11 · Owner: Brian (COO) · Audience: TrueVi engineering team + design contractors</div>
+
+<div class="wordmark">TrueVi</div>
+<div class="tagline">Page Template Wireframe · M3.4</div>
+
+<h1>Search Response Template</h1>
+<p class="lede">
+  The Ask Anything answer page. Where a user's open-ended question becomes
+  a curated, scripture-anchored response with recommended content. Every
+  response has a stable, shareable URL via semantic hash. Library may
+  select different response templates based on the question's classified
+  intent.
+</p>
+
+<div class="callout principle">
+  <h4>One sentence</h4>
+  <p style="margin:0">
+    A Search Response is a <strong>composed answer</strong> — never labeled
+    "AI" — built from a curated text response, scripture anchors, and
+    recommended content the Library pulled together for this specific
+    question.
+  </p>
+</div>
+
+<div class="callout warning">
+  <h4>Copy rule</h4>
+  <p style="margin:0">
+    The word "AI" must never appear in user-facing copy on this page.
+    Position the response as <em>"Personalized Guidance"</em>,
+    <em>"What we've gathered"</em>, or <em>"For your question"</em>.
+    Reinforced in CLAUDE.md and Console copy validation.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2>Rendered page · annotated</h2>
+
+<div class="browser">
+  <div class="chrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="url">truevi.tv/answer/a3f9c2d7b1e4...</span>
+  </div>
+
+  <div class="page-mock">
+
+    <!-- Slot 1: question echo -->
+    <div class="slot">
+      <span class="slot-mark">1</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>question</code> · Hero (variant: <code>Hero-AskAnything</code>) · echoes the user's query
+      </div>
+      <div class="m-q">
+        <div class="actions">
+          <span class="iconbtn" title="Save">★</span>
+          <span class="iconbtn" title="Share">↗</span>
+        </div>
+        <div class="label">You asked</div>
+        <div class="qtext">"How do I forgive my father?"</div>
+        <div class="meta">Tone: empathic · Based on 12 teachings · Answer generated 2 min ago</div>
+      </div>
+    </div>
+
+    <!-- Slot 2: AI response -->
+    <div class="slot">
+      <span class="slot-mark">2</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>response</code> · AIResponseBlock · tone: empathic (chosen by Library)
+      </div>
+      <div class="m-air">
+        <div class="eyebrow">Personalized Guidance</div>
+        <div class="resp">
+          <p>Forgiveness is one of the hardest things we are asked to do — especially with a father whose actions have wounded us. Scripture is clear that <em>forgiveness is not about excusing what was done</em>, but about releasing the debt so we are not bound by bitterness.</p>
+          <p>It is often a process, not a moment. The pastors below have sat with this question themselves and offer paths through it. None of them will tell you it is easy. They will tell you it is possible, and that you are not alone in carrying it.</p>
+        </div>
+        <div class="meta">Drawn from teachings by Pastor Jane Doe, Pastor John Smith, and 10 others across our partner ministries.</div>
+      </div>
+    </div>
+
+    <!-- Slot 3: scripture anchor -->
+    <div class="slot">
+      <span class="slot-mark">3</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>scripture</code> · ScriptureBlock · reference chosen by Library
+      </div>
+      <div class="m-scripture">
+        "Then Peter came up and said to him, 'Lord, how often will my brother sin against me, and I forgive him? As many as seven times?' Jesus said to him, 'I do not say to you seven times, but seventy-seven times.'"
+        <span class="ref">Matthew 18:21–22 · ESV</span>
+      </div>
+    </div>
+
+    <!-- Slot 4: recommended content -->
+    <div class="slot dynamic">
+      <span class="slot-mark">4</span>
+      <div class="slot-meta">
+        <span class="kind dynamic">Dynamic</span>
+        <code>recommended</code> · allows: ContentRail · SeriesRail · Library returned 2 rails
+      </div>
+
+      <div class="m-rail" style="margin-bottom:22px;">
+        <div class="title">Teachings on this</div>
+        <div class="subtitle">Most directly relevant to your question</div>
+        <div class="m-cards">
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">How to Forgive</div><div class="meta">Mercy Hill · 31 min</div></div></div>
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">The Prodigal Father</div><div class="meta">Gospel Coalition · 24 min</div></div></div>
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">When Family Hurts</div><div class="meta">Redemption Hill · 27 min</div></div></div>
+          <div class="m-card" style="opacity:.5;"><div class="thumb"></div><div class="body"><div class="ttl">…</div></div></div>
+        </div>
+      </div>
+
+      <div class="m-rail">
+        <div class="title">Go deeper · series on forgiveness</div>
+        <div class="subtitle">Multi-part teachings for sustained study</div>
+        <div class="m-cards">
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Forgiveness Series</div><div class="meta">7 episodes · Mercy Hill</div></div></div>
+          <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Healing Family Wounds</div><div class="meta">5 episodes · Redemption Hill</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot 5: follow-up Ask Anything -->
+    <div class="slot">
+      <span class="slot-mark">5</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>followup</code> · AskAnythingBlock (variant: <code>inline</code>) · context-aware
+      </div>
+      <div class="m-followup">
+        <div class="eyebrow">Continue the conversation</div>
+        <div class="head">Is there more to your question?</div>
+        <div class="input">Ask a follow-up — "How do I start the conversation with him?"</div>
+        <div class="chips">
+          <span class="chip">What if he's not sorry?</span>
+          <span class="chip">How do I forgive myself?</span>
+          <span class="chip">Forgiveness vs. reconciliation</span>
+          <span class="chip">Praying for someone who hurt you</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot 6: share / bookmark -->
+    <div class="slot">
+      <span class="slot-mark">6</span>
+      <div class="slot-meta">
+        <span class="kind fixed">Fixed</span>
+        <code>share</code> · CTABlock (variant: <code>shareUrl</code>)
+      </div>
+      <div class="m-share">
+        Share this answer · <span class="url">truevi.tv/answer/a3f9c2d7b1e4</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Annotated walkthrough</h2>
+
+<div class="annot">
+  <span class="num">1</span>
+  <div>
+    <strong>Question echo · Hero-AskAnything</strong>
+    The user's raw question is displayed back to them in elegant typography.
+    Reinforces that they are seen and understood. Save and Share icons let
+    them bookmark or send the response. Tone label
+    (<em>empathic</em> / <em>theological</em> / <em>practical</em> /
+    <em>scriptural</em>) is the Library's classification — visible for
+    transparency.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">2</span>
+  <div>
+    <strong>AIResponseBlock · tone selected by Library</strong>
+    The curated text response. The Library picks one of four tones based
+    on the question's classified intent. Notice the eyebrow says
+    <em>"Personalized Guidance"</em> — never <em>"AI."</em> The italicized
+    phrase highlights a theological framing point.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">3</span>
+  <div>
+    <strong>Scripture anchor</strong>
+    Always present. Library selects the most relevant scripture for the
+    question. For TrueVi+ subscribers, tapping the reference opens the
+    full ScriptureViewer (deferred; legal-cleared translations required —
+    see CLAUDE.md backlog).
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">4</span>
+  <div>
+    <strong>Recommended content · DYNAMIC slot</strong>
+    The Library decides how many rails (typically 1-3) and whether each
+    is a ContentRail or SeriesRail. Long-form questions often surface a
+    series rail. Short, urgent questions surface single-teaching rails
+    sorted by relevance and personalization.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">5</span>
+  <div>
+    <strong>Follow-up · context-aware AskAnything</strong>
+    The suggestion chips are <strong>generated from the original
+    question's intent</strong> — they're not generic. If the user clicks
+    a chip, a new Search Response is generated with
+    <code>context.previousResponseId</code> set, enabling multi-turn
+    behavior. Conversation IDs link related responses.
+  </div>
+</div>
+
+<div class="annot">
+  <span class="num">6</span>
+  <div>
+    <strong>Share URL · semantic hash</strong>
+    The URL <code>/answer/[hash]</code> is the semantic hash of the
+    normalized query (M1.1 §15). Same question → same hash → same
+    response (until invalidated). Anyone with the URL sees the same
+    answer. Personalization at this layer is intentionally limited — a
+    shared URL must be useful to the recipient too.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Template definition</h2>
+
+<pre><code>{
+  <span class="k">"templateId"</span>: <span class="s">"search-response-empathic-v1"</span>,
+  <span class="k">"pageType"</span>:   <span class="s">"search-response"</span>,
+  <span class="k">"name"</span>:       <span class="s">"Search Response · Empathic"</span>,
+  <span class="k">"inputs"</span>: [
+    { <span class="k">"name"</span>: <span class="s">"responseId"</span>, <span class="k">"type"</span>: <span class="s">"hash"</span>, <span class="k">"required"</span>: <span class="n">true</span> }
+  ],
+  <span class="k">"slots"</span>: [
+    {
+      <span class="k">"slotId"</span>: <span class="s">"question"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"Hero"</span>,
+      <span class="k">"instance"</span>: { <span class="k">"config"</span>: { <span class="k">"variant"</span>: <span class="s">"Hero-AskAnything"</span>, <span class="k">"showActions"</span>: <span class="n">true</span> } }
+    },
+    {
+      <span class="k">"slotId"</span>: <span class="s">"response"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"AIResponseBlock"</span>,
+      <span class="k">"instance"</span>: { <span class="k">"config"</span>: { <span class="k">"tone"</span>: <span class="s">"empathic"</span>, <span class="k">"maxLength"</span>: <span class="n">600</span>, <span class="k">"showSourceCount"</span>: <span class="n">true</span> } }
+    },
+    {
+      <span class="k">"slotId"</span>: <span class="s">"scripture"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"ScriptureBlock"</span>,
+      <span class="k">"instance"</span>: { <span class="k">"config"</span>: { <span class="k">"translation"</span>: <span class="s">"ESV"</span>, <span class="k">"alignment"</span>: <span class="s">"left"</span>, <span class="k">"openInViewer"</span>: <span class="n">false</span> } }
+    },
+    {
+      <span class="k">"slotId"</span>: <span class="s">"recommended"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"DYNAMIC"</span>,
+      <span class="k">"allows"</span>: [<span class="s">"ContentRail"</span>, <span class="s">"SeriesRail"</span>],
+      <span class="k">"minCount"</span>: <span class="n">1</span>,
+      <span class="k">"maxCount"</span>: <span class="n">3</span>
+    },
+    {
+      <span class="k">"slotId"</span>: <span class="s">"followup"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"AskAnythingBlock"</span>,
+      <span class="k">"instance"</span>: {
+        <span class="k">"config"</span>: { <span class="k">"variant"</span>: <span class="s">"inline"</span>, <span class="k">"showSuggestions"</span>: <span class="n">true</span>, <span class="k">"suggestionSource"</span>: <span class="s">"context-aware"</span> },
+        <span class="k">"copy"</span>: {
+          <span class="k">"en"</span>: { <span class="k">"eyebrowLabel"</span>: <span class="s">"Continue the conversation"</span>, <span class="k">"headline"</span>: <span class="s">"Is there more to your question?"</span> }
+        }
+      }
+    },
+    {
+      <span class="k">"slotId"</span>: <span class="s">"share"</span>,
+      <span class="k">"kind"</span>:   <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"CTABlock"</span>,
+      <span class="k">"instance"</span>: { <span class="k">"config"</span>: { <span class="k">"style"</span>: <span class="s">"shareUrl"</span> } }
+    }
+  ]
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2>Tone-based template variants</h2>
+
+<p>Library picks one of four templates per question, based on classified intent. Same six slots; the AIResponseBlock <code>tone</code> + ScriptureBlock selection logic differ.</p>
+
+<table>
+  <thead><tr><th>Template ID</th><th>Tone</th><th>Selected when</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>search-response-empathic-v1</code></td>
+      <td>empathic</td>
+      <td>Intent = emotional-pain, grief, struggle. Question wording contains emotional markers. Default fallback.</td>
+    </tr>
+    <tr>
+      <td><code>search-response-theological-v1</code></td>
+      <td>theological</td>
+      <td>Intent = doctrinal-question, apologetics, "what does scripture say about..."</td>
+    </tr>
+    <tr>
+      <td><code>search-response-practical-v1</code></td>
+      <td>practical</td>
+      <td>Intent = how-to, application, "how do I start...", "what should I do..."</td>
+    </tr>
+    <tr>
+      <td><code>search-response-scriptural-v1</code></td>
+      <td>scriptural</td>
+      <td>Intent = direct verse query. ScriptureBlock surfaces first; AIResponseBlock contextualizes.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Generation flow</h2>
+
+<pre><code><span class="c">// User submits from AskAnythingBlock on any page</span>
+POST /library/ask-anything
+{
+  <span class="k">"query"</span>: <span class="s">"How do I forgive my father?"</span>,
+  <span class="k">"identity"</span>: { ... },
+  <span class="k">"request"</span>:  { ... }
+}
+
+<span class="c">// Library</span>
+1. Normalize query → strip filler, lemmatize
+2. Compute semantic hash from embedding
+3. Cache lookup:
+   - HIT  → return stored composition spec (~10-30ms)
+   - MISS → generate composition:
+            a) Classify intent (empathic/theological/practical/scriptural)
+            b) Select Search Response template by intent
+            c) Generate AIResponseBlock content with chosen tone
+            d) Choose scripture anchor
+            e) Query content for recommended rails (personalized)
+            f) Generate context-aware follow-up suggestions
+            g) Store spec in cache, persist on share
+            h) Return composition (~2-4s for fresh generation)
+
+<span class="c">// Renderer</span>
+HTTP 200 → navigate to /answer/[responseId]
+GET /library/ask-anything?responseId=[id] for the page render
+                                  OR
+POST /library/compose-page with pageType=search-response, responseId in routeParams</code></pre>
+
+<!-- ============================================================ -->
+<h2>Caching &amp; storage</h2>
+
+<p>See M1.1 §15 for the strategy in full. Summary:</p>
+
+<table>
+  <thead><tr><th>Tier</th><th>What lives here</th><th>Storage</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Hot</strong></td><td>Last 30 days OR &gt; 5 shares</td><td>Redis-style hot cache + Postgres</td></tr>
+    <tr><td><strong>Warm</strong></td><td>Shared at least once, persistent</td><td>Postgres</td></tr>
+    <tr><td><strong>Cold</strong></td><td>Never shared, last accessed &gt; 30d</td><td>Evicted; regenerated on demand (same hash, deterministic)</td></tr>
+  </tbody>
+</table>
+
+<p>Storage cost projection (M1.1 §15): 100M unique responses ≈ 500 GB ≈ $100/month on Cloud SQL. Storing <em>composition specs</em>, not rendered HTML, makes this cheap.</p>
+
+<!-- ============================================================ -->
+<h2>Multi-turn conversation</h2>
+
+<p>
+  When a user clicks a follow-up suggestion or types a follow-up into the
+  inline AskAnythingBlock, the system creates a related response with a
+  <code>conversationId</code> link.
+</p>
+
+<pre><code>POST /library/ask-anything
+{
+  <span class="k">"query"</span>: <span class="s">"What if he's not sorry?"</span>,
+  <span class="k">"context"</span>: {
+    <span class="k">"previousResponseId"</span>: <span class="s">"a3f9c2d7b1e4..."</span>,
+    <span class="k">"conversationId"</span>:    <span class="s">"conv-2026-05-11-..."</span>     <span class="c">// auto-created on first follow-up</span>
+  },
+  <span class="k">"identity"</span>: { ... },
+  <span class="k">"request"</span>:  { ... }
+}</code></pre>
+
+<p>
+  Library generates a fresh response that <em>references the prior
+  question</em>. Conversations are stored as a separate
+  <code>conversations</code> table joining response IDs in order. Future
+  enhancement: render conversation history as a thread above the current
+  response.
+</p>
+
+<!-- ============================================================ -->
+<h2>Personalization vs. shareability tension</h2>
+
+<div class="callout warning">
+  <h4>Important design choice</h4>
+  <p style="margin:0">
+    A shared response URL must produce a useful answer for any viewer —
+    even if they're not the original asker. Personalization is therefore
+    <strong>tightly bounded</strong> on this page:
+  </p>
+</div>
+
+<ul>
+  <li><strong>AIResponseBlock</strong> — same content for everyone with the same semantic hash. Not personalized.</li>
+  <li><strong>ScriptureBlock</strong> — same verse for everyone. Not personalized.</li>
+  <li><strong>Recommended rails</strong> — <em>lightly</em> personalized. The Library re-ranks based on the current viewer's signals, but the pool of candidate content is the same.</li>
+  <li><strong>Follow-up suggestions</strong> — same for everyone (derived from the question's intent, not the user).</li>
+  <li><strong>Save/Share UI state</strong> — per-viewer (their save state, not the asker's).</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2>Empty &amp; edge states</h2>
+
+<h3>Invalid <code>responseId</code> (URL tampered)</h3>
+<p>Returns 404. Renderer shows: <em>"This answer no longer exists. Ask your question again to get a fresh response."</em> with an AskAnythingBlock prefilled with the original query if extractable.</p>
+
+<h3>Generation in progress</h3>
+<p>If a fresh response is being generated (first user to ask this), the renderer shows a skeleton loader for ~2-4s. Subsequent users hit the cache and load instantly.</p>
+
+<h3>Library degraded · cannot generate</h3>
+<p>Returns <code>503 DEGRADED</code>. Renderer shows: <em>"We can't generate a response right now. Browse teachings on this topic instead:"</em> + a ContentGrid filtered by the original query as keyword search.</p>
+
+<h3>Theological guardrail rejected the response</h3>
+<p>If the generated response or recommended content fails guardrails, Library re-generates with stricter constraints. If it still fails after 3 attempts, returns a hardcoded editorial fallback: <em>"We're not yet ready to answer this with the care it deserves. Here are pastoral teachings we trust on this subject."</em></p>
+
+<!-- ============================================================ -->
+<h2>Activity events emitted</h2>
+
+<table>
+  <thead><tr><th>Event</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td><code>ask_anything_response_viewed</code></td><td>Page rendered, response loaded</td></tr>
+    <tr><td><code>card_impression</code></td><td>Per content card in recommended rail entering viewport</td></tr>
+    <tr><td><code>click</code></td><td>Card click, scripture click, share click</td></tr>
+    <tr><td><code>save_added</code> · <code>save_removed</code></td><td>Save button toggle</td></tr>
+    <tr><td><code>share_initiated</code></td><td>Share button click; emits even if cancelled</td></tr>
+    <tr><td><code>ask_anything_submitted</code></td><td>Follow-up question submitted from this page; carries <code>previousResponseId</code></td></tr>
+  </tbody>
+</table>
+
+<hr/>
+<div class="navlinks">
+  <a href="09-template-search.html">← M3.3 · Search Template</a>
+  <a href="11-template-ministry.html">M3.5 · Ministry Template →</a>
+</div>
+
+</div>
+</body>
+</html>

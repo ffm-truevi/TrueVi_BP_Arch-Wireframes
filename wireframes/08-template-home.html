@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TrueVi — Home Template (M3.2)</title>
+<style>
+  :root {
+    --tv-canvas:#030C0F; --tv-rail:#051318; --tv-card:#0A2830; --tv-card-hover:#112F38;
+    --tv-element-mid:#1A4E5C; --tv-accent:#245F70; --tv-glow:#2E7A8A;
+    --tv-cta:#C9902A; --tv-cta-bright:#E8A832; --tv-glacia:#C8E4E8;
+    --tv-secondary:#8FB8BE; --tv-stone:#E8E8E2; --tv-text-dark:#1A1A1A;
+  }
+  * { box-sizing:border-box; }
+  html, body { margin:0; padding:0; background:var(--tv-canvas); color:var(--tv-glacia); }
+  body { font-family:"Jost","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-weight:300; line-height:1.6; font-size:15px; }
+  .docpage { max-width:1280px; margin:0 auto; padding:48px 32px 96px; }
+  .docmeta { color:var(--tv-secondary); font-size:12px; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--tv-element-mid); }
+  .wordmark { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:22px; margin-bottom:4px; }
+  .tagline { font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; color:var(--tv-secondary); font-size:14px; margin-bottom:24px; }
+  h1 { font-family:"Jost",sans-serif; font-weight:800; color:var(--tv-stone); font-size:36px; margin:0 0 8px; }
+  h2 { font-family:"Jost",sans-serif; font-weight:700; color:var(--tv-stone); font-size:22px; margin:56px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--tv-element-mid); }
+  h3 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-stone); font-size:16px; margin:28px 0 8px; }
+  h4 { font-family:"Jost",sans-serif; font-weight:600; color:var(--tv-glacia); font-size:13px; text-transform:uppercase; letter-spacing:.1em; margin:18px 0 6px; }
+  p, li { color:var(--tv-glacia); }
+  strong { color:var(--tv-stone); font-weight:600; }
+  em { color:var(--tv-secondary); font-style:italic; }
+  .lede { font-size:17px; color:var(--tv-glacia); margin-bottom:24px; }
+  .crumb { color:var(--tv-secondary); font-size:13px; margin-bottom:8px; }
+  .crumb a { color:var(--tv-cta-bright); text-decoration:none; }
+  code { font-family:"JetBrains Mono","Consolas",monospace; background:var(--tv-card); color:var(--tv-glacia); padding:2px 6px; border-radius:4px; font-size:13px; }
+  pre { font-family:"JetBrains Mono",monospace; background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:8px; padding:16px 20px; overflow-x:auto; font-size:12px; line-height:1.5; }
+  pre code { background:transparent; padding:0; }
+  pre .k { color: var(--tv-cta-bright); } pre .s { color: var(--tv-glacia); } pre .c { color: var(--tv-secondary); font-style:italic; } pre .n { color: var(--tv-glow); }
+  .callout { background:var(--tv-card); border-left:3px solid var(--tv-cta); padding:14px 18px; margin:18px 0; border-radius:0 6px 6px 0; }
+  .callout.principle { border-left-color: var(--tv-glow); }
+  .callout h4 { margin-top:0; color: var(--tv-stone); }
+  table { width:100%; border-collapse:collapse; margin:14px 0; font-size:13px; }
+  th { text-align:left; padding:9px 12px; background:var(--tv-rail); color:var(--tv-stone); font-weight:600; border-bottom:1px solid var(--tv-accent); }
+  td { padding:9px 12px; border-bottom:1px solid var(--tv-element-mid); color:var(--tv-glacia); vertical-align:top; }
+
+  /* page mock */
+  .browser { background:var(--tv-rail); border:1px solid var(--tv-element-mid); border-radius:14px; overflow:hidden; margin:24px 0; box-shadow:0 12px 48px rgba(0,0,0,.4); position:relative; }
+  .chrome { background:var(--tv-canvas); padding:10px 16px; border-bottom:1px solid var(--tv-element-mid); display:flex; align-items:center; gap:8px; font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--tv-secondary); }
+  .chrome .dot { width:9px; height:9px; border-radius:50%; background:var(--tv-accent); }
+  .chrome .url { margin-left:12px; }
+
+  .page-mock { padding:0; background:var(--tv-canvas); }
+
+  /* slot annotation rail (left side numbers) */
+  .annotated-page { position:relative; }
+  .slot-mark {
+    position:absolute; left:-32px; width:24px; height:24px;
+    background:var(--tv-cta); color:var(--tv-text-dark);
+    border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-family:"JetBrains Mono",monospace; font-weight:700; font-size:12px;
+    z-index:3;
+  }
+
+  .slot {
+    position:relative; border-left:3px solid var(--tv-cta); margin-left:0;
+    padding:18px 22px 18px 28px;
+    border-bottom:1px solid var(--tv-element-mid);
+  }
+  .slot.dynamic { border-left-color:var(--tv-cta-bright); border-left-style:dashed; }
+  .slot-meta {
+    color:var(--tv-secondary); font-family:"JetBrains Mono",monospace; font-size:10px;
+    letter-spacing:.08em; margin-bottom:8px;
+  }
+  .slot-meta .kind {
+    display:inline-block; padding:2px 8px; border-radius:999px; font-weight:700;
+    font-size:9px; letter-spacing:.12em; text-transform:uppercase; margin-right:8px;
+  }
+  .slot-meta .kind.fixed { background:var(--tv-accent); color:var(--tv-stone); }
+  .slot-meta .kind.dynamic { background:var(--tv-cta); color:var(--tv-text-dark); }
+
+  /* mock primitives */
+  .m-hero {
+    background:linear-gradient(135deg, #07252e, #19536b);
+    border-radius:10px; padding:36px 32px;
+    color:var(--tv-stone); min-height:240px;
+    display:flex; flex-direction:column; justify-content:flex-end;
+    position:relative; overflow:hidden;
+  }
+  .m-hero .eyebrow { color:var(--tv-cta-bright); font-size:11px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:8px; }
+  .m-hero .title { font-family:"Jost",sans-serif; font-weight:800; font-size:32px; color:var(--tv-stone); line-height:1.1; max-width:600px; }
+  .m-hero .sub { color:var(--tv-glacia); font-size:14px; margin-top:8px; max-width:560px; }
+  .m-hero .cta { display:inline-block; background:var(--tv-cta); color:var(--tv-text-dark); padding:10px 22px; border-radius:6px; font-weight:600; margin-top:18px; align-self:flex-start; font-size:13px; }
+  .m-hero .dots { position:absolute; bottom:18px; right:24px; display:flex; gap:6px; }
+  .m-hero .dot { width:7px; height:7px; border-radius:50%; background:var(--tv-secondary); }
+  .m-hero .dot.on { background:var(--tv-cta); }
+
+  .m-rail .title { color:var(--tv-stone); font-family:"Jost",sans-serif; font-weight:600; font-size:18px; margin-bottom:10px; }
+  .m-rail .subtitle { color:var(--tv-secondary); font-size:12px; margin-bottom:12px; font-style:italic; }
+  .m-cards { display:flex; gap:12px; overflow:hidden; }
+  .m-card {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:8px;
+    width:200px; flex-shrink:0; overflow:hidden;
+  }
+  .m-card .thumb { background:linear-gradient(135deg, var(--tv-element-mid), var(--tv-card)); height:110px; }
+  .m-card .body { padding:10px 12px; }
+  .m-card .ttl { color:var(--tv-stone); font-weight:600; font-size:13px; line-height:1.2; }
+  .m-card .meta { color:var(--tv-secondary); font-size:11px; margin-top:4px; }
+  .m-card .badge { display:inline-block; background:var(--tv-cta); color:var(--tv-text-dark); padding:1px 6px; border-radius:3px; font-size:9px; font-weight:600; margin-top:6px; }
+
+  .m-min {
+    background:var(--tv-card); border:1px solid var(--tv-accent); border-radius:8px;
+    padding:14px; width:220px; flex-shrink:0;
+  }
+  .m-min .logo { width:64px; height:64px; border-radius:8px; background:var(--tv-element-mid); margin-bottom:10px; }
+  .m-min .mname { color:var(--tv-stone); font-weight:600; font-size:14px; }
+  .m-min .mpastor { color:var(--tv-secondary); font-size:11px; margin-top:2px; }
+  .m-min .mtag { color:var(--tv-glacia); font-style:italic; font-size:11px; margin-top:8px; }
+  .m-min .mcount { color:var(--tv-cta-bright); font-size:10px; margin-top:8px; font-weight:600; }
+
+  .m-ask {
+    background:linear-gradient(135deg, rgba(46,122,138,.18), rgba(201,144,42,.10));
+    border:1px solid var(--tv-glow); border-radius:12px; padding:28px;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+  }
+  .m-ask .eyebrow { color:var(--tv-cta-bright); font-size:11px; letter-spacing:.14em; text-transform:uppercase; }
+  .m-ask .q { font-family:"Cormorant Garamond",Georgia,serif; font-style:italic; color:var(--tv-stone); font-size:24px; margin:10px 0 16px; }
+  .m-ask .input { width:100%; max-width:560px; background:var(--tv-canvas); border:1px solid var(--tv-accent); border-radius:8px; padding:14px 18px; color:var(--tv-secondary); font-size:13px; text-align:left; }
+  .m-ask .suggest { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:12px; }
+  .m-ask .chip { background:transparent; border:1px solid var(--tv-accent); color:var(--tv-glacia); padding:5px 12px; border-radius:999px; font-size:11px; }
+
+  .m-upgrade {
+    background:linear-gradient(135deg, rgba(201,144,42,.2), rgba(46,122,138,.12));
+    border:1px solid var(--tv-cta); border-radius:12px; padding:22px 28px;
+    display:flex; align-items:center; gap:24px;
+  }
+  .m-upgrade .label { color:var(--tv-cta-bright); font-size:10px; letter-spacing:.14em; text-transform:uppercase; }
+  .m-upgrade .head { font-family:"Jost",sans-serif; color:var(--tv-stone); font-size:18px; font-weight:700; margin-top:4px; }
+  .m-upgrade .sub { color:var(--tv-glacia); font-size:13px; margin-top:4px; }
+  .m-upgrade .btn { background:var(--tv-cta); color:var(--tv-text-dark); padding:10px 20px; border-radius:6px; font-weight:600; font-size:13px; margin-left:auto; flex-shrink:0; }
+
+  /* annotation list */
+  .annots { margin-top:28px; }
+  .annot { display:flex; gap:14px; background:var(--tv-card); border-left:3px solid var(--tv-glow); padding:12px 16px; margin-bottom:10px; border-radius:0 6px 6px 0; font-size:13px; }
+  .annot .num { background:var(--tv-cta); color:var(--tv-text-dark); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0; font-family:"JetBrains Mono",monospace; }
+  .annot strong { color: var(--tv-stone); display:block; margin-bottom:2px; }
+
+  hr { border:none; border-top:1px solid var(--tv-element-mid); margin:36px 0; }
+  .navlinks { display:flex; justify-content:space-between; margin-top:32px; font-size:12px; color:var(--tv-secondary); }
+  .navlinks a { color:var(--tv-cta-bright); text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="docpage">
+
+<p class="crumb"><a href="../index.html">← Index</a> · M3 · Page Templates</p>
+<div class="docmeta">Document M3.2 · Home Template · v0.1 · 2026-05-11 · Owner: Brian (COO) · Audience: TrueVi engineering team + design contractors</div>
+
+<div class="wordmark">TrueVi</div>
+<div class="tagline">Page Template Wireframe · M3.2</div>
+
+<h1>Home Template</h1>
+<p class="lede">
+  The default landing experience for <code>truevi.tv/</code>. Four slots
+  shape the page; the Library fills them. The single most heavily-trafficked
+  page on the platform — and the canonical example of the slot model in
+  action.
+</p>
+
+<div class="callout principle">
+  <h4>One sentence</h4>
+  <p style="margin:0">
+    Home is a <strong>holding tank</strong> — one Hero, a flexible
+    rail zone, an Ask Anything entry point, and an upgrade prompt for free
+    users. The Library decides what fills the rail zone, in what order,
+    and with what titles, per user, per session.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2>Rendered page · annotated</h2>
+
+<div class="browser">
+  <div class="chrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="url">truevi.tv/</span>
+  </div>
+
+  <div class="page-mock">
+    <div class="annotated-page">
+
+      <!-- Slot 1: Hero -->
+      <div class="slot">
+        <span class="slot-mark">1</span>
+        <div class="slot-meta">
+          <span class="kind fixed">Fixed</span>
+          <code>hero</code> · Hero (variant: <code>Hero-Carousel</code>) · maxSlides=5
+        </div>
+        <div class="m-hero">
+          <div class="eyebrow">Featured for you</div>
+          <div class="title">When forgiveness feels impossible</div>
+          <div class="sub">A 4-part teaching from Mercy Hill on the work of releasing what we cannot change.</div>
+          <span class="cta">Watch the first teaching</span>
+          <div class="dots"><span class="dot on"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+        </div>
+      </div>
+
+      <!-- Slot 2: dynamic-rails -->
+      <div class="slot dynamic">
+        <span class="slot-mark">2</span>
+        <div class="slot-meta">
+          <span class="kind dynamic">Dynamic</span>
+          <code>dynamic-rails</code> · allows: ContentRail · MinistryRail · SeriesRail · min=3 max=10 · Library filled 5 rails
+        </div>
+
+        <!-- rail 1 -->
+        <div class="m-rail" style="margin-bottom:24px;">
+          <div class="title">Continue Watching</div>
+          <div class="m-cards">
+            <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">How to Forgive</div><div class="meta">Mercy Hill · 31 min</div><span class="badge">62% watched</span></div></div>
+            <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">The Prodigal Father</div><div class="meta">Gospel Coalition · 24 min</div><span class="badge">In progress</span></div></div>
+            <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">When God Feels Distant</div><div class="meta">Mercy Hill · 28 min</div></div></div>
+            <div class="m-card" style="opacity:.5;"><div class="thumb"></div><div class="body"><div class="ttl">…</div></div></div>
+          </div>
+        </div>
+
+        <!-- rail 2 -->
+        <div class="m-rail" style="margin-bottom:24px;">
+          <div class="title">Because you've been exploring forgiveness</div>
+          <div class="subtitle">Curated based on what you've watched recently</div>
+          <div class="m-cards">
+            <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Forgiving the Unforgivable</div><div class="meta">Redemption Hill · 22 min</div></div></div>
+            <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Grace for the Wounded</div><div class="meta">Mercy Hill · 28 min</div></div></div>
+            <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Letting Go of Resentment</div><div class="meta">Gospel Coalition · 24 min</div></div></div>
+            <div class="m-card" style="opacity:.5;"><div class="thumb"></div><div class="body"><div class="ttl">…</div></div></div>
+          </div>
+        </div>
+
+        <!-- rail 3 - ministries -->
+        <div class="m-rail" style="margin-bottom:24px;">
+          <div class="title">Ministries that speak to where you are</div>
+          <div class="m-cards">
+            <div class="m-min">
+              <div class="logo"></div>
+              <div class="mname">Mercy Hill Church</div>
+              <div class="mpastor">Pastor Jane Doe</div>
+              <div class="mtag">Rooted in grace.</div>
+              <div class="mcount">82 teachings</div>
+            </div>
+            <div class="m-min">
+              <div class="logo"></div>
+              <div class="mname">Redemption Hill</div>
+              <div class="mpastor">Pastor John Smith</div>
+              <div class="mtag">For the wounded heart.</div>
+              <div class="mcount">114 teachings</div>
+            </div>
+            <div class="m-min">
+              <div class="logo"></div>
+              <div class="mname">Gospel Coalition</div>
+              <div class="mpastor">Multiple pastors</div>
+              <div class="mtag">Sound doctrine. Always.</div>
+              <div class="mcount">340 teachings</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- rail 4 -->
+        <div class="m-rail" style="margin-bottom:24px;">
+          <div class="title">Trending across TrueVi this week</div>
+          <div class="m-cards">
+            <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">When Faith is Hard</div><div class="meta">Redemption Hill · 26 min</div></div></div>
+            <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Praying When You Don't Believe</div><div class="meta">Mercy Hill · 19 min</div></div></div>
+            <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">The God Who Stays</div><div class="meta">Gospel Coalition · 31 min</div></div></div>
+            <div class="m-card" style="opacity:.5;"><div class="thumb"></div><div class="body"><div class="ttl">…</div></div></div>
+          </div>
+        </div>
+
+        <!-- rail 5 -->
+        <div class="m-rail">
+          <div class="title">Quick teachings under 15 minutes</div>
+          <div class="m-cards">
+            <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Daily Mercy</div><div class="meta">Mercy Hill · 8 min</div></div></div>
+            <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Three Truths for Today</div><div class="meta">Gospel Coalition · 11 min</div></div></div>
+            <div class="m-card"><div class="thumb"></div><div class="body"><div class="ttl">Anxiety and the Word</div><div class="meta">Redemption Hill · 14 min</div></div></div>
+            <div class="m-card" style="opacity:.5;"><div class="thumb"></div><div class="body"><div class="ttl">…</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slot 3: ask-anything -->
+      <div class="slot">
+        <span class="slot-mark">3</span>
+        <div class="slot-meta">
+          <span class="kind fixed">Fixed</span>
+          <code>ask-anything</code> · AskAnythingBlock (variant: <code>hero-card</code>)
+        </div>
+        <div class="m-ask">
+          <div class="eyebrow">Personalized Guidance</div>
+          <div class="q">"What's on your heart today?"</div>
+          <div class="input">I'm struggling to forgive my father…</div>
+          <div class="suggest">
+            <span class="chip">When God feels far</span>
+            <span class="chip">Anxiety</span>
+            <span class="chip">Forgiveness</span>
+            <span class="chip">Doubt and faith</span>
+            <span class="chip">Grief</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slot 4: upgrade-teaser (free tier only) -->
+      <div class="slot">
+        <span class="slot-mark">4</span>
+        <div class="slot-meta">
+          <span class="kind fixed">Fixed</span>
+          <code>upgrade-teaser</code> · UpgradeTeaser · audience: <code>tier=new</code> only · hidden when <code>monetizationMode=open-all</code>
+        </div>
+        <div class="m-upgrade">
+          <div>
+            <div class="label">TrueVi · The Vine</div>
+            <div class="head">Unlock personalized guidance</div>
+            <div class="sub">Free for 14 days. Ask anything. Get teachings tailored to where you are.</div>
+          </div>
+          <span class="btn">Start free trial</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Annotated walkthrough</h2>
+
+<div class="annots">
+  <div class="annot">
+    <span class="num">1</span>
+    <div>
+      <strong>Hero slot · FIXED · Hero-Carousel</strong>
+      Single FIXED slot at the top. Admin chose <code>Hero-Carousel</code>;
+      Library decides which 5 items rotate through based on the user's
+      <code>inferredFaithStage</code>, <code>askAnythingHistory</code>,
+      and <code>visitedMinistries</code>. The "Featured for you" eyebrow is
+      Library-authored — it's part of the response payload, not the
+      template config.
+    </div>
+  </div>
+
+  <div class="annot">
+    <span class="num">2</span>
+    <div>
+      <strong>Dynamic rails slot · DYNAMIC · 3-10 rails</strong>
+      The heart of the page. Admin defined: <em>min 3, max 10, allowed
+      components are ContentRail · MinistryRail · SeriesRail</em>.
+      Library returned 5 rails for this user, including:
+      a Continue Watching rail (signals: <code>watchPatterns</code> +
+      <code>content_state</code>), a personalized rail framed around the
+      user's recent subject exploration, a MinistryRail picking ministries
+      with high faith-stage alignment, a trending rail (no
+      personalization), and a short-format rail tuned to the user's
+      <code>preferredSessionMin</code>.
+      Each rail title is Library-authored.
+    </div>
+  </div>
+
+  <div class="annot">
+    <span class="num">3</span>
+    <div>
+      <strong>Ask Anything slot · FIXED</strong>
+      Always present, hero-card variant. Suggestion chips beneath are
+      Library-generated based on <code>askAnythingHistory</code> and
+      <code>exploredSubjects</code>. Empty for cold-start users — falls
+      back to editorial default suggestions.
+    </div>
+  </div>
+
+  <div class="annot">
+    <span class="num">4</span>
+    <div>
+      <strong>Upgrade teaser slot · FIXED · tier-gated</strong>
+      Audience restricted to <code>tier=new</code> (free users). When
+      Console's <code>monetizationMode = "open-all"</code>, this slot
+      renders empty in production but still shows in Console preview so
+      admins can author it. When mode flips to <code>tier-gated</code>,
+      this slot appears for free-tier users only.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Template definition</h2>
+
+<pre><code>{
+  <span class="k">"templateId"</span>:   <span class="s">"home-v3"</span>,
+  <span class="k">"pageType"</span>:     <span class="s">"home"</span>,
+  <span class="k">"name"</span>:         <span class="s">"HomeTemplate v3"</span>,
+  <span class="k">"version"</span>:      <span class="s">"3.0.0"</span>,
+  <span class="k">"status"</span>:       <span class="s">"published"</span>,
+  <span class="k">"inputs"</span>:       [],
+
+  <span class="k">"slots"</span>: [
+    {
+      <span class="k">"slotId"</span>:    <span class="s">"hero"</span>,
+      <span class="k">"kind"</span>:      <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"Hero"</span>,
+      <span class="k">"instance"</span>: {
+        <span class="k">"version"</span>: <span class="s">"2.1.0"</span>,
+        <span class="k">"config"</span>: {
+          <span class="k">"variant"</span>:   <span class="s">"Hero-Carousel"</span>,
+          <span class="k">"maxSlides"</span>: <span class="n">5</span>,
+          <span class="k">"autoplay"</span>:  <span class="n">true</span>,
+          <span class="k">"dwellSec"</span>:  <span class="n">7</span>
+        },
+        <span class="k">"query"</span>: { <span class="k">"mode"</span>: <span class="s">"auto"</span>, <span class="k">"sort"</span>: <span class="s">"featured"</span>, <span class="k">"limit"</span>: <span class="n">5</span> },
+        <span class="k">"personalization"</span>: {
+          <span class="k">"enabled"</span>: <span class="n">true</span>,
+          <span class="k">"signals"</span>: [<span class="s">"inferredFaithStage"</span>, <span class="s">"askAnythingHistory"</span>, <span class="s">"visitedMinistries"</span>],
+          <span class="k">"fallback"</span>: <span class="s">"trending"</span>
+        },
+        <span class="k">"visibility"</span>: { <span class="k">"tiers"</span>: [<span class="s">"new"</span>, <span class="s">"vine"</span>, <span class="s">"plus"</span>] }
+      }
+    },
+    {
+      <span class="k">"slotId"</span>:    <span class="s">"dynamic-rails"</span>,
+      <span class="k">"kind"</span>:      <span class="s">"DYNAMIC"</span>,
+      <span class="k">"allows"</span>:    [<span class="s">"ContentRail"</span>, <span class="s">"MinistryRail"</span>, <span class="s">"SeriesRail"</span>],
+      <span class="k">"minCount"</span>:  <span class="n">3</span>,
+      <span class="k">"maxCount"</span>:  <span class="n">10</span>,
+      <span class="k">"tierVisibility"</span>: [<span class="s">"new"</span>, <span class="s">"vine"</span>, <span class="s">"plus"</span>]
+    },
+    {
+      <span class="k">"slotId"</span>:    <span class="s">"ask-anything"</span>,
+      <span class="k">"kind"</span>:      <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"AskAnythingBlock"</span>,
+      <span class="k">"instance"</span>: {
+        <span class="k">"version"</span>: <span class="s">"1.3.0"</span>,
+        <span class="k">"config"</span>: {
+          <span class="k">"variant"</span>:         <span class="s">"hero-card"</span>,
+          <span class="k">"showSuggestions"</span>: <span class="n">true</span>,
+          <span class="k">"maxQueryLength"</span>:  <span class="n">280</span>
+        },
+        <span class="k">"copy"</span>: {
+          <span class="k">"en"</span>: {
+            <span class="k">"eyebrowLabel"</span>: <span class="s">"Personalized Guidance"</span>,
+            <span class="k">"headline"</span>:     <span class="s">"What's on your heart today?"</span>,
+            <span class="k">"placeholder"</span>:  <span class="s">"Ask anything — \"I'm struggling to forgive…\""</span>
+          }
+        },
+        <span class="k">"visibility"</span>: { <span class="k">"tiers"</span>: [<span class="s">"new"</span>, <span class="s">"vine"</span>, <span class="s">"plus"</span>] }
+      }
+    },
+    {
+      <span class="k">"slotId"</span>:    <span class="s">"upgrade-teaser"</span>,
+      <span class="k">"kind"</span>:      <span class="s">"FIXED"</span>,
+      <span class="k">"component"</span>: <span class="s">"UpgradeTeaser"</span>,
+      <span class="k">"instance"</span>: {
+        <span class="k">"version"</span>: <span class="s">"1.0.0"</span>,
+        <span class="k">"config"</span>: {
+          <span class="k">"targetTier"</span>:          <span class="s">"vine"</span>,
+          <span class="k">"trigger"</span>:             <span class="s">"placement"</span>,
+          <span class="k">"frequencyCapPerWeek"</span>: <span class="n">3</span>,
+          <span class="k">"dismissible"</span>:         <span class="n">true</span>
+        },
+        <span class="k">"copy"</span>: {
+          <span class="k">"en"</span>: {
+            <span class="k">"label"</span>:    <span class="s">"TrueVi · The Vine"</span>,
+            <span class="k">"headline"</span>: <span class="s">"Unlock personalized guidance"</span>,
+            <span class="k">"subhead"</span>:  <span class="s">"Free for 14 days. Ask anything. Get teachings tailored to where you are."</span>,
+            <span class="k">"ctaLabel"</span>: <span class="s">"Start free trial"</span>
+          }
+        },
+        <span class="k">"visibility"</span>: { <span class="k">"tiers"</span>: [<span class="s">"new"</span>] }      <span class="c">// audience = free users only</span>
+      }
+    }
+  ]
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2>Library compose-page · request &amp; response</h2>
+
+<h3>Renderer → Library</h3>
+<pre><code><span class="c">// POST /library/compose-page</span>
+{
+  <span class="k">"pageType"</span>:    <span class="s">"home"</span>,
+  <span class="k">"route"</span>:       <span class="s">"/"</span>,
+  <span class="k">"routeParams"</span>: {},
+
+  <span class="k">"identity"</span>: {
+    <span class="k">"userId"</span>:      <span class="s">"01919ab0-..."</span>,
+    <span class="k">"anonymousId"</span>: <span class="s">"01919ab0-..."</span>,
+    <span class="k">"sessionId"</span>:   <span class="s">"01919ab0-..."</span>,
+    <span class="k">"deviceId"</span>:    <span class="s">"01919ab0-..."</span>
+  },
+
+  <span class="k">"request"</span>: {
+    <span class="k">"timestamp"</span>:    <span class="s">"2026-05-11T20:14:00Z"</span>,
+    <span class="k">"referrer"</span>:     <span class="s">"https://www.google.com/"</span>,
+    <span class="k">"deviceClass"</span>:  <span class="s">"desktop"</span>,
+    <span class="k">"locale"</span>:       <span class="s">"en-US"</span>,
+    <span class="k">"ipGeoCountry"</span>: <span class="s">"US"</span>
+  }
+}</code></pre>
+
+<h3>Library → Renderer</h3>
+<pre><code><span class="c">// 200 OK</span>
+{
+  <span class="k">"templateId"</span>:        <span class="s">"home-v3"</span>,
+  <span class="k">"templateVersion"</span>:   <span class="s">"3.0.0"</span>,
+  <span class="k">"pageType"</span>:          <span class="s">"home"</span>,
+
+  <span class="k">"experimentAssignments"</span>: [
+    { <span class="k">"experimentId"</span>: <span class="s">"home-hero-carousel"</span>, <span class="k">"variantId"</span>: <span class="s">"variant-B"</span> }
+  ],
+
+  <span class="k">"composition"</span>: {
+    <span class="k">"slots"</span>: [
+      { <span class="k">"slotId"</span>: <span class="s">"hero"</span>,           <span class="k">"kind"</span>: <span class="s">"FIXED"</span>,   <span class="k">"instances"</span>: [ FilledInstance ] },
+      { <span class="k">"slotId"</span>: <span class="s">"dynamic-rails"</span>,  <span class="k">"kind"</span>: <span class="s">"DYNAMIC"</span>, <span class="k">"instances"</span>: [
+          FilledInstance,    <span class="c">// ContentRail · Continue Watching</span>
+          FilledInstance,    <span class="c">// ContentRail · "Because you've been exploring..."</span>
+          FilledInstance,    <span class="c">// MinistryRail · "Ministries that speak..."</span>
+          FilledInstance,    <span class="c">// ContentRail · Trending</span>
+          FilledInstance     <span class="c">// ContentRail · Short-format</span>
+      ] },
+      { <span class="k">"slotId"</span>: <span class="s">"ask-anything"</span>,   <span class="k">"kind"</span>: <span class="s">"FIXED"</span>,   <span class="k">"instances"</span>: [ FilledInstance ] },
+      { <span class="k">"slotId"</span>: <span class="s">"upgrade-teaser"</span>, <span class="k">"kind"</span>: <span class="s">"FIXED"</span>,   <span class="k">"instances"</span>: [ FilledInstance ] }
+    ]
+  },
+
+  <span class="k">"cacheKey"</span>:   <span class="s">"home:user-abc:home-v3:variant-B:..."</span>,
+  <span class="k">"ttl"</span>:        <span class="n">900</span>,
+  <span class="k">"serverTime"</span>: <span class="s">"2026-05-11T20:14:00Z"</span>,
+  <span class="k">"degraded"</span>:   <span class="n">false</span>
+}</code></pre>
+
+<!-- ============================================================ -->
+<h2>Template variants</h2>
+
+<p>Multiple Home templates exist. The Library selects per user (M1.1 §8).</p>
+
+<table>
+  <thead><tr><th>Template ID</th><th>When selected</th><th>How it differs from <code>home-v3</code></th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>home-v3</code></td>
+      <td>Default · all returning users</td>
+      <td>Baseline. Carousel hero + 3-10 dynamic rails + Ask Anything + upgrade teaser.</td>
+    </tr>
+    <tr>
+      <td><code>home-discovery-v1</code></td>
+      <td>visitorType == first-visit</td>
+      <td>Hero-Video with explainer instead of carousel. MinistryRail prioritized in dynamic slot. Larger Ask Anything block. No upgrade teaser.</td>
+    </tr>
+    <tr>
+      <td><code>home-power-v2</code></td>
+      <td>visitorType == power AND sessionCount > 30</td>
+      <td>Smaller hero (saves vertical space). More rails (up to 12). Compact card density.</td>
+    </tr>
+    <tr>
+      <td><code>home-plus-v1</code></td>
+      <td>tier == plus</td>
+      <td>Premium framing in hero copy. No upgrade teaser. Adds a ScriptureBlock between rails. Larger Ask Anything.</td>
+    </tr>
+    <tr>
+      <td><code>home-v3-carousel</code></td>
+      <td>Experiment variant for <code>home-hero-carousel</code></td>
+      <td>Same as v3 but the carousel auto-plays slower (10s vs 7s) and includes 7 slides instead of 5.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Cold-start behavior</h2>
+
+<p>
+  First-visit users have zero behavioral signals. Library still produces a
+  useful page:
+</p>
+
+<ul>
+  <li><strong>Template selection</strong>: <code>home-discovery-v1</code> is chosen via the first-visit selector rule (M2.2).</li>
+  <li><strong>Hero</strong>: shows editorial-curated featured content + a framing tagline.</li>
+  <li><strong>Dynamic rails</strong>: Library returns ministry-led exploration rails — "Discover ministries," "Most-watched this month," "Where to begin." No personalization yet; trending and editorial only.</li>
+  <li><strong>Ask Anything</strong>: suggestion chips show "popular questions this week" instead of personalized.</li>
+  <li><strong>Upgrade teaser</strong>: hidden — too early to push.</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2>Responsive behavior</h2>
+
+<table>
+  <thead><tr><th>Slot</th><th>Desktop</th><th>Tablet</th><th>Mobile</th></tr></thead>
+  <tbody>
+    <tr><td>Hero</td><td>240px tall, horizontal carousel</td><td>200px tall, horizontal carousel</td><td>180px tall, swipeable</td></tr>
+    <tr><td>ContentRail</td><td>5-6 cards visible, horizontal scroll</td><td>3-4 cards visible</td><td>1.5 cards visible, swipe</td></tr>
+    <tr><td>MinistryRail</td><td>3-4 cards visible</td><td>2-3 cards visible</td><td>1.2 cards visible</td></tr>
+    <tr><td>AskAnything</td><td>Full-width hero-card</td><td>Full-width hero-card</td><td>Sticky-bottom variant auto-swap on small screens</td></tr>
+    <tr><td>UpgradeTeaser</td><td>Horizontal flex</td><td>Horizontal flex</td><td>Stacked vertical</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<h2>Edge cases &amp; fallbacks</h2>
+
+<table>
+  <thead><tr><th>Situation</th><th>Behavior</th></tr></thead>
+  <tbody>
+    <tr><td>Library returns 0 instances for dynamic-rails</td><td>Renderer shows editorial default: "Discover what TrueVi has to offer" CTA + 3 trending rails fetched server-side</td></tr>
+    <tr><td>Hero personalization low-confidence</td><td>Hero falls back to trending featured content (component-level <code>fallback: "trending"</code>)</td></tr>
+    <tr><td>Same content appears in multiple rails</td><td>Library de-dupes at page level — highest-priority rail wins (M1.1 §13)</td></tr>
+    <tr><td>UpgradeTeaser frequency cap hit</td><td>Slot renders empty; renderer collapses vertical space</td></tr>
+    <tr><td>Library 503 DEGRADED</td><td>Renderer shows cached previous composition if within TTL; otherwise editorial baseline</td></tr>
+  </tbody>
+</table>
+
+<hr/>
+<div class="navlinks">
+  <a href="07-component-library.html">← M3.1 · Component Library</a>
+  <a href="09-template-search.html">M3.3 · Search Template →</a>
+</div>
+
+</div>
+</body>
+</html>
